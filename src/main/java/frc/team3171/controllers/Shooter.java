@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Relay.Direction;
 import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
@@ -74,7 +75,8 @@ public class Shooter implements RobotProperties {
         pickupMotor.setInverted(pickupInverted);
 
         // Init the shooter brake
-        shooterBrake = new DoublePistonController(pcmCANID, shooterBrakeForwardChannel, shooterBrakeReverseChannel,
+        shooterBrake = new DoublePistonController(pcmCANID, PneumaticsModuleType.CTREPCM, shooterBrakeForwardChannel,
+                shooterBrakeReverseChannel,
                 shooterBrakeInverted);
 
         // Initialize the executor service for concurrency
@@ -270,7 +272,6 @@ public class Shooter implements RobotProperties {
         return (upperShooterMotor.getSelectedSensorVelocity() / 2048.0) * 600;
     }
 
-
     /**
      * Returns the target velocity of the lower shooter motor in RPM, converted from
      * Units per 100ms.
@@ -340,7 +341,7 @@ public class Shooter implements RobotProperties {
                     try {
                         final double endTime = Timer.getFPGATimestamp() + runTime;
                         while (Timer.getFPGATimestamp() <= endTime) {
-                            if (DriverStation.getInstance().isDisabled()) {
+                            if (DriverStation.isDisabled()) {
                                 break;
                             }
                             setFeederSpeed(speed);

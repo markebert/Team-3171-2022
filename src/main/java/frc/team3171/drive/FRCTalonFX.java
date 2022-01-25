@@ -1,19 +1,19 @@
 package frc.team3171.drive;
 
 // FRC Imports
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;;
 
 /**
- * Encapsulates the {@link TalonFX} to comply with the {@link SpeedController}
+ * Encapsulates the {@link TalonFX} to comply with the {@link MotorController}
  * to interface so that it can function within FRC designed drive trains.
  * 
  * @author Mark Ebert
  */
-public class FRCTalonFX extends TalonFX implements SpeedController {
+public class FRCTalonFX extends TalonFX implements MotorController {
 
     /**
      * Constructor
@@ -22,11 +22,6 @@ public class FRCTalonFX extends TalonFX implements SpeedController {
      */
     public FRCTalonFX(int deviceNumber) {
         super(deviceNumber);
-    }
-
-    @Override
-    public void pidWrite(double output) {
-        set(ControlMode.PercentOutput, output);
     }
 
     @Override

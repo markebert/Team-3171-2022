@@ -46,58 +46,58 @@ public class LightingController {
             while (true) {
                 try {
                     switch (selectedPattern) {
-                    case Color_From_Center:
-                        colorFromCenter(primaryColor);
-                        colorFromCenter(secondaryColor);
-                        break;
-                    case Color_From_Edges:
-                        colorFromEdges(primaryColor);
-                        colorFromEdges(secondaryColor);
-                        break;
-                    case Color_From_Start:
-                        colorFromStart(primaryColor);
-                        colorFromStart(secondaryColor);
-                        break;
-                    case Color_From_End:
-                        colorFromEnd(primaryColor);
-                        colorFromEnd(secondaryColor);
-                        break;
-                    case Snake_From_Center:
-                        snakeFromCenter(primaryColor, secondaryColor);
-                        snakeFromCenter(secondaryColor, primaryColor);
-                        break;
-                    case Snake_From_Edges:
-                        snakeFromEdges(primaryColor, secondaryColor);
-                        snakeFromEdges(secondaryColor, primaryColor);
-                        break;
-                    case Snake_From_Start:
-                        snakeFromStart(primaryColor, secondaryColor);
-                        snakeFromStart(secondaryColor, primaryColor);
-                        break;
-                    case Snake_From_End:
-                        snakeFromEnd(primaryColor, secondaryColor);
-                        snakeFromEnd(secondaryColor, primaryColor);
-                        break;
-                    case Running_Lights_From_Center:
-                        runningLightsFromCenter(primaryColor);
-                        break;
-                    case Running_Lights_From_Edges:
-                        runningLightsFromEdges(primaryColor);
-                        break;
-                    case Running_Lights_From_Start:
-                        runningLightsFromStart(primaryColor);
-                        break;
-                    case Running_Lights_From_End:
-                        runningLightsFromEnd(primaryColor);
-                        break;
-                    case Static_Color:
-                        staticColor(primaryColor);
-                        break;
-                    case Off:
-                    default:
-                        // Set strip to off
-                        staticColor(Color.kBlack);
-                        break;
+                        case Color_From_Center:
+                            colorFromCenter(primaryColor);
+                            colorFromCenter(secondaryColor);
+                            break;
+                        case Color_From_Edges:
+                            colorFromEdges(primaryColor);
+                            colorFromEdges(secondaryColor);
+                            break;
+                        case Color_From_Start:
+                            colorFromStart(primaryColor);
+                            colorFromStart(secondaryColor);
+                            break;
+                        case Color_From_End:
+                            colorFromEnd(primaryColor);
+                            colorFromEnd(secondaryColor);
+                            break;
+                        case Snake_From_Center:
+                            snakeFromCenter(primaryColor, secondaryColor);
+                            snakeFromCenter(secondaryColor, primaryColor);
+                            break;
+                        case Snake_From_Edges:
+                            snakeFromEdges(primaryColor, secondaryColor);
+                            snakeFromEdges(secondaryColor, primaryColor);
+                            break;
+                        case Snake_From_Start:
+                            snakeFromStart(primaryColor, secondaryColor);
+                            snakeFromStart(secondaryColor, primaryColor);
+                            break;
+                        case Snake_From_End:
+                            snakeFromEnd(primaryColor, secondaryColor);
+                            snakeFromEnd(secondaryColor, primaryColor);
+                            break;
+                        case Running_Lights_From_Center:
+                            runningLightsFromCenter(primaryColor);
+                            break;
+                        case Running_Lights_From_Edges:
+                            runningLightsFromEdges(primaryColor);
+                            break;
+                        case Running_Lights_From_Start:
+                            runningLightsFromStart(primaryColor);
+                            break;
+                        case Running_Lights_From_End:
+                            runningLightsFromEnd(primaryColor);
+                            break;
+                        case Static_Color:
+                            staticColor(primaryColor);
+                            break;
+                        case Off:
+                        default:
+                            // Set strip to off
+                            staticColor(Color.kBlack);
+                            break;
                     }
                     patternChanged = false;
                     Timer.delay(delay);
@@ -559,17 +559,17 @@ public class LightingController {
     }
 
     public void reset() {
-        if (DriverStation.getInstance().isFMSAttached()) {
-            switch (DriverStation.getInstance().getAlliance()) {
-            case Red:
-                setPattern(Pattern.Color_From_Center, Color.kGreen, Color.kRed);
-                break;
-            case Blue:
-                setPattern(Pattern.Color_From_Center, Color.kGreen, Color.kBlue);
-                break;
-            default:
-                setPattern(Pattern.Static_Color, Color.kGreen, Color.kGreen);
-                break;
+        if (DriverStation.isFMSAttached()) {
+            switch (DriverStation.getAlliance()) {
+                case Red:
+                    setPattern(Pattern.Color_From_Center, Color.kGreen, Color.kRed);
+                    break;
+                case Blue:
+                    setPattern(Pattern.Color_From_Center, Color.kGreen, Color.kBlue);
+                    break;
+                default:
+                    setPattern(Pattern.Static_Color, Color.kGreen, Color.kGreen);
+                    break;
             }
         } else {
             setPattern(Pattern.Static_Color, Color.kGreen, Color.kGreen);

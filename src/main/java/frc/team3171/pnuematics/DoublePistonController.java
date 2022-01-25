@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 // FRC Imports
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
@@ -52,14 +53,17 @@ public class DoublePistonController {
      * Constructor
      * 
      * @param pcmCANID       The CAN ID of the PCM.
+     * @param moduleType     The type of pneumatic control module being used, either
+     *                       CTRE or REV.
      * @param forwardChannel The forward channel on the module to control (0-7).
      * @param reverseChannel The reverse channel on the module to control (0-7).
      * @param inverted       Whether or not the {@linkplain DoublePistonController}
      *                       needs to be inverted.
      */
-    public DoublePistonController(final int pcmCANID, final int forwardChannel, final int reverseChannel,
+    public DoublePistonController(final int pcmCANID, final PneumaticsModuleType moduleType,
+            final int forwardChannel, final int reverseChannel,
             final boolean inverted) {
-        this(new DoubleSolenoid(pcmCANID, forwardChannel, reverseChannel), inverted);
+        this(new DoubleSolenoid(pcmCANID, moduleType, forwardChannel, reverseChannel), inverted);
     }
 
     /**
@@ -137,7 +141,7 @@ public class DoublePistonController {
                     try {
                         final double endTime = Timer.getFPGATimestamp() + duration;
                         while (Timer.getFPGATimestamp() <= endTime) {
-                            if (DriverStation.getInstance().isDisabled()) {
+                            if (DriverStation.isDisabled()) {
                                 break;
                             }
                             extend();
@@ -169,7 +173,7 @@ public class DoublePistonController {
                     try {
                         final double endTime = Timer.getFPGATimestamp() + duration;
                         while (Timer.getFPGATimestamp() <= endTime) {
-                            if (DriverStation.getInstance().isDisabled()) {
+                            if (DriverStation.isDisabled()) {
                                 break;
                             }
                             retract();
