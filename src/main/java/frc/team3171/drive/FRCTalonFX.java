@@ -9,7 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;;
 
 /**
  * Encapsulates the {@link TalonFX} to comply with the {@link MotorController}
- * to interface so that it can function within FRC designed drive trains.
+ * interface so that it can function within FRC designed drive trains.
  * 
  * @author Mark Ebert
  */
