@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;;
 
 /**
@@ -22,6 +23,8 @@ public class FRCTalonFX extends TalonFX implements MotorController {
      */
     public FRCTalonFX(int deviceNumber) {
         super(deviceNumber);
+        configFactoryDefault();
+        configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 20);
     }
 
     @Override
@@ -42,6 +45,28 @@ public class FRCTalonFX extends TalonFX implements MotorController {
     @Override
     public void stopMotor() {
         set(ControlMode.Disabled, 0);
+    }
+
+    /**
+     * Returns the raw value of the {@link TalonFX} integrated encoder. The encoder
+     * has 2048 ticks per revolution.
+     * 
+     * @return The raw value of the {@link TalonFX} integrated encoder.
+     */
+    public int getEncoderValue() {
+        return (int) getSelectedSensorPosition();
+    }
+
+    /**
+     * Returns the velocity of the {@link TalonFX} integrated encoder. The encoder
+     * has 2048 ticks per revolution and the return units of the velocity is in
+     * ticks per 100ms.
+     * 
+     * @return The velocity, in ticks per 100ms, of the {@link TalonFX} integrated
+     *         encoder.
+     */
+    public int getEncoderVelocity() {
+        return (int) getSelectedSensorVelocity();
     }
 
 }
