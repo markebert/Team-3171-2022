@@ -74,6 +74,57 @@ public class GenericMotorGroup implements MotorGroup {
     }
 
     /**
+     * Constructor
+     * 
+     * @param inverted         Whether or not the direction of the motors in the
+     *                         {@link MotorController} need to be inverted.
+     * @param motorController  The first {@link MotorController} to be used in
+     *                         the {@link MotorGroup}.
+     * @param motorControllers The rest of the {@link MotorController} to be used in
+     *                         the {@link MotorGroup}.
+     * @throws Exception Throws a new exception if there are an invalid amount of
+     *                   motors.
+     */
+    public GenericMotorGroup(final boolean inverted, final MotorType motorType,
+            final int... motorControllers) throws Exception {
+        if (motorControllers.length < 2) {
+            throw new Exception("Invalid amount of motors provided!! At least two motors are needed.");
+        }
+
+        slaveMotors = new MotorController[motorControllers.length - 1];
+
+        // Sets whether or not to enable slave motors using following support
+        this.motorType = motorType;
+        switch (motorType) {
+            case TalonFX:
+                // Init the master motor
+                masterMotor = new FRCTalonFX(motorControllers[0]);
+                masterMotor.setInverted(inverted);
+                for (int i = 0; i < motorControllers.length - 1; i++) {
+                    slaveMotors[i] = new FRCTalonFX(motorControllers[i + 1]);
+                    ((BaseMotorController) slaveMotors[i]).follow((BaseMotorController) masterMotor);
+                    ((BaseMotorController) slaveMotors[i]).setInverted(InvertType.FollowMaster);
+                }
+                followSupport = true;
+                break;
+            case TalonSRX:
+                // Init the master motor
+                masterMotor = new FRCTalonSRX(motorControllers[0]);
+                masterMotor.setInverted(inverted);
+                for (int i = 0; i < motorControllers.length - 1; i++) {
+                    slaveMotors[i] = new FRCTalonSRX(motorControllers[i + 1]);
+                    ((BaseMotorController) slaveMotors[i]).follow((BaseMotorController) masterMotor);
+                    ((BaseMotorController) slaveMotors[i]).setInverted(InvertType.FollowMaster);
+                }
+                followSupport = true;
+                break;
+            default:
+                followSupport = false;
+                throw new Exception("Invalid type of motor provided to the motor group!");
+        }
+    }
+
+    /**
      * Sets all of the {@link TalonFX} motors in the {@linkplain TalonFXMotorGroup}
      * to the desired speed.
      * 
