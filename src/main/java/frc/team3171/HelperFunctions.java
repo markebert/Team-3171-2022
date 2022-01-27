@@ -16,11 +16,7 @@ public class HelperFunctions {
 	 */
 	public static double Deadzone(double deadzoneRange, final double currentValue) {
 		deadzoneRange = Math.abs(deadzoneRange);
-		if (currentValue <= -deadzoneRange || currentValue >= deadzoneRange) {
-			return currentValue;
-		} else {
-			return 0;
-		}
+		return (currentValue <= -deadzoneRange || currentValue >= deadzoneRange ? currentValue : 0);
 	}
 
 	/**
@@ -102,12 +98,7 @@ public class HelperFunctions {
 	 */
 	public static double Normalize_Gryo_Value(final double gyroValue) {
 		final double gyroAngle = gyroValue % 360;
-		if (gyroAngle > 180) {
-			return gyroAngle - 360;
-		} else if (gyroAngle < -180) {
-			return gyroAngle + 360;
-		}
-		return gyroAngle;
+		return (gyroAngle < -180 ? gyroAngle + 360 : gyroAngle > 180 ? gyroAngle - 360 : gyroAngle);
 	}
 
 	/**
@@ -123,12 +114,7 @@ public class HelperFunctions {
 	 */
 	public static double Get_Gyro_Displacement(final double currentValue, final double desiredValue) {
 		final double displacement = Normalize_Gryo_Value(desiredValue) - Normalize_Gryo_Value(currentValue);
-		if (displacement < -180) {
-			return displacement + 360;
-		} else if (displacement > 180) {
-			return displacement - 360;
-		}
-		return displacement;
+		return (displacement < -180 ? displacement + 360 : displacement > 180 ? displacement - 360 : displacement);
 	}
 
 }

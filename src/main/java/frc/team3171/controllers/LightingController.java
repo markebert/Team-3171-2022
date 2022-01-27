@@ -131,13 +131,7 @@ public class LightingController {
     }
 
     public void setDelay(final double delay) {
-        if (delay > .25) {
-            this.delay = .25;
-        } else if (delay < .01) {
-            this.delay = .01;
-        } else {
-            this.delay = delay;
-        }
+        this.delay = (delay > .25 ? .25 : (delay < .01 ? .01 : delay));
     }
 
     private void colorFromCenter(final Color color) {
