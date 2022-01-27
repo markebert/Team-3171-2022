@@ -73,7 +73,7 @@ public interface RobotProperties {
     /**
      * ShooterShield CAN IDs
      * 
-     * @param shieldCANID An int represtenting the CAN ID of the 
+     * @param shieldCANID An int represtenting the CAN ID of the
      *                    {@linkplain CANSparkMax} that spins the deflector.
      */
     public static final int shieldCANID = 13;
@@ -141,5 +141,10 @@ public interface RobotProperties {
     public static final int shooter_kPIDLoopIndex = 0, shooter_kTimeoutMs = 20;
     public static final double shooter_kP = .01, shooter_kI = .0002, shooter_kD = .0001, shooter_kF = 0;
     // shooter_kF = 1.0 / (6380 / 600);
+
+    public static final String[] autonOptions = {
+            "Auton 1",
+            "Auton 2"
+    };
 
 }

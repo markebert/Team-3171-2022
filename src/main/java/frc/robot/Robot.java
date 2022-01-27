@@ -4,7 +4,6 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project. */
 /*----------------------------------------------------------------------------*/
-
 package frc.robot;
 
 // Java Imports
@@ -45,13 +44,13 @@ public class Robot extends TimedRobot implements RobotProperties {
   // Auton Mode Constants
   private static final String kDefaultAuton = "Disabled";
   private static final String kHardcodedAuton = "Hardcoded Auton";
-  private static final String kRecordAutonOne = "Record Auton 1";
-  private static final String kPlaybackAutonOne = "Playback Auton 1";
 
   // Selected Auton String
+  private boolean selectedAutonType;
   private String selectedAutonMode;
 
   // Auton Chooser
+  private SendableChooser<Boolean> recordAutonChooser;
   private SendableChooser<String> autonChooser;
 
   // Joysticks
@@ -76,13 +75,19 @@ public class Robot extends TimedRobot implements RobotProperties {
     playbackData = null;
     saveNewAuton = false;
 
+    //
+    recordAutonChooser = new SendableChooser<>();
+    recordAutonChooser.setDefaultOption("Playback Auton", false);
+    recordAutonChooser.addOption("Record Auton", true);
+    SmartDashboard.putData("Auton Type:", recordAutonChooser);
+
     // Auton Modes init
     autonChooser = new SendableChooser<>();
     autonChooser.setDefaultOption(kDefaultAuton, kDefaultAuton);
     autonChooser.addOption(kHardcodedAuton, kHardcodedAuton);
-    autonChooser.addOption(kRecordAutonOne, kRecordAutonOne);
-    autonChooser.addOption(kPlaybackAutonOne, kPlaybackAutonOne);
-
+    for (final String autonMode : autonOptions) {
+      autonChooser.addOption(autonMode, autonMode);
+    }
     SmartDashboard.putData("Auton Modes:", autonChooser);
 
     // Joystick init
@@ -127,17 +132,23 @@ public class Robot extends TimedRobot implements RobotProperties {
     driveController.setDriveDirectionFlipped(false);
 
     // Update Auton Selected Mode and load the auton
+    selectedAutonType = recordAutonChooser.getSelected();
     selectedAutonMode = autonChooser.getSelected();
-    switch (selectedAutonMode) {
-      case kPlaybackAutonOne:
-        AutonRecorder.loadFromFile(autonPlaybackQueue, kPlaybackAutonOne);
-        playbackData = autonPlaybackQueue.poll();
-        break;
-      case kHardcodedAuton:
-        // HardcodedAutons.Auton_Init();
-      default:
-        playbackData = null;
-        break;
+    if (selectedAutonType) {
+      playbackData = null;
+    } else {
+      switch (selectedAutonMode) {
+        case kHardcodedAuton:
+          // HardcodedAutons.Auton_Init();
+          break;
+        case kDefaultAuton:
+          playbackData = null;
+          break;
+        default:
+          AutonRecorder.loadFromFile(autonPlaybackQueue, selectedAutonMode);
+          playbackData = autonPlaybackQueue.poll();
+          break;
+      }
     }
 
     // Update the autonStartTime
@@ -154,8 +165,14 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     switch (selectedAutonMode) {
-      case kPlaybackAutonOne:
-        // Plays the recorded auton if theres a valid next step, otherwise disables
+      case kHardcodedAuton:
+        // HardcodedAutons.Auton_Center(driveController, gyro, gyroPIDController,
+        // shooterController);
+        break;
+      case kDefaultAuton:
+        disabledPeriodic();
+        break;
+      default: // Plays the recorded auton if theres a valid next step, otherwise disables
         if (playbackData != null) {
           // Get the latest joystick values and calculate their deadzones
           final double leftStickY = playbackData.getLeftY();
@@ -171,15 +188,6 @@ public class Robot extends TimedRobot implements RobotProperties {
           disabledInit();
           selectedAutonMode = kDefaultAuton;
         }
-        break;
-      case kHardcodedAuton:
-        // HardcodedAutons.Auton_Center(driveController, gyro, gyroPIDController,
-        // shooterController);
-        break;
-      case kRecordAutonOne:
-      case kDefaultAuton:
-      default:
-        // Do Nothing
         break;
     }
 
@@ -197,9 +205,10 @@ public class Robot extends TimedRobot implements RobotProperties {
     driveController.setDriveDirectionFlipped(false);
 
     // Update Auton Selected Mode and reset the data recorder
+    selectedAutonType = recordAutonChooser.getSelected();
     selectedAutonMode = autonChooser.getSelected();
     autonRecorder.clear();
-    saveNewAuton = false;
+    saveNewAuton = selectedAutonType;
 
     // Update the autonStartTime
     autonStartTime = Timer.getFPGATimestamp();
@@ -219,23 +228,25 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX());
 
     // Auton Recording
-    switch (selectedAutonMode) {
-      case kRecordAutonOne:
-        final double autonFPGATimestamp = Timer.getFPGATimestamp() - autonStartTime;
-        saveNewAuton = true;
-        // Crate new auton data packet and record the data
-        final AutonRecorderData newData = new AutonRecorderData();
-        newData.setFPGATimestamp(autonFPGATimestamp);
+    if (saveNewAuton) {
+      switch (selectedAutonMode) {
+        case kHardcodedAuton:
+        case kDefaultAuton:
+          // Do Nothing
+          break;
+        default:
+          final double autonFPGATimestamp = Timer.getFPGATimestamp() - autonStartTime;
 
-        newData.setLeftY(leftStickY);
-        newData.setRightX(rightStickX);
+          // Create new auton data packet and record the data
+          final AutonRecorderData newData = new AutonRecorderData();
+          newData.setFPGATimestamp(autonFPGATimestamp);
+          newData.setLeftY(leftStickY);
+          newData.setRightX(rightStickX);
 
-        // Adds the recorded data to the auton recorder, but only if the data is new
-        autonRecorder.addNewData(newData);
-        break;
-      default:
-        // Do Nothing
-        break;
+          // Adds the recorded data to the auton recorder, but only if the data is new
+          autonRecorder.addNewData(newData);
+          break;
+      }
     }
 
     driveController.mecanumTraction(-leftStickY, rightStickX);
@@ -257,11 +268,12 @@ public class Robot extends TimedRobot implements RobotProperties {
       saveNewAuton = false;
       // Once auton recording is done, save the data to a file, if there is any
       switch (selectedAutonMode) {
-        case kRecordAutonOne:
-          autonRecorder.saveToFile(kPlaybackAutonOne);
+        case kHardcodedAuton:
+        case kDefaultAuton:
+          // Do Nothing
           break;
         default:
-          // Do Nothing
+          autonRecorder.saveToFile(selectedAutonMode);
           break;
       }
     }
