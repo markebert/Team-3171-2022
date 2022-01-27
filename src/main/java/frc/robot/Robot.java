@@ -76,12 +76,14 @@ public class Robot extends TimedRobot implements RobotProperties {
     saveNewAuton = false;
 
     // Auton Type init
+    selectedAutonType = false;
     autonTypeChooser = new SendableChooser<>();
     autonTypeChooser.setDefaultOption("Playback Auton", false);
     autonTypeChooser.addOption("Record Auton", true);
     SmartDashboard.putData("Auton Type:", autonTypeChooser);
 
     // Auton Modes init
+    selectedAutonMode = kDefaultAuton;
     autonModeChooser = new SendableChooser<>();
     autonModeChooser.setDefaultOption(kDefaultAuton, kDefaultAuton);
     autonModeChooser.addOption(kHardcodedAuton, kHardcodedAuton);
