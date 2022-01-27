@@ -50,8 +50,8 @@ public class Robot extends TimedRobot implements RobotProperties {
   private String selectedAutonMode;
 
   // Auton Chooser
-  private SendableChooser<Boolean> recordAutonChooser;
-  private SendableChooser<String> autonChooser;
+  private SendableChooser<Boolean> autonTypeChooser;
+  private SendableChooser<String> autonModeChooser;
 
   // Joysticks
   private Joystick leftStick, rightStick;
@@ -76,19 +76,19 @@ public class Robot extends TimedRobot implements RobotProperties {
     saveNewAuton = false;
 
     // Auton Type init
-    recordAutonChooser = new SendableChooser<>();
-    recordAutonChooser.setDefaultOption("Playback Auton", false);
-    recordAutonChooser.addOption("Record Auton", true);
-    SmartDashboard.putData("Auton Type:", recordAutonChooser);
+    autonTypeChooser = new SendableChooser<>();
+    autonTypeChooser.setDefaultOption("Playback Auton", false);
+    autonTypeChooser.addOption("Record Auton", true);
+    SmartDashboard.putData("Auton Type:", autonTypeChooser);
 
     // Auton Modes init
-    autonChooser = new SendableChooser<>();
-    autonChooser.setDefaultOption(kDefaultAuton, kDefaultAuton);
-    autonChooser.addOption(kHardcodedAuton, kHardcodedAuton);
+    autonModeChooser = new SendableChooser<>();
+    autonModeChooser.setDefaultOption(kDefaultAuton, kDefaultAuton);
+    autonModeChooser.addOption(kHardcodedAuton, kHardcodedAuton);
     for (final String autonMode : autonOptions) {
-      autonChooser.addOption(autonMode, autonMode);
+      autonModeChooser.addOption(autonMode, autonMode);
     }
-    SmartDashboard.putData("Auton Modes:", autonChooser);
+    SmartDashboard.putData("Auton Modes:", autonModeChooser);
 
     // Joystick init
     leftStick = new Joystick(0);
@@ -132,8 +132,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     driveController.setDriveDirectionFlipped(false);
 
     // Update Auton Selected Mode and load the auton
-    selectedAutonType = recordAutonChooser.getSelected();
-    selectedAutonMode = autonChooser.getSelected();
+    selectedAutonType = autonTypeChooser.getSelected();
+    selectedAutonMode = autonModeChooser.getSelected();
     if (selectedAutonType) {
       playbackData = null;
     } else {
@@ -206,8 +206,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     driveController.setDriveDirectionFlipped(false);
 
     // Update Auton Selected Mode and reset the data recorder
-    selectedAutonType = recordAutonChooser.getSelected();
-    selectedAutonMode = autonChooser.getSelected();
+    selectedAutonType = autonTypeChooser.getSelected();
+    selectedAutonMode = autonModeChooser.getSelected();
     autonRecorder.clear();
     saveNewAuton = selectedAutonType;
 
