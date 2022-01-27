@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 // Team 3171 Imports
 import frc.team3171.auton.AutonRecorder;
 import frc.team3171.auton.AutonRecorderData;
-import frc.team3171.auton.HardcodedAutons;
+//import frc.team3171.auton.HardcodedAutons;
 import static frc.team3171.HelperFunctions.Deadzone_With_Map;
 import frc.team3171.drive.GenericMotorGroup;
 import frc.team3171.drive.TractionDrive;
@@ -134,7 +134,7 @@ public class Robot extends TimedRobot implements RobotProperties {
         playbackData = autonPlaybackQueue.poll();
         break;
       case kHardcodedAuton:
-        HardcodedAutons.Auton_Init();
+        //HardcodedAutons.Auton_Init();
       default:
         playbackData = null;
         break;
