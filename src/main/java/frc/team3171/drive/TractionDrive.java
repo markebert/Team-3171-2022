@@ -6,7 +6,7 @@ package frc.team3171.drive;
 public class TractionDrive {
 
 	// Motor Groups
-	private final MotorGroup leftMotorGroup, rightMotorGroup;
+	private final UniversalMotorGroup leftMotorGroup, rightMotorGroup;
 
 	// Drive Direction
 	private volatile boolean driveDirectionFlipped;
@@ -21,7 +21,8 @@ public class TractionDrive {
 	 * @param inverted        Whether or not the direction of the drive train needs
 	 *                        to be inverted.
 	 */
-	public TractionDrive(final MotorGroup leftMotorGroup, final MotorGroup rightMotorGroup, final boolean inverted) {
+	public TractionDrive(final UniversalMotorGroup leftMotorGroup, final UniversalMotorGroup rightMotorGroup,
+			final boolean inverted) {
 		leftMotorGroup.setInverted(inverted);
 		rightMotorGroup.setInverted(!inverted);
 		this.leftMotorGroup = leftMotorGroup;
@@ -37,7 +38,7 @@ public class TractionDrive {
 	 * @param rightMotorGroup A {@link MotorGroup} containing all of the motors used
 	 *                        for the right side of the drive train.
 	 */
-	public TractionDrive(final MotorGroup leftMotorGroup, final MotorGroup rightMotorGroup) {
+	public TractionDrive(final UniversalMotorGroup leftMotorGroup, final UniversalMotorGroup rightMotorGroup) {
 		this(leftMotorGroup, rightMotorGroup, false);
 	}
 
@@ -82,7 +83,7 @@ public class TractionDrive {
 	 * 
 	 * @param flipped Whether ot not to flip the drive direction of the robot.
 	 */
-	public void setDriveDirectionFlipped(final boolean flipped) {
+	public synchronized void setDriveDirectionFlipped(final boolean flipped) {
 		driveDirectionFlipped = flipped;
 	}
 
@@ -90,7 +91,7 @@ public class TractionDrive {
 	 * Toggles whether or not the drive direction of the robot is flipped.
 	 */
 	public void toggleDriveDirectionFlipped() {
-		driveDirectionFlipped = !driveDirectionFlipped;
+		setDriveDirectionFlipped(!driveDirectionFlipped);
 	}
 
 	/**

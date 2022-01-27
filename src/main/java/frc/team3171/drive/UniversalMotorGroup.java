@@ -10,8 +10,9 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 /**
  * @author Mark Ebert
  */
-public class UniversalMotorGroup implements MotorGroup {
+public class UniversalMotorGroup {
 
+    // Supported motor types
     public enum MotorType {
         TalonFX, TalonSRX, VictorSPX, VictorSP
     }
@@ -30,9 +31,9 @@ public class UniversalMotorGroup implements MotorGroup {
      * @param inverted         Whether or not the direction of the motors in the
      *                         {@link MotorController} need to be inverted.
      * @param motorController  The first {@link MotorController} to be used in
-     *                         the {@link MotorGroup}.
+     *                         the {@link UniversalMotorGroup}.
      * @param motorControllers The rest of the {@link MotorController} to be used in
-     *                         the {@link MotorGroup}.
+     *                         the {@link UniversalMotorGroup}.
      * @throws Exception Throws a new exception if there are an invalid amount of
      *                   motors.
      */
@@ -100,9 +101,9 @@ public class UniversalMotorGroup implements MotorGroup {
      * @param inverted         Whether or not the direction of the motors in the
      *                         {@link MotorController} need to be inverted.
      * @param motorController  The first {@link MotorController} to be used in
-     *                         the {@link MotorGroup}.
+     *                         the {@link UniversalMotorGroup}.
      * @param motorControllers The rest of the {@link MotorController} to be used in
-     *                         the {@link MotorGroup}.
+     *                         the {@link UniversalMotorGroup}.
      * @throws Exception Throws a new exception if there are an invalid amount of
      *                   motors.
      */
@@ -173,7 +174,6 @@ public class UniversalMotorGroup implements MotorGroup {
      * @param speed The speed, from -1.0 to 1.0, to set the {@linkplain TalonFX}
      *              motors to.
      */
-    @Override
     public void set(final double speed) {
         /*
          * Sets the speed of the master TalonFX, and therefore it's followers, to the
@@ -194,7 +194,6 @@ public class UniversalMotorGroup implements MotorGroup {
      * @param inverted Whether or not the direction of the {@link TalonFX} motors
      *                 need to be inverted.
      */
-    @Override
     public void setInverted(final boolean inverted) {
         /*
          * Sets whether or not the direction of the master TalonFX, and therefore it's
@@ -214,7 +213,6 @@ public class UniversalMotorGroup implements MotorGroup {
      * 
      * @return True, if the motors are inverted, false otherwise.
      */
-    @Override
     public boolean getInverted() {
         /*
          * Gets whether or not the direction of the master TalonFX, and therefore it's
@@ -268,7 +266,6 @@ public class UniversalMotorGroup implements MotorGroup {
      * Disables all of the {@link TalonFX} motors in the
      * {@linkplain TalonFXMotorGroup}.
      */
-    @Override
     public void disable() {
         /*
          * Sets the speed of the master TalonFX, and therefore it's followers, to the
