@@ -91,8 +91,8 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Drive, Shooter and Climber Controller inits
     try {
-      leftMotorGroup = new UniversalMotorGroup(false, MotorType.TalonFX, leftDriveCANIDArray);
-      rightMotorGroup = new UniversalMotorGroup(false, MotorType.TalonFX, rightDriveCANIDArray);
+      leftMotorGroup = new UniversalMotorGroup(false, MotorType.TalonSRX, leftDriveCANIDArray);
+      rightMotorGroup = new UniversalMotorGroup(false, MotorType.TalonSRX, rightDriveCANIDArray);
       driveController = new TractionDrive(leftMotorGroup, rightMotorGroup);
     } catch (Exception e) {
       System.err.println(e.getMessage());
@@ -134,7 +134,7 @@ public class Robot extends TimedRobot implements RobotProperties {
         playbackData = autonPlaybackQueue.poll();
         break;
       case kHardcodedAuton:
-        //HardcodedAutons.Auton_Init();
+        // HardcodedAutons.Auton_Init();
       default:
         playbackData = null;
         break;
