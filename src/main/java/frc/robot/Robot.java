@@ -75,7 +75,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     playbackData = null;
     saveNewAuton = false;
 
-    //
+    // Auton Type init
     recordAutonChooser = new SendableChooser<>();
     recordAutonChooser.setDefaultOption("Playback Auton", false);
     recordAutonChooser.addOption("Record Auton", true);
@@ -142,6 +142,7 @@ public class Robot extends TimedRobot implements RobotProperties {
           // HardcodedAutons.Auton_Init();
           break;
         case kDefaultAuton:
+          disabledInit();
           playbackData = null;
           break;
         default:
