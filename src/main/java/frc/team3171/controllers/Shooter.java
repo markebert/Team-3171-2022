@@ -22,8 +22,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 // Team 3171 Imports
 import frc.robot.RobotProperties;
-import frc.team3171.drive.GenericMotorGroup;
-import frc.team3171.drive.GenericMotorGroup.MotorType;
+import frc.team3171.drive.UniversalMotorGroup;
+import frc.team3171.drive.UniversalMotorGroup.MotorType;
 import frc.team3171.pnuematics.DoublePistonController;
 
 /**
@@ -33,7 +33,7 @@ public class Shooter implements RobotProperties {
 
     // Motor Controllers
     private final TalonFX lowerShooterMotor, upperShooterMotor, pickupMotor;
-    private final GenericMotorGroup feederMotors;
+    private final UniversalMotorGroup feederMotors;
 
     // Relay for the targeting light
     private final Relay targetLightRelay;
@@ -61,7 +61,7 @@ public class Shooter implements RobotProperties {
         lowerShooterMotor = new TalonFX(lowerShooterCANID);
         upperShooterMotor = new TalonFX(upperShooterCANID);
         pickupMotor = new TalonFX(pickupCANID);
-        feederMotors = new GenericMotorGroup(feederInverted, MotorType.TalonSRX, 0, feederCANIDArray);
+        feederMotors = new UniversalMotorGroup(feederInverted, MotorType.TalonSRX, 0, feederCANIDArray);
         targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
 
         // Factory Default all motors to prevent unexpected behaviour

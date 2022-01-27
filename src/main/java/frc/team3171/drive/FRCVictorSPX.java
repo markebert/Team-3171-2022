@@ -5,22 +5,22 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;;
 
 /**
- * Encapsulates the {@link TalonSRX} to comply with the {@link MotorController}
+ * Encapsulates the {@link VictorSPX} to comply with the {@link MotorController}
  * interface so that it can function within FRC designed drive trains.
  * 
  * @author Mark Ebert
  */
-public class FRCTalonSRX extends TalonSRX implements MotorController {
+public class FRCVictorSPX extends VictorSPX implements MotorController {
 
     /**
      * Constructor
      * 
      * @param deviceNumber [0,62]
      */
-    public FRCTalonSRX(int deviceNumber) {
+    public FRCVictorSPX(int deviceNumber) {
         super(deviceNumber);
         configFactoryDefault();
     }

@@ -22,9 +22,9 @@ import frc.team3171.auton.AutonRecorder;
 import frc.team3171.auton.AutonRecorderData;
 //import frc.team3171.auton.HardcodedAutons;
 import static frc.team3171.HelperFunctions.Deadzone_With_Map;
-import frc.team3171.drive.GenericMotorGroup;
+import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.TractionDrive;
-import frc.team3171.drive.GenericMotorGroup.MotorType;
+import frc.team3171.drive.UniversalMotorGroup.MotorType;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -58,7 +58,7 @@ public class Robot extends TimedRobot implements RobotProperties {
   private Joystick leftStick, rightStick;
 
   // Drive Controller
-  private GenericMotorGroup leftMotorGroup, rightMotorGroup;
+  private UniversalMotorGroup leftMotorGroup, rightMotorGroup;
   private TractionDrive driveController;
 
   /**
@@ -91,8 +91,8 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Drive, Shooter and Climber Controller inits
     try {
-      leftMotorGroup = new GenericMotorGroup(false, MotorType.TalonFX, leftDriveCANIDArray);
-      rightMotorGroup = new GenericMotorGroup(false, MotorType.TalonFX, rightDriveCANIDArray);
+      leftMotorGroup = new UniversalMotorGroup(false, MotorType.TalonFX, leftDriveCANIDArray);
+      rightMotorGroup = new UniversalMotorGroup(false, MotorType.TalonFX, rightDriveCANIDArray);
       driveController = new TractionDrive(leftMotorGroup, rightMotorGroup);
     } catch (Exception e) {
       System.err.println(e.getMessage());

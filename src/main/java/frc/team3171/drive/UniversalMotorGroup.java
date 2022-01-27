@@ -2,18 +2,18 @@ package frc.team3171.drive;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
 
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.InvertType;
-import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 
 /**
  * @author Mark Ebert
  */
-public class GenericMotorGroup implements MotorGroup {
+public class UniversalMotorGroup implements MotorGroup {
 
     public enum MotorType {
-        TalonFX, TalonSRX
+        TalonFX, TalonSRX, VictorSPX, VictorSP
     }
 
     // Variables
@@ -36,7 +36,7 @@ public class GenericMotorGroup implements MotorGroup {
      * @throws Exception Throws a new exception if there are an invalid amount of
      *                   motors.
      */
-    public GenericMotorGroup(final boolean inverted, final MotorType motorType,
+    public UniversalMotorGroup(final boolean inverted, final MotorType motorType,
             final int motorController,
             final int... motorControllers) throws Exception {
 
@@ -49,10 +49,10 @@ public class GenericMotorGroup implements MotorGroup {
                 // Init the master motor
                 masterMotor = new FRCTalonFX(motorController);
                 masterMotor.setInverted(inverted);
-                for (int i = 0; i < motorControllers.length; i++) {
+                for (int i = 0; i < slaveMotors.length; i++) {
                     slaveMotors[i] = new FRCTalonFX(motorControllers[i]);
-                    ((BaseMotorController) slaveMotors[i]).follow((BaseMotorController) masterMotor);
-                    ((BaseMotorController) slaveMotors[i]).setInverted(InvertType.FollowMaster);
+                    ((FRCTalonFX) slaveMotors[i]).follow((FRCTalonFX) masterMotor);
+                    ((FRCTalonFX) slaveMotors[i]).setInverted(InvertType.FollowMaster);
                 }
                 followSupport = true;
                 break;
@@ -60,12 +60,33 @@ public class GenericMotorGroup implements MotorGroup {
                 // Init the master motor
                 masterMotor = new FRCTalonSRX(motorController);
                 masterMotor.setInverted(inverted);
-                for (int i = 0; i < motorControllers.length; i++) {
+                for (int i = 0; i < slaveMotors.length; i++) {
                     slaveMotors[i] = new FRCTalonSRX(motorControllers[i]);
-                    ((BaseMotorController) slaveMotors[i]).follow((BaseMotorController) masterMotor);
-                    ((BaseMotorController) slaveMotors[i]).setInverted(InvertType.FollowMaster);
+                    ((FRCTalonSRX) slaveMotors[i]).follow((FRCTalonSRX) masterMotor);
+                    ((FRCTalonSRX) slaveMotors[i]).setInverted(InvertType.FollowMaster);
                 }
                 followSupport = true;
+                break;
+            case VictorSPX:
+                // Init the master motor
+                masterMotor = new FRCVictorSPX(motorController);
+                masterMotor.setInverted(inverted);
+                for (int i = 0; i < slaveMotors.length; i++) {
+                    slaveMotors[i] = new FRCVictorSPX(motorControllers[i]);
+                    ((FRCVictorSPX) slaveMotors[i]).follow((FRCVictorSPX) masterMotor);
+                    ((FRCVictorSPX) slaveMotors[i]).setInverted(InvertType.FollowMaster);
+                }
+                followSupport = true;
+                break;
+            case VictorSP:
+                // Init the master motor
+                masterMotor = new VictorSP(motorController);
+                masterMotor.setInverted(inverted);
+                for (int i = 0; i < slaveMotors.length; i++) {
+                    slaveMotors[i] = new VictorSP(motorControllers[i]);
+                    ((VictorSP) slaveMotors[i]).setInverted(inverted);
+                }
+                followSupport = false;
                 break;
             default:
                 followSupport = false;
@@ -85,7 +106,7 @@ public class GenericMotorGroup implements MotorGroup {
      * @throws Exception Throws a new exception if there are an invalid amount of
      *                   motors.
      */
-    public GenericMotorGroup(final boolean inverted, final MotorType motorType,
+    public UniversalMotorGroup(final boolean inverted, final MotorType motorType,
             final int... motorControllers) throws Exception {
         if (motorControllers.length < 2) {
             throw new Exception("Invalid amount of motors provided!! At least two motors are needed.");
@@ -100,10 +121,10 @@ public class GenericMotorGroup implements MotorGroup {
                 // Init the master motor
                 masterMotor = new FRCTalonFX(motorControllers[0]);
                 masterMotor.setInverted(inverted);
-                for (int i = 0; i < motorControllers.length - 1; i++) {
+                for (int i = 0; i < slaveMotors.length; i++) {
                     slaveMotors[i] = new FRCTalonFX(motorControllers[i + 1]);
-                    ((BaseMotorController) slaveMotors[i]).follow((BaseMotorController) masterMotor);
-                    ((BaseMotorController) slaveMotors[i]).setInverted(InvertType.FollowMaster);
+                    ((FRCTalonFX) slaveMotors[i]).follow((FRCTalonFX) masterMotor);
+                    ((FRCTalonFX) slaveMotors[i]).setInverted(InvertType.FollowMaster);
                 }
                 followSupport = true;
                 break;
@@ -111,12 +132,33 @@ public class GenericMotorGroup implements MotorGroup {
                 // Init the master motor
                 masterMotor = new FRCTalonSRX(motorControllers[0]);
                 masterMotor.setInverted(inverted);
-                for (int i = 0; i < motorControllers.length - 1; i++) {
+                for (int i = 0; i < slaveMotors.length; i++) {
                     slaveMotors[i] = new FRCTalonSRX(motorControllers[i + 1]);
-                    ((BaseMotorController) slaveMotors[i]).follow((BaseMotorController) masterMotor);
-                    ((BaseMotorController) slaveMotors[i]).setInverted(InvertType.FollowMaster);
+                    ((FRCTalonSRX) slaveMotors[i]).follow((FRCTalonSRX) masterMotor);
+                    ((FRCTalonSRX) slaveMotors[i]).setInverted(InvertType.FollowMaster);
                 }
                 followSupport = true;
+                break;
+            case VictorSPX:
+                // Init the master motor
+                masterMotor = new FRCVictorSPX(motorControllers[0]);
+                masterMotor.setInverted(inverted);
+                for (int i = 0; i < slaveMotors.length; i++) {
+                    slaveMotors[i] = new FRCVictorSPX(motorControllers[i + 1]);
+                    ((FRCVictorSPX) slaveMotors[i]).follow((FRCVictorSPX) masterMotor);
+                    ((FRCVictorSPX) slaveMotors[i]).setInverted(InvertType.FollowMaster);
+                }
+                followSupport = true;
+                break;
+            case VictorSP:
+                // Init the master motor
+                masterMotor = new VictorSP(motorControllers[0]);
+                masterMotor.setInverted(inverted);
+                for (int i = 0; i < slaveMotors.length; i++) {
+                    slaveMotors[i] = new VictorSP(motorControllers[i + 1]);
+                    ((VictorSP) slaveMotors[i]).setInverted(inverted);
+                }
+                followSupport = false;
                 break;
             default:
                 followSupport = false;
@@ -182,34 +224,41 @@ public class GenericMotorGroup implements MotorGroup {
     }
 
     /**
-     * Returns the raw value of the {@link TalonFX} integrated encoder. The encoder
-     * has 2048 ticks per revolution.
+     * If the designated motor type is {@link MotorType} {@link FRCTalonFX}, then
+     * the function returns the raw value of the {@link FRCTalonFX} integrated
+     * encoder, if not then 0 is always returned. The encoder has 2048 ticks per
+     * revolution.
      * 
-     * @return The raw value of the {@link TalonFX} integrated encoder.
+     * @return The raw value of the {@link FRCTalonFX} integrated encoder.
      */
     public int getEncoderValue() {
         switch (motorType) {
             case TalonFX:
-                return (int) ((BaseMotorController) masterMotor).getSelectedSensorPosition();
+                return (int) ((FRCTalonFX) masterMotor).getSelectedSensorPosition();
             case TalonSRX:
+            case VictorSPX:
+            case VictorSP:
             default:
                 return 0;
         }
     }
 
     /**
-     * Returns the velocity of the {@link TalonFX} integrated encoder. The encoder
-     * has 2048 ticks per revolution and the return units of the velocity is in
-     * ticks per 100ms.
+     * If the designated motor type is {@link MotorType} {@link FRCTalonFX}, then
+     * the function returns the velocity of the {@link FRCTalonFX} integrated
+     * encoder, if not then 0 is always returned. The encoder has 2048 ticks per
+     * revolution and the return units of the velocity is in ticks per 100ms.
      * 
-     * @return The velocity, in ticks per 100ms, of the {@link TalonFX} integrated
-     *         encoder.
+     * @return The velocity, in ticks per 100ms, of the {@link FRCTalonFX}
+     *         integrated encoder.
      */
     public int getEncoderVelocity() {
         switch (motorType) {
             case TalonFX:
-                return (int) ((BaseMotorController) masterMotor).getSelectedSensorVelocity();
+                return (int) ((FRCTalonFX) masterMotor).getSelectedSensorVelocity();
             case TalonSRX:
+            case VictorSPX:
+            case VictorSP:
             default:
                 return 0;
         }
