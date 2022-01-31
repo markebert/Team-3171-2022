@@ -80,10 +80,7 @@ public class HelperFunctions {
 	public static boolean Within_Percent_Error(final double currentValue, final double desiredValue,
 			final double errorPercentage) {
 		final double acceptableError = Math.abs(desiredValue) * Math.abs(errorPercentage);
-		if ((currentValue >= (desiredValue - acceptableError)) && (currentValue <= (desiredValue + acceptableError))) {
-			return true;
-		}
-		return false;
+		return (currentValue >= (desiredValue - acceptableError)) && (currentValue <= (desiredValue + acceptableError));
 	}
 
 	/**
