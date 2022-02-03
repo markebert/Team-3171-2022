@@ -27,10 +27,9 @@ public interface RobotProperties {
     /**
      * Max Drive Speed
      * 
-     * @param MAX_Y_DRIVE_SPEED The maximum drive speed of the robot, from 0 to 1.0.
+     * @param MAX_DRIVE_SPEED The maximum drive speed of the robot, from 0 to 1.0.
      */
-    public static final double MAX_Y_DRIVE_SPEED = .8;
-    public static final double MAX_X_DRIVE_SPEED = .55;
+    public static final double MAX_DRIVE_SPEED = .75;
 
     /**
      * Drive Controller TalonFX CAN IDs

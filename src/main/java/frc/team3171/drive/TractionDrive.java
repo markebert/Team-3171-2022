@@ -45,17 +45,17 @@ public class TractionDrive {
 	/**
 	 * Standard Tank Traction Drive.
 	 * 
-	 * @param leftSickY   The speed value of the left motors based the left
+	 * @param leftStickY  The speed value of the left motors based the left
 	 *                    {@code Joystick} y-axis value.
 	 * @param rightStickY The speed value of the left motors based the right
 	 *                    {@code Joystick} y-axis value.
 	 */
-	public void tankTraction(final double leftSickY, final double rightStickY) {
+	public void tankTraction(final double leftStickY, final double rightStickY) {
 		if (driveDirectionFlipped) {
-			leftMotorGroup.set(-leftSickY);
+			leftMotorGroup.set(-leftStickY);
 			rightMotorGroup.set(rightStickY);
 		} else {
-			leftMotorGroup.set(leftSickY);
+			leftMotorGroup.set(leftStickY);
 			rightMotorGroup.set(-rightStickY);
 		}
 	}

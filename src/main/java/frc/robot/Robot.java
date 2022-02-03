@@ -23,7 +23,7 @@ import frc.team3171.auton.AutonRecorderData;
 import static frc.team3171.HelperFunctions.Deadzone_With_Map;
 import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.TractionDrive;
-import frc.team3171.drive.UniversalMotorGroup.MotorType;
+import frc.team3171.drive.UniversalMotorGroup.ControllerType;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -98,8 +98,8 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Drive, Shooter and Climber Controller inits
     try {
-      leftMotorGroup = new UniversalMotorGroup(false, MotorType.TalonSRX, leftDriveCANIDArray);
-      rightMotorGroup = new UniversalMotorGroup(false, MotorType.TalonSRX, rightDriveCANIDArray);
+      leftMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonSRX, leftDriveCANIDArray);
+      rightMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonSRX, rightDriveCANIDArray);
       driveController = new TractionDrive(leftMotorGroup, rightMotorGroup);
     } catch (Exception e) {
       System.err.println(e.getMessage());
@@ -227,8 +227,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Get the latest joystick values and calculate their deadzones
-    final double leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY());
-    final double rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX());
+    final double leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY() * MAX_DRIVE_SPEED);
+    final double rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX() * MAX_DRIVE_SPEED);
 
     // Auton Recording
     if (saveNewAuton) {
