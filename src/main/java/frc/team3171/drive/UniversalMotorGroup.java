@@ -2,10 +2,13 @@ package frc.team3171.drive;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
 
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.InvertType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 /**
  * @author Mark Ebert
@@ -13,13 +16,13 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 public class UniversalMotorGroup {
 
     // Supported motor types
-    public enum MotorType {
-        TalonFX, TalonSRX, VictorSPX, VictorSP
+    public enum ControllerType {
+        TalonFX, TalonSRX, VictorSPX, VictorSP, CANSparkMaxBrushed, CANSparkMaxBrushless, PWMSparkMax
     }
 
     // Variables
     private final boolean followSupport;
-    private final MotorType motorType;
+    private final ControllerType controllerType;
 
     // Motor Controllers
     private final MotorController masterMotor;
@@ -37,15 +40,15 @@ public class UniversalMotorGroup {
      * @throws Exception Throws a new exception if there are an invalid amount of
      *                   motors.
      */
-    public UniversalMotorGroup(final boolean inverted, final MotorType motorType,
+    public UniversalMotorGroup(final boolean inverted, final ControllerType controllerType,
             final int motorController,
             final int... motorControllers) throws Exception {
 
         slaveMotors = new MotorController[motorControllers.length];
 
         // Sets whether or not to enable slave motors using following support
-        this.motorType = motorType;
-        switch (motorType) {
+        this.controllerType = controllerType;
+        switch (controllerType) {
             case TalonFX:
                 // Init the master motor
                 masterMotor = new FRCTalonFX(motorController);
@@ -89,6 +92,36 @@ public class UniversalMotorGroup {
                 }
                 followSupport = false;
                 break;
+            case CANSparkMaxBrushed:
+                // Init the master motor
+                masterMotor = new CANSparkMax(motorController, MotorType.kBrushed);
+                masterMotor.setInverted(inverted);
+                for (int i = 0; i < slaveMotors.length; i++) {
+                    slaveMotors[i] = new CANSparkMax(motorControllers[i], MotorType.kBrushed);
+                    ((CANSparkMax) slaveMotors[i]).follow((CANSparkMax) masterMotor);
+                }
+                followSupport = true;
+                break;
+            case CANSparkMaxBrushless:
+                // Init the master motor
+                masterMotor = new CANSparkMax(motorController, MotorType.kBrushless);
+                masterMotor.setInverted(inverted);
+                for (int i = 0; i < slaveMotors.length; i++) {
+                    slaveMotors[i] = new CANSparkMax(motorControllers[i], MotorType.kBrushless);
+                    ((CANSparkMax) slaveMotors[i]).follow((CANSparkMax) masterMotor);
+                }
+                followSupport = true;
+                break;
+            case PWMSparkMax:
+                // Init the master motor
+                masterMotor = new PWMSparkMax(motorController);
+                masterMotor.setInverted(inverted);
+                for (int i = 0; i < slaveMotors.length; i++) {
+                    slaveMotors[i] = new PWMSparkMax(motorControllers[i]);
+                    ((PWMSparkMax) slaveMotors[i]).setInverted(inverted);
+                }
+                followSupport = false;
+                break;
             default:
                 followSupport = false;
                 throw new Exception("Invalid type of motor provided to the motor group!");
@@ -107,7 +140,7 @@ public class UniversalMotorGroup {
      * @throws Exception Throws a new exception if there are an invalid amount of
      *                   motors.
      */
-    public UniversalMotorGroup(final boolean inverted, final MotorType motorType,
+    public UniversalMotorGroup(final boolean inverted, final ControllerType motorType,
             final int... motorControllers) throws Exception {
         if (motorControllers.length < 2) {
             throw new Exception("Invalid amount of motors provided!! At least two motors are needed.");
@@ -116,7 +149,7 @@ public class UniversalMotorGroup {
         slaveMotors = new MotorController[motorControllers.length - 1];
 
         // Sets whether or not to enable slave motors using following support
-        this.motorType = motorType;
+        this.controllerType = motorType;
         switch (motorType) {
             case TalonFX:
                 // Init the master motor
@@ -222,7 +255,8 @@ public class UniversalMotorGroup {
     }
 
     /**
-     * If the designated motor type is {@link MotorType} {@link FRCTalonFX}, then
+     * If the designated motor type is {@link ControllerType} {@link FRCTalonFX},
+     * then
      * the function returns the raw value of the {@link FRCTalonFX} integrated
      * encoder, if not then 0 is always returned. The encoder has 2048 ticks per
      * revolution.
@@ -230,7 +264,7 @@ public class UniversalMotorGroup {
      * @return The raw value of the {@link FRCTalonFX} integrated encoder.
      */
     public int getEncoderValue() {
-        switch (motorType) {
+        switch (controllerType) {
             case TalonFX:
                 return (int) ((FRCTalonFX) masterMotor).getSelectedSensorPosition();
             case TalonSRX:
@@ -242,7 +276,8 @@ public class UniversalMotorGroup {
     }
 
     /**
-     * If the designated motor type is {@link MotorType} {@link FRCTalonFX}, then
+     * If the designated motor type is {@link ControllerType} {@link FRCTalonFX},
+     * then
      * the function returns the velocity of the {@link FRCTalonFX} integrated
      * encoder, if not then 0 is always returned. The encoder has 2048 ticks per
      * revolution and the return units of the velocity is in ticks per 100ms.
@@ -251,7 +286,7 @@ public class UniversalMotorGroup {
      *         integrated encoder.
      */
     public int getEncoderVelocity() {
-        switch (motorType) {
+        switch (controllerType) {
             case TalonFX:
                 return (int) ((FRCTalonFX) masterMotor).getSelectedSensorVelocity();
             case TalonSRX:
