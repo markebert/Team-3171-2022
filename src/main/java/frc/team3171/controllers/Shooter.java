@@ -8,23 +8,24 @@ import java.util.concurrent.locks.ReentrantLock;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Relay.Direction;
-import edu.wpi.first.wpilibj.Relay.Value;
+//import edu.wpi.first.wpilibj.Relay.Direction;
+//import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Relay;
+//import edu.wpi.first.wpilibj.PneumaticsModuleType;
+//import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 // Team 3171 Imports
 import frc.robot.RobotProperties;
 import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.UniversalMotorGroup.ControllerType;
-import frc.team3171.pnuematics.DoublePistonController;
+//import frc.team3171.pnuematics.DoublePistonController;
 
 /**
  * @author Mark Ebert
@@ -32,14 +33,15 @@ import frc.team3171.pnuematics.DoublePistonController;
 public class Shooter implements RobotProperties {
 
     // Motor Controllers
-    private final TalonFX lowerShooterMotor, upperShooterMotor, pickupMotor;
+    private final TalonFX lowerShooterMotor, upperShooterMotor;
+    private final TalonSRX pickupMotor;
     private final UniversalMotorGroup feederMotors;
 
     // Relay for the targeting light
-    private final Relay targetLightRelay;
+    //private final Relay targetLightRelay;
 
     // Double Solenoid used to stop the balls in the feeder
-    private final DoublePistonController shooterBrake;
+    //private final DoublePistonController shooterBrake;
 
     // Executor Service
     private final ExecutorService executorService;
@@ -60,9 +62,9 @@ public class Shooter implements RobotProperties {
         // Init all of the motors
         lowerShooterMotor = new TalonFX(lowerShooterCANID);
         upperShooterMotor = new TalonFX(upperShooterCANID);
-        pickupMotor = new TalonFX(pickupCANID);
+        pickupMotor = new TalonSRX(pickupCANID);
         feederMotors = new UniversalMotorGroup(feederInverted, ControllerType.TalonSRX, 0, feederCANIDArray);
-        targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
+        //targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
 
         // Factory Default all motors to prevent unexpected behaviour
         lowerShooterMotor.configFactoryDefault();
@@ -76,9 +78,7 @@ public class Shooter implements RobotProperties {
         pickupMotor.setInverted(pickupInverted);
 
         // Init the shooter brake
-        shooterBrake = new DoublePistonController(pcmCANID, PneumaticsModuleType.CTREPCM, shooterBrakeForwardChannel,
-                shooterBrakeReverseChannel,
-                shooterBrakeInverted);
+        //shooterBrake = new DoublePistonController(pcmCANID, PneumaticsModuleType.CTREPCM, shooterBrakeForwardChannel, shooterBrakeReverseChannel, shooterBrakeInverted);
 
         // Initialize the executor service for concurrency
         executorService = Executors.newSingleThreadExecutor();
@@ -146,9 +146,9 @@ public class Shooter implements RobotProperties {
      */
     public void enableTargetingLight(final boolean enable) {
         if (enable) {
-            targetLightRelay.set(Value.kOn);
+            //targetLightRelay.set(Value.kOn);
         } else {
-            targetLightRelay.set(Value.kOff);
+            //targetLightRelay.set(Value.kOff);
         }
     }
 
@@ -161,9 +161,9 @@ public class Shooter implements RobotProperties {
      */
     public void setShooterBrake(final boolean enable) {
         if (enable) {
-            shooterBrake.extend();
+            //shooterBrake.extend();
         } else {
-            shooterBrake.retract();
+            //shooterBrake.retract();
         }
     }
 
@@ -377,8 +377,8 @@ public class Shooter implements RobotProperties {
         upperShooterMotor.set(ControlMode.Disabled, 0);
         pickupMotor.set(ControlMode.Disabled, 0);
         feederMotors.disable();
-        targetLightRelay.set(Value.kOff);
-        shooterBrake.disable();
+        //targetLightRelay.set(Value.kOff);
+        //shooterBrake.disable();
     }
 
 }

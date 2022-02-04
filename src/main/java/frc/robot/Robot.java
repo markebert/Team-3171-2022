@@ -19,8 +19,11 @@ import edu.wpi.first.wpilibj.Timer;
 // Team 3171 Imports
 import frc.team3171.auton.AutonRecorder;
 import frc.team3171.auton.AutonRecorderData;
+import frc.team3171.controllers.Shooter;
+
 //import frc.team3171.auton.HardcodedAutons;
 import static frc.team3171.HelperFunctions.Deadzone_With_Map;
+import static frc.team3171.HelperFunctions.Within_Percent_Error;
 import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.TractionDrive;
 import frc.team3171.drive.UniversalMotorGroup.ControllerType;
@@ -60,11 +63,13 @@ public class Robot extends TimedRobot implements RobotProperties {
   private UniversalMotorGroup leftMotorGroup, rightMotorGroup;
   private TractionDrive driveController;
 
+  // Shooter Controller
+  private Shooter shooterController;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
    */
-
   @Override
   public void robotInit() {
     final double startTime = Timer.getFPGATimestamp();
@@ -101,6 +106,8 @@ public class Robot extends TimedRobot implements RobotProperties {
       leftMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonSRX, leftDriveCANIDArray);
       rightMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonSRX, rightDriveCANIDArray);
       driveController = new TractionDrive(leftMotorGroup, rightMotorGroup);
+
+      shooterController = new Shooter();
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
@@ -227,8 +234,33 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Get the latest joystick values and calculate their deadzones
-    final double leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY() * MAX_DRIVE_SPEED);
-    final double rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX() * MAX_DRIVE_SPEED);
+    final double leftStickY, rightStickX;
+    if (leftStick.getTrigger()) {
+      leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY());
+      rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX());
+    } else {
+      leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY() * MAX_DRIVE_SPEED);
+      rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX() * MAX_DRIVE_SPEED);
+    }
+
+    // Get the latest joystick button values
+    final boolean button_Shooter = rightStick.getTrigger();
+
+    // Drive Control
+    driveController.mecanumTraction(-leftStickY, rightStickX);
+
+    // Shooter Control
+    final int lowerShooterVelocity = 2000, upperShooterVelocity = 5000;
+    if (button_Shooter) {
+      shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
+      shooterController.disengageShooterBrake();
+      if (Within_Percent_Error(shooterController.getLowerShooterVelocity(), lowerShooterVelocity, .05)
+          && Within_Percent_Error(shooterController.getUpperShooterVelocity(), upperShooterVelocity, .05)) {
+        shooterController.setFeederSpeed(.35);
+      } else {
+        shooterController.setFeederSpeed(0);
+      }
+    }
 
     // Auton Recording
     if (saveNewAuton) {
@@ -251,8 +283,6 @@ public class Robot extends TimedRobot implements RobotProperties {
           break;
       }
     }
-
-    driveController.mecanumTraction(-leftStickY, rightStickX);
 
     SmartDashboard.putNumber("teleopPeriodic:", Timer.getFPGATimestamp() - startTime);
   }
