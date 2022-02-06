@@ -253,7 +253,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     final int lowerShooterVelocity = 2000, upperShooterVelocity = 5000;
     if (button_Shooter) {
       shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
-      shooterController.disengageShooterBrake();
+      shooterController.retractPickupArm();
       if (Within_Percent_Error(shooterController.getLowerShooterVelocity(), lowerShooterVelocity, .05)
           && Within_Percent_Error(shooterController.getUpperShooterVelocity(), upperShooterVelocity, .05)) {
         shooterController.setFeederSpeed(.35);

@@ -8,11 +8,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.Timer;
+//import edu.wpi.first.wpilibj.Relay;
 //import edu.wpi.first.wpilibj.Relay.Direction;
 //import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.DriverStation;
-//import edu.wpi.first.wpilibj.PneumaticsModuleType;
-//import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 // CTRE Imports
@@ -25,7 +25,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.robot.RobotProperties;
 import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.UniversalMotorGroup.ControllerType;
-//import frc.team3171.pnuematics.DoublePistonController;
+import frc.team3171.pnuematics.DoublePistonController;
 
 /**
  * @author Mark Ebert
@@ -33,15 +33,15 @@ import frc.team3171.drive.UniversalMotorGroup.ControllerType;
 public class Shooter implements RobotProperties {
 
     // Motor Controllers
-    private final TalonFX lowerShooterMotor, upperShooterMotor;
+    private final TalonFX lowerShooterMotor, upperShooterMotor, upperFeederMotor;
     private final TalonSRX pickupMotor;
-    private final UniversalMotorGroup feederMotors;
+    private final UniversalMotorGroup lowerFeederMotors;
 
     // Relay for the targeting light
-    //private final Relay targetLightRelay;
+    // private final Relay targetLightRelay;
 
-    // Double Solenoid used to stop the balls in the feeder
-    //private final DoublePistonController shooterBrake;
+    // Double Solenoid used extend the pickup mechanism
+    private final DoublePistonController pickupArm;
 
     // Executor Service
     private final ExecutorService executorService;
@@ -50,7 +50,7 @@ public class Shooter implements RobotProperties {
     private final ReentrantLock executorLock;
 
     // Atomic Booleans
-    private final AtomicBoolean feederExecutorActive;
+    private final AtomicBoolean lowerFeederExecutorActive, upperFeederExecutorActive;
 
     /**
      * Constructor
@@ -63,8 +63,9 @@ public class Shooter implements RobotProperties {
         lowerShooterMotor = new TalonFX(lowerShooterCANID);
         upperShooterMotor = new TalonFX(upperShooterCANID);
         pickupMotor = new TalonSRX(pickupCANID);
-        feederMotors = new UniversalMotorGroup(feederInverted, ControllerType.TalonSRX, 0, feederCANIDArray);
-        //targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
+        upperFeederMotor = new TalonFX(upperFeederCANID);
+        lowerFeederMotors = new UniversalMotorGroup(feederInverted, ControllerType.TalonSRX, 0, lowerFeederCANIDArray);
+        // targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
 
         // Factory Default all motors to prevent unexpected behaviour
         lowerShooterMotor.configFactoryDefault();
@@ -78,15 +79,18 @@ public class Shooter implements RobotProperties {
         pickupMotor.setInverted(pickupInverted);
 
         // Init the shooter brake
-        //shooterBrake = new DoublePistonController(pcmCANID, PneumaticsModuleType.CTREPCM, shooterBrakeForwardChannel, shooterBrakeReverseChannel, shooterBrakeInverted);
+        pickupArm = new DoublePistonController(pcmCANID,
+                PneumaticsModuleType.REVPH, pickupArmForwardChannel,
+                pickupArmReverseChannel, pickupArmInverted);
 
         // Initialize the executor service for concurrency
-        executorService = Executors.newSingleThreadExecutor();
+        executorService = Executors.newFixedThreadPool(2);
 
         executorLock = new ReentrantLock(true);
 
         // Initialize the AtomicBooleans to control the thread executors
-        feederExecutorActive = new AtomicBoolean(false);
+        lowerFeederExecutorActive = new AtomicBoolean(false);
+        upperFeederExecutorActive = new AtomicBoolean(false);
     }
 
     /**
@@ -146,39 +150,39 @@ public class Shooter implements RobotProperties {
      */
     public void enableTargetingLight(final boolean enable) {
         if (enable) {
-            //targetLightRelay.set(Value.kOn);
+            // targetLightRelay.set(Value.kOn);
         } else {
-            //targetLightRelay.set(Value.kOff);
+            // targetLightRelay.set(Value.kOff);
         }
     }
 
     /**
-     * Controls the {@linkplain DoubleSolenoid} to set whether or not the shooter
-     * brake should be engaged or disengaged.
+     * Controls the {@linkplain DoubleSolenoid} to set whether or not the pickup arm
+     * should be engaged or disengaged.
      * 
-     * @param enable True to engaged the brake to prevent ball movement, false to
-     *               disengaged it and allow the balls to pass.
+     * @param enable True to engage the pickup arm and entend it, false to
+     *               disengaged it and retract it.
      */
-    public void setShooterBrake(final boolean enable) {
+    public void setPickupArm(final boolean enable) {
         if (enable) {
-            //shooterBrake.extend();
+            pickupArm.extend();
         } else {
-            //shooterBrake.retract();
+            pickupArm.retract();
         }
     }
 
     /**
-     * Disengages the shooter brake to allow the balls to pass.
+     * Disengages (retracts) the pickup arm.
      */
-    public void disengageShooterBrake() {
-        setShooterBrake(false);
+    public void retractPickupArm() {
+        setPickupArm(false);
     }
 
     /**
-     * Engages the shooter brake to prevent the balls from passing.
+     * Engages (extends) the pickup arm.
      */
-    public void engageShooterBrake() {
-        setShooterBrake(true);
+    public void extendPickupArm() {
+        setPickupArm(true);
     }
 
     /**
@@ -323,7 +327,17 @@ public class Shooter implements RobotProperties {
      * @param speed The speed, from -1.0 to 1.0, to set the feeder motors to.
      */
     public void setFeederSpeed(final double speed) {
-        feederMotors.set(speed);
+        lowerFeederMotors.set(speed);
+        upperFeederMotor.set(ControlMode.PercentOutput, speed);
+    }
+
+    /**
+     * Sets the speed of the feeder motors to the given value.
+     * 
+     * @param speed The speed, from -1.0 to 1.0, to set the feeder motors to.
+     */
+    public void setLowerFeederSpeed(final double speed) {
+        lowerFeederMotors.set(speed);
     }
 
     /**
@@ -334,10 +348,10 @@ public class Shooter implements RobotProperties {
      * @param runTime The amount of time, in seconds, to keep the motors spinning
      *                for.
      */
-    public void runFeeder(final double speed, final double runTime) {
+    public void runLowerFeeder(final double speed, final double runTime) {
         try {
             executorLock.lock();
-            if (feederExecutorActive.compareAndSet(false, true)) {
+            if (lowerFeederExecutorActive.compareAndSet(false, true)) {
                 executorService.execute(() -> {
                     try {
                         final double endTime = Timer.getFPGATimestamp() + runTime;
@@ -345,12 +359,95 @@ public class Shooter implements RobotProperties {
                             if (DriverStation.isDisabled()) {
                                 break;
                             }
-                            setFeederSpeed(speed);
+                            setLowerFeederSpeed(speed);
                             Timer.delay(.02);
                         }
-                        setFeederSpeed(0);
+                        setLowerFeederSpeed(0);
                     } finally {
-                        feederExecutorActive.set(false);
+                        lowerFeederExecutorActive.set(false);
+                    }
+                });
+            }
+        } finally {
+            executorLock.unlock();
+        }
+    }
+
+    /**
+     * Sets the speed of the feeder motors to the given value.
+     * 
+     * @param speed The speed, from -1.0 to 1.0, to set the feeder motors to.
+     */
+    public void setUpperFeederSpeed(final double speed) {
+        upperFeederMotor.set(ControlMode.PercentOutput, speed);
+    }
+
+    /**
+     * Sets the speed of the feeder motors to the given value and keeps them running
+     * for the desired time.
+     * 
+     * @param speed   The speed, from -1.0 to 1.0, to set the feeder motor to.
+     * @param runTime The amount of time, in seconds, to keep the motors spinning
+     *                for.
+     */
+    public void runUpperFeeder(final double speed, final double runTime) {
+        try {
+            executorLock.lock();
+            if (upperFeederExecutorActive.compareAndSet(false, true)) {
+                executorService.execute(() -> {
+                    try {
+                        final double endTime = Timer.getFPGATimestamp() + runTime;
+                        while (Timer.getFPGATimestamp() <= endTime) {
+                            if (DriverStation.isDisabled()) {
+                                break;
+                            }
+                            setUpperFeederSpeed(speed);
+                            Timer.delay(.02);
+                        }
+                        setUpperFeederSpeed(0);
+                    } finally {
+                        upperFeederExecutorActive.set(false);
+                    }
+                });
+            }
+        } finally {
+            executorLock.unlock();
+        }
+    }
+
+    /**
+     * Sets the speed of the feeder motors to the given value and keeps them running
+     * for the desired time.
+     * 
+     * @param speed   The speed, from -1.0 to 1.0, to set the feeder motor to.
+     * @param runTime The amount of time, in seconds, to keep the motors spinning
+     *                for.
+     */
+    public void pulseUpperFeeder(final double speed, final double runTime) {
+        try {
+            executorLock.lock();
+            if (upperFeederExecutorActive.compareAndSet(false, true)) {
+                executorService.execute(() -> {
+                    try {
+                        double endTime = Timer.getFPGATimestamp() + runTime;
+                        while (Timer.getFPGATimestamp() <= endTime) {
+                            if (DriverStation.isDisabled()) {
+                                break;
+                            }
+                            setUpperFeederSpeed(speed);
+                            Timer.delay(.02);
+                        }
+                        endTime = Timer.getFPGATimestamp() + runTime;
+                        while (Timer.getFPGATimestamp() <= endTime) {
+                            if (DriverStation.isDisabled()) {
+                                break;
+                            }
+                            setUpperFeederSpeed(0);
+                            Timer.delay(.02);
+                        }
+                        setUpperFeederSpeed(0);
+                    } finally {
+                        upperFeederExecutorActive.set(false);
                     }
                 });
             }
@@ -366,7 +463,6 @@ public class Shooter implements RobotProperties {
      */
     public void setPickupSpeed(final double speed) {
         pickupMotor.set(ControlMode.PercentOutput, speed);
-
     }
 
     /**
@@ -376,9 +472,9 @@ public class Shooter implements RobotProperties {
         lowerShooterMotor.set(ControlMode.Disabled, 0);
         upperShooterMotor.set(ControlMode.Disabled, 0);
         pickupMotor.set(ControlMode.Disabled, 0);
-        feederMotors.disable();
-        //targetLightRelay.set(Value.kOff);
-        //shooterBrake.disable();
+        lowerFeederMotors.disable();
+        // targetLightRelay.set(Value.kOff);
+        pickupArm.disable();
     }
 
 }

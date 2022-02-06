@@ -173,7 +173,8 @@ public class HardcodedAutons {
             shooter.setPickupSpeed(.8);
             final boolean pickupSensor = sensor.getRange() < 125;
             if (pickupSensor && !reverseFeederEdgeTrigger) {
-                shooter.runFeeder(-.2, .25);
+                shooter.runLowerFeeder(-.2, .25);
+                shooter.runUpperFeeder(-.2, .25);
             } else {
                 shooter.setFeederSpeed(.3);
             }
@@ -181,7 +182,8 @@ public class HardcodedAutons {
         } else if (currentTime < 10.5) {
             drive.mecanumTraction(0, 0);
             shooter.setPickupSpeed(0);
-            shooter.runFeeder(-.35, .5);
+            shooter.runLowerFeeder(-.35, .5);
+            shooter.runUpperFeeder(-.35, .5);
             quickTurnEdgeTrigger = false;
         } else if (currentTime < 12.5) {
             if (!gyro.getPossibleError()) {

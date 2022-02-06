@@ -70,25 +70,17 @@ public interface RobotProperties {
     public static final int pcmCANID = 14;
 
     /**
-     * ShooterShield CAN IDs
-     * 
-     * @param shieldCANID An int represtenting the CAN ID of the
-     *                    {@linkplain CANSparkMax} that spins the deflector.
-     */
-    public static final int shieldCANID = 13;
-
-    /**
      * Shooter Controller CAN IDs
      * 
-     * @param shooterBrakeForwardChannel
-     * @param shooterBrakeReverseChannel
+     * @param pickupArmForwardChannel
+     * @param pickupArmReverseChannel
      * @param lowerShooterCANID          An int representing the CAN ID of the
      *                                   {@linkplain TalonFX} motor.
      * @param upperShooterCANID          An int representing the CAN ID of the
      *                                   {@linkplain TalonFX} motor.
      * @param pickupCANID                An int representing the CAN ID of the
      *                                   {@linkplain TalonFX} motor.
-     * @param feederCANIDArray           An int array containing the CAN IDs of the
+     * @param lowerFeederCANIDArray           An int array containing the CAN IDs of the
      *                                   {@linkplain TalonSRX} motors.
      * @param targetLightChannel         The DIO channel to use for the
      *                                   {@linkplain DigitalOutput} to control the
@@ -96,12 +88,13 @@ public interface RobotProperties {
      *                                   <P>
      *                                   0-9 are on-board, 10-25 are on the MXP.
      */
-    public static final int shooterBrakeForwardChannel = 0;
-    public static final int shooterBrakeReverseChannel = 1;
+    public static final int pickupArmForwardChannel = 0;
+    public static final int pickupArmReverseChannel = 1;
     public static final int lowerShooterCANID = 5;
     public static final int upperShooterCANID = 6;
     public static final int pickupCANID = 7;
-    public static final int[] feederCANIDArray = new int[] { 8, 9 };
+    public static final int upperFeederCANID = 10;
+    public static final int[] lowerFeederCANIDArray = new int[] { 8, 9 };
     public static final int targetLightChannel = 0;
 
     /**
@@ -114,7 +107,7 @@ public interface RobotProperties {
     public static final boolean shooterInverted = true;
     public static final boolean pickupInverted = true;
     public static final boolean feederInverted = true;
-    public static final boolean shooterBrakeInverted = true;
+    public static final boolean pickupArmInverted = true;
 
     /**
      * Shooter Motors PID Controller Settings for Velocity based PID Values.
