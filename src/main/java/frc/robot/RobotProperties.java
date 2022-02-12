@@ -90,11 +90,11 @@ public interface RobotProperties {
      */
     public static final int pickupArmForwardChannel = 0;
     public static final int pickupArmReverseChannel = 1;
-    public static final int lowerShooterCANID = 5;
-    public static final int upperShooterCANID = 6;
-    public static final int pickupCANID = 7;
-    public static final int upperFeederCANID = 10;
-    public static final int[] lowerFeederCANIDArray = new int[] { 8, 9 };
+    public static final int lowerShooterCANID = 10;
+    public static final int upperShooterCANID = 11;
+    public static final int pickupCANID = 5;
+    public static final int upperFeederCANID = 12;
+    public static final int[] lowerFeederCANIDArray = new int[] { 6, 7 };
     public static final int targetLightChannel = 0;
 
     /**
@@ -139,7 +139,7 @@ public interface RobotProperties {
             "Auton 2"
     };
 
-    public static final int[] winchCANIDArray = new int[] { 20, 21 };
+    public static final int[] winchCANIDArray = new int[] { 8, 9 };
     public static final boolean winchInverted = false;
 
 }
