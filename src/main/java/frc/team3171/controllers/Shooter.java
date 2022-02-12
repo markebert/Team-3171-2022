@@ -41,7 +41,7 @@ public class Shooter implements RobotProperties {
     // private final Relay targetLightRelay;
 
     // Double Solenoid used extend the pickup mechanism
-    private final DoublePistonController pickupArm;
+    //private final DoublePistonController pickupArm;
 
     // Executor Service
     private final ExecutorService executorService;
@@ -64,7 +64,7 @@ public class Shooter implements RobotProperties {
         upperShooterMotor = new TalonFX(upperShooterCANID);
         pickupMotor = new TalonSRX(pickupCANID);
         upperFeederMotor = new TalonFX(upperFeederCANID);
-        lowerFeederMotors = new UniversalMotorGroup(feederInverted, ControllerType.TalonSRX, 0, lowerFeederCANIDArray);
+        lowerFeederMotors = new UniversalMotorGroup(feederInverted, ControllerType.TalonSRX, lowerFeederCANIDArray);
         // targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
 
         // Factory Default all motors to prevent unexpected behaviour
@@ -79,9 +79,9 @@ public class Shooter implements RobotProperties {
         pickupMotor.setInverted(pickupInverted);
 
         // Init the shooter brake
-        pickupArm = new DoublePistonController(pcmCANID,
-                PneumaticsModuleType.REVPH, pickupArmForwardChannel,
-                pickupArmReverseChannel, pickupArmInverted);
+        //pickupArm = new DoublePistonController(pcmCANID,
+        //        PneumaticsModuleType.REVPH, pickupArmForwardChannel,
+        //        pickupArmReverseChannel, pickupArmInverted);
 
         // Initialize the executor service for concurrency
         executorService = Executors.newFixedThreadPool(2);
@@ -101,7 +101,7 @@ public class Shooter implements RobotProperties {
     private final void initShooterMotorsPID() {
         // Set if any motors need to be inverted
         lowerShooterMotor.setInverted(!shooterInverted);
-        upperShooterMotor.setInverted(!shooterInverted);
+        upperShooterMotor.setInverted(shooterInverted);
 
         // Config sensor used for Shooter Motor Velocity PID Controller
         lowerShooterMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, shooter_kPIDLoopIndex,
@@ -165,9 +165,9 @@ public class Shooter implements RobotProperties {
      */
     public void setPickupArm(final boolean enable) {
         if (enable) {
-            pickupArm.extend();
+            //pickupArm.extend();
         } else {
-            pickupArm.retract();
+            //pickupArm.retract();
         }
     }
 
@@ -474,7 +474,7 @@ public class Shooter implements RobotProperties {
         pickupMotor.set(ControlMode.Disabled, 0);
         lowerFeederMotors.disable();
         // targetLightRelay.set(Value.kOff);
-        pickupArm.disable();
+        //pickupArm.disable();
     }
 
 }

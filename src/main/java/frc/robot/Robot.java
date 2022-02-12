@@ -268,6 +268,17 @@ public class Robot extends TimedRobot implements RobotProperties {
       } else {
         shooterController.setFeederSpeed(0);
       }
+    } else {
+      shooterController.setShooterVelocity(0, 0);
+      if (operatorLeftStick.getTrigger()) {
+        shooterController.setPickupSpeed(.5);
+        shooterController.setLowerFeederSpeed(.3);
+        shooterController.setUpperFeederSpeed(.3);
+      } else {
+        shooterController.setPickupSpeed(0);
+        shooterController.setLowerFeederSpeed(0);
+        shooterController.setUpperFeederSpeed(0);
+      }
     }
 
     // Climber Control
