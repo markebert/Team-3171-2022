@@ -74,19 +74,19 @@ public interface RobotProperties {
      * 
      * @param pickupArmForwardChannel
      * @param pickupArmReverseChannel
-     * @param lowerShooterCANID          An int representing the CAN ID of the
-     *                                   {@linkplain TalonFX} motor.
-     * @param upperShooterCANID          An int representing the CAN ID of the
-     *                                   {@linkplain TalonFX} motor.
-     * @param pickupCANID                An int representing the CAN ID of the
-     *                                   {@linkplain TalonFX} motor.
-     * @param lowerFeederCANIDArray           An int array containing the CAN IDs of the
-     *                                   {@linkplain TalonSRX} motors.
-     * @param targetLightChannel         The DIO channel to use for the
-     *                                   {@linkplain DigitalOutput} to control the
-     *                                   targeting light relay.
-     *                                   <P>
-     *                                   0-9 are on-board, 10-25 are on the MXP.
+     * @param lowerShooterCANID       An int representing the CAN ID of the
+     *                                {@linkplain TalonFX} motor.
+     * @param upperShooterCANID       An int representing the CAN ID of the
+     *                                {@linkplain TalonFX} motor.
+     * @param pickupCANID             An int representing the CAN ID of the
+     *                                {@linkplain TalonFX} motor.
+     * @param lowerFeederCANIDArray   An int array containing the CAN IDs of the
+     *                                {@linkplain TalonSRX} motors.
+     * @param targetLightChannel      The DIO channel to use for the
+     *                                {@linkplain DigitalOutput} to control the
+     *                                targeting light relay.
+     *                                <P>
+     *                                0-9 are on-board, 10-25 are on the MXP.
      */
     public static final int pickupArmForwardChannel = 0;
     public static final int pickupArmReverseChannel = 1;
@@ -138,5 +138,8 @@ public interface RobotProperties {
             "Auton 1",
             "Auton 2"
     };
+
+    public static final int[] winchCANIDArray = new int[] { 20, 21 };
+    public static final boolean winchInverted = false;
 
 }

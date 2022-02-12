@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.Timer;
 // Team 3171 Imports
 import frc.team3171.auton.AutonRecorder;
 import frc.team3171.auton.AutonRecorderData;
+import frc.team3171.controllers.Climber;
 import frc.team3171.controllers.Shooter;
 
 //import frc.team3171.auton.HardcodedAutons;
@@ -57,7 +58,7 @@ public class Robot extends TimedRobot implements RobotProperties {
   private SendableChooser<String> autonModeChooser;
 
   // Joysticks
-  private Joystick leftStick, rightStick;
+  private Joystick leftStick, rightStick, operatorLeftStick;
 
   // Drive Controller
   private UniversalMotorGroup leftMotorGroup, rightMotorGroup;
@@ -65,6 +66,9 @@ public class Robot extends TimedRobot implements RobotProperties {
 
   // Shooter Controller
   private Shooter shooterController;
+
+  // Climber Controller
+  private Climber climberController;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -100,6 +104,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Joystick init
     leftStick = new Joystick(0);
     rightStick = new Joystick(1);
+    operatorLeftStick = new Joystick(2);
 
     // Drive, Shooter and Climber Controller inits
     try {
@@ -108,6 +113,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       driveController = new TractionDrive(leftMotorGroup, rightMotorGroup);
 
       shooterController = new Shooter();
+      climberController = new Climber();
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
@@ -234,7 +240,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Get the latest joystick values and calculate their deadzones
-    final double leftStickY, rightStickX;
+    final double leftStickY, rightStickX, operatorLeftStickY;
     if (leftStick.getTrigger()) {
       leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY());
       rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX());
@@ -242,6 +248,8 @@ public class Robot extends TimedRobot implements RobotProperties {
       leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY() * MAX_DRIVE_SPEED);
       rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX() * MAX_DRIVE_SPEED);
     }
+
+    operatorLeftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, operatorLeftStick.getY());
 
     // Get the latest joystick button values
     final boolean button_Shooter = rightStick.getTrigger();
@@ -261,6 +269,9 @@ public class Robot extends TimedRobot implements RobotProperties {
         shooterController.setFeederSpeed(0);
       }
     }
+
+    // Climber Control
+    climberController.setClimberSpeed(operatorLeftStickY);
 
     // Auton Recording
     if (saveNewAuton) {
@@ -296,6 +307,8 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Disabled all of the robot controllers
     driveController.disable();
+    shooterController.disable();
+    climberController.disable();
 
     if (saveNewAuton) {
       saveNewAuton = false;
