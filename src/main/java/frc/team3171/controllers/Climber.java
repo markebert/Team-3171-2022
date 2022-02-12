@@ -1,9 +1,5 @@
 package frc.team3171.controllers;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.InvertType;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import frc.robot.RobotProperties;
 import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.UniversalMotorGroup.ControllerType;
