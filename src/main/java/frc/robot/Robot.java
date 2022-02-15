@@ -258,7 +258,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     driveController.mecanumTraction(-leftStickY, rightStickX);
 
     // Shooter Control
-    final int lowerShooterVelocity = 2000, upperShooterVelocity = 5000;
+    final int lowerShooterVelocity = 2500, upperShooterVelocity = 5000;
     if (button_Shooter) {
       shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
       shooterController.retractPickupArm();
