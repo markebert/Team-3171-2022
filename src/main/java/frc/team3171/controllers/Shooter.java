@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 // Team 3171 Imports
 import frc.robot.RobotProperties;
@@ -74,14 +73,14 @@ public class Shooter implements RobotProperties {
         pickupMotor.configFactoryDefault();
         upperFeederMotor.configFactoryDefault();
 
-        // Init the shooter motors and pid controller
-        initShooterMotorsPID();
-
         // Set if any motors need to be inverted
         lowerShooterMotor.setInverted(shooterInverted);
         upperShooterMotor.setInverted(!shooterInverted);
         pickupMotor.setInverted(pickupInverted);
         upperFeederMotor.setInverted(upperFeederInverted);
+
+        // Init the shooter motors and pid controller
+        initShooterMotorsPID();
 
         // Init the shooter brake
         // pickupArm = new DoublePistonController(pcmCANID,
