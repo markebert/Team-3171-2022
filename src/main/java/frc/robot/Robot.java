@@ -253,9 +253,11 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Get the latest joystick button values
-    final boolean boost_Button = leftStick.getTrigger();
-    final boolean button_Pickup = operatorLeftStick.getTrigger();
+    final boolean boost_Button = leftStick.getRawButton(2);
+    final boolean button_Pickup = leftStick.getTrigger();
     final boolean button_Shooter = rightStick.getTrigger();
+    final boolean extendClimber = operatorLeftStick.getRawButton(4);
+    final boolean retractClimber = operatorLeftStick.getRawButton(3);
 
     // Get the latest joystick values and calculate their deadzones
     final double leftStickY, rightStickX, operatorLeftStickY;
@@ -266,7 +268,6 @@ public class Robot extends TimedRobot implements RobotProperties {
       leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY()) * MAX_DRIVE_SPEED;
       rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX()) * MAX_DRIVE_SPEED;
     }
-    operatorLeftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, operatorLeftStick.getY());
 
     // Drive Control
     driveController.mecanumTraction(-leftStickY, rightStickX);
@@ -315,7 +316,13 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
 
     // Climber Control
-    climberController.setClimberSpeed(operatorLeftStickY);
+    if (extendClimber) {
+      climberController.setClimberSpeed(.5);
+    } else if (retractClimber) {
+      climberController.setClimberSpeed(-.5);
+    } else {
+      climberController.setClimberSpeed(0);
+    }
 
     // Auton Recording
     if (saveNewAuton) {
