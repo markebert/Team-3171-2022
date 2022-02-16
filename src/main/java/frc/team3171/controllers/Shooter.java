@@ -34,8 +34,7 @@ import frc.team3171.pnuematics.DoublePistonController;
 public class Shooter implements RobotProperties {
 
     // Motor Controllers
-    private final TalonFX lowerShooterMotor, upperShooterMotor, upperFeederMotor;
-    private final TalonSRX pickupMotor;
+    private final TalonFX lowerShooterMotor, upperShooterMotor, pickupMotor, upperFeederMotor;
     private final UniversalMotorGroup lowerFeederMotors;
 
     // Relay for the targeting light
@@ -63,7 +62,7 @@ public class Shooter implements RobotProperties {
         // Init all of the motors
         lowerShooterMotor = new TalonFX(lowerShooterCANID);
         upperShooterMotor = new TalonFX(upperShooterCANID);
-        pickupMotor = new TalonSRX(pickupCANID);
+        pickupMotor = new TalonFX(pickupCANID);
         upperFeederMotor = new TalonFX(upperFeederCANID);
         lowerFeederMotors = new UniversalMotorGroup(lowerFeederInverted, ControllerType.TalonSRX,
                 lowerFeederCANIDArray);
