@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 //import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 // CTRE Imports
@@ -41,7 +42,7 @@ public class Shooter implements RobotProperties {
     // private final Relay targetLightRelay;
 
     // Double Solenoid used extend the pickup mechanism
-    //private final DoublePistonController pickupArm;
+    // private final DoublePistonController pickupArm;
 
     // Executor Service
     private final ExecutorService executorService;
@@ -64,24 +65,29 @@ public class Shooter implements RobotProperties {
         upperShooterMotor = new TalonFX(upperShooterCANID);
         pickupMotor = new TalonSRX(pickupCANID);
         upperFeederMotor = new TalonFX(upperFeederCANID);
-        lowerFeederMotors = new UniversalMotorGroup(feederInverted, ControllerType.TalonSRX, lowerFeederCANIDArray);
+        lowerFeederMotors = new UniversalMotorGroup(lowerFeederInverted, ControllerType.TalonSRX,
+                lowerFeederCANIDArray);
         // targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
 
         // Factory Default all motors to prevent unexpected behaviour
         lowerShooterMotor.configFactoryDefault();
         upperShooterMotor.configFactoryDefault();
         pickupMotor.configFactoryDefault();
+        upperFeederMotor.configFactoryDefault();
 
         // Init the shooter motors and pid controller
         initShooterMotorsPID();
 
-        // Inverts the pickup motor if needed
+        // Set if any motors need to be inverted
+        lowerShooterMotor.setInverted(shooterInverted);
+        upperShooterMotor.setInverted(!shooterInverted);
         pickupMotor.setInverted(pickupInverted);
+        upperFeederMotor.setInverted(upperFeederInverted);
 
         // Init the shooter brake
-        //pickupArm = new DoublePistonController(pcmCANID,
-        //        PneumaticsModuleType.REVPH, pickupArmForwardChannel,
-        //        pickupArmReverseChannel, pickupArmInverted);
+        // pickupArm = new DoublePistonController(pcmCANID,
+        // PneumaticsModuleType.REVPH, pickupArmForwardChannel,
+        // pickupArmReverseChannel, pickupArmInverted);
 
         // Initialize the executor service for concurrency
         executorService = Executors.newFixedThreadPool(2);
@@ -99,10 +105,6 @@ public class Shooter implements RobotProperties {
      * @param shooterInverted Whether or not the shooter motors need to be inverted.
      */
     private final void initShooterMotorsPID() {
-        // Set if any motors need to be inverted
-        lowerShooterMotor.setInverted(!shooterInverted);
-        upperShooterMotor.setInverted(shooterInverted);
-
         // Config sensor used for Shooter Motor Velocity PID Controller
         lowerShooterMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, shooter_kPIDLoopIndex,
                 shooter_kTimeoutMs);
@@ -113,8 +115,8 @@ public class Shooter implements RobotProperties {
          * Set the sensor phase accordingly. Positive sensor reading should match Green
          * (blinking) Leds on Talon when the motor is being driven.
          */
-        lowerShooterMotor.setSensorPhase(shooterInverted);
-        upperShooterMotor.setSensorPhase(!shooterInverted);
+        lowerShooterMotor.setSensorPhase(lowerShooterMotor.getInverted());
+        upperShooterMotor.setSensorPhase(upperShooterMotor.getInverted());
 
         // Resets the ingrated encoders on the Shooter Motors
         lowerShooterMotor.setSelectedSensorPosition(0);
@@ -165,9 +167,9 @@ public class Shooter implements RobotProperties {
      */
     public void setPickupArm(final boolean enable) {
         if (enable) {
-            //pickupArm.extend();
+            // pickupArm.extend();
         } else {
-            //pickupArm.retract();
+            // pickupArm.retract();
         }
     }
 
@@ -326,16 +328,6 @@ public class Shooter implements RobotProperties {
      * 
      * @param speed The speed, from -1.0 to 1.0, to set the feeder motors to.
      */
-    public void setFeederSpeed(final double speed) {
-        lowerFeederMotors.set(speed);
-        upperFeederMotor.set(ControlMode.PercentOutput, speed);
-    }
-
-    /**
-     * Sets the speed of the feeder motors to the given value.
-     * 
-     * @param speed The speed, from -1.0 to 1.0, to set the feeder motors to.
-     */
     public void setLowerFeederSpeed(final double speed) {
         lowerFeederMotors.set(speed);
     }
@@ -360,7 +352,7 @@ public class Shooter implements RobotProperties {
                                 break;
                             }
                             setLowerFeederSpeed(speed);
-                            Timer.delay(.02);
+                            Timer.delay(TimedRobot.kDefaultPeriod);
                         }
                         setLowerFeederSpeed(0);
                     } finally {
@@ -402,7 +394,7 @@ public class Shooter implements RobotProperties {
                                 break;
                             }
                             setUpperFeederSpeed(speed);
-                            Timer.delay(.02);
+                            Timer.delay(TimedRobot.kDefaultPeriod);
                         }
                         setUpperFeederSpeed(0);
                     } finally {
@@ -473,8 +465,9 @@ public class Shooter implements RobotProperties {
         upperShooterMotor.set(ControlMode.Disabled, 0);
         pickupMotor.set(ControlMode.Disabled, 0);
         lowerFeederMotors.disable();
+        upperFeederMotor.set(ControlMode.Disabled, 0);
         // targetLightRelay.set(Value.kOff);
-        //pickupArm.disable();
+        // pickupArm.disable();
     }
 
 }
