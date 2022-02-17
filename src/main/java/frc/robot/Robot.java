@@ -290,7 +290,7 @@ public class Robot extends TimedRobot implements RobotProperties {
           && Within_Percent_Error(shooterController.getUpperShooterVelocity(), upperShooterVelocity, .04);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
         shooterAtSpeedStart = Timer.getFPGATimestamp();
-      } else if (isAtSpeed && shooterAtSpeedEdgeTrigger && (Timer.getFPGATimestamp() > shooterAtSpeedStart + 5)) {
+      } else if (isAtSpeed && shooterAtSpeedEdgeTrigger && (Timer.getFPGATimestamp() >= shooterAtSpeedStart + 5)) {
         shooterController.setLowerFeederSpeed(.8);
         shooterController.setUpperFeederSpeed(.8);
       } else {
