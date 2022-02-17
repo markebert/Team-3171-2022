@@ -67,10 +67,10 @@ public interface RobotProperties {
      * @param lowerFeederInverted Wether or not the feeder motor needs to be
      *                            inverted.
      */
-    public static final boolean shooterInverted = true;
+    public static final boolean shooterInverted = false;
     public static final boolean pickupInverted = false;
     public static final boolean lowerFeederInverted = true;
-    public static final boolean upperFeederInverted = true;
+    public static final boolean upperFeederInverted = false;
     public static final boolean pickupArmInverted = true;
     public static final boolean winchInverted = false;
 

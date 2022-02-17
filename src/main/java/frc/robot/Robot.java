@@ -66,7 +66,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
   // Shooter Controller
   private Shooter shooterController;
-  private volatile boolean ballpickupEdgeTrigger, reverseFeederEdgeTrigger;
+  private volatile boolean shooterAtSpeedEdgeTrigger, ballpickupEdgeTrigger, reverseFeederEdgeTrigger;
 
   // Climber Controller
   private Climber climberController;
@@ -120,6 +120,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
 
     // Edge Trigger init
+    shooterAtSpeedEdgeTrigger = false;
+    ballpickupEdgeTrigger = false;
     reverseFeederEdgeTrigger = false;
 
     SmartDashboard.putNumber("roboInit:", Timer.getFPGATimestamp() - startTime);
@@ -139,7 +141,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     SmartDashboard.putNumber("Lower Shooter Velocity:", shooterController.getLowerShooterVelocity());
     SmartDashboard.putNumber("Lower Shooter Target Velocity:", shooterController.getLowerShooterTargetVelocity());
-    SmartDashboard.putNumber("Upper Shooter Velocity:", shooterController.getUpperShooterSpeed());
+    SmartDashboard.putNumber("Upper Shooter Velocity:", shooterController.getUpperShooterVelocity());
     SmartDashboard.putNumber("Upper Shooter Target Velocity:", shooterController.getUpperShooterTargetVelocity());
 
     SmartDashboard.putNumber("robotPeriodic:", Timer.getFPGATimestamp() - startTime);
@@ -219,6 +221,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("autonomousPeriodic:", Timer.getFPGATimestamp() - startTime);
   }
 
+  double shooterAtSpeedStart = 0;
+
   /**
    * This function is called once at the beginning of operator control.
    */
@@ -226,7 +230,10 @@ public class Robot extends TimedRobot implements RobotProperties {
   public void teleopInit() {
     final double startTime = Timer.getFPGATimestamp();
 
+    shooterAtSpeedStart = startTime;
+
     // Reset all of the Edge Triggers
+    shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
     reverseFeederEdgeTrigger = false;
 
@@ -255,12 +262,13 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Get the latest joystick button values
     final boolean boost_Button = leftStick.getRawButton(2);
     final boolean button_Pickup = leftStick.getTrigger();
+    final boolean button_Reverse_Pickup = leftStick.getRawButton(4);
     final boolean button_Shooter = rightStick.getTrigger();
     final boolean extendClimber = operatorLeftStick.getRawButton(4);
     final boolean retractClimber = operatorLeftStick.getRawButton(3);
 
     // Get the latest joystick values and calculate their deadzones
-    final double leftStickY, rightStickX, operatorLeftStickY;
+    final double leftStickY, rightStickX;
     if (boost_Button) {
       leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY());
       rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX());
@@ -273,24 +281,29 @@ public class Robot extends TimedRobot implements RobotProperties {
     driveController.mecanumTraction(-leftStickY, rightStickX);
 
     // Shooter Control
-    final int lowerShooterVelocity = 2500, upperShooterVelocity = 5000;
+    final int lowerShooterVelocity = 2500, upperShooterVelocity = 6000;
     if (button_Shooter) {
       shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
       // shooterController.retractPickupArm();
-      if (Within_Percent_Error(shooterController.getLowerShooterVelocity(), lowerShooterVelocity, .04)
-          && Within_Percent_Error(shooterController.getUpperShooterVelocity(), upperShooterVelocity, .04)) {
-        shooterController.setLowerFeederSpeed(.35);
-        shooterController.setUpperFeederSpeed(.35);
+      final boolean isAtSpeed = Within_Percent_Error(shooterController.getLowerShooterVelocity(), lowerShooterVelocity,
+          .04)
+          && Within_Percent_Error(shooterController.getUpperShooterVelocity(), upperShooterVelocity, .04);
+      if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
+        shooterAtSpeedStart = Timer.getFPGATimestamp();
+      } else if (isAtSpeed && shooterAtSpeedEdgeTrigger && (Timer.getFPGATimestamp() > shooterAtSpeedStart + 5)) {
+        shooterController.setLowerFeederSpeed(.8);
+        shooterController.setUpperFeederSpeed(.8);
       } else {
         shooterController.setLowerFeederSpeed(0);
         shooterController.setUpperFeederSpeed(0);
       }
+      shooterAtSpeedEdgeTrigger = isAtSpeed;
     } else {
-      shooterController.setShooterVelocity(0, 0);
+      shooterController.setShooterVelocity(0);
       // Ball Pickup Controls
       if (button_Pickup) {
         shooterController.extendPickupArm();
-        shooterController.setPickupSpeed(.6);
+        // shooterController.setPickupSpeed(1);
         // final boolean pickupSensor = distanceSensor.getRange() < 125;
         final boolean pickupSensor = false;
         if (pickupSensor && !reverseFeederEdgeTrigger) {
@@ -301,14 +314,17 @@ public class Robot extends TimedRobot implements RobotProperties {
           shooterController.setUpperFeederSpeed(.3);
         }
         reverseFeederEdgeTrigger = pickupSensor;
+      } else if (button_Reverse_Pickup) {
+        // shooterController.setPickupSpeed(0);
+        shooterController.setLowerFeederSpeed(-.5);
+        shooterController.setUpperFeederSpeed(-.5);
       } else {
         shooterController.setPickupSpeed(0);
         shooterController.retractPickupArm();
+        shooterController.setLowerFeederSpeed(0);
         if (ballpickupEdgeTrigger) {
-          // shooterController.runLowerFeeder(-.35, .5);
-          shooterController.runUpperFeeder(-.35, .5);
+          shooterController.runUpperFeeder(-.2, .25);
         } else {
-          shooterController.setLowerFeederSpeed(0);
           shooterController.setUpperFeederSpeed(0);
         }
       }
