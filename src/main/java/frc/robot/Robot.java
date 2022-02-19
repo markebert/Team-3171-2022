@@ -292,9 +292,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     if (button_Shooter) {
       shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
       // shooterController.retractPickupArm();
-      final boolean isAtSpeed = Within_Percent_Error(shooterController.getLowerShooterVelocity(), lowerShooterVelocity,
-          .04)
-          && Within_Percent_Error(shooterController.getUpperShooterVelocity(), upperShooterVelocity, .04);
+      final boolean isAtSpeed = shooterController.isLowerShooterAtVelocity(.04)
+          && shooterController.isUpperShooterAtVelocity(.04);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
         shooterAtSpeedStart = Timer.getFPGATimestamp();
       } else if (isAtSpeed && shooterAtSpeedEdgeTrigger && (Timer.getFPGATimestamp() >= shooterAtSpeedStart + 5)) {
