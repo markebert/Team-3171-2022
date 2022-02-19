@@ -303,7 +303,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       // Ball Pickup Controls
       if (button_Pickup) {
         shooterController.extendPickupArm();
-        // shooterController.setPickupSpeed(1);
+        shooterController.setPickupSpeed(.7);
         // final boolean pickupSensor = distanceSensor.getRange() < 125;
         final boolean pickupSensor = false;
         if (pickupSensor && !reverseFeederEdgeTrigger) {
@@ -315,7 +315,7 @@ public class Robot extends TimedRobot implements RobotProperties {
         }
         reverseFeederEdgeTrigger = pickupSensor;
       } else if (button_Reverse_Pickup) {
-        // shooterController.setPickupSpeed(0);
+        shooterController.setPickupSpeed(0);
         shooterController.setLowerFeederSpeed(-.5);
         shooterController.setUpperFeederSpeed(-.5);
       } else {
