@@ -26,7 +26,6 @@ import frc.team3171.controllers.Shooter;
 
 //import frc.team3171.auton.HardcodedAutons;
 import static frc.team3171.HelperFunctions.Deadzone_With_Map;
-import static frc.team3171.HelperFunctions.Within_Percent_Error;
 import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.TractionDrive;
 import frc.team3171.drive.UniversalMotorGroup.ControllerType;
@@ -68,7 +67,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
   // Shooter Controller
   private Shooter shooterController;
-  private volatile boolean shooterAtSpeedEdgeTrigger, ballpickupEdgeTrigger, reverseFeederEdgeTrigger;
+  private volatile boolean shooterAtSpeedEdgeTrigger, ballpickupEdgeTrigger;
 
   // Climber Controller
   private Climber climberController;
@@ -124,7 +123,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Edge Trigger init
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
-    reverseFeederEdgeTrigger = false;
 
     // Camera Server for climber camera
     final UsbCamera camera = CameraServer.startAutomaticCapture();
@@ -242,7 +240,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Reset all of the Edge Triggers
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
-    reverseFeederEdgeTrigger = false;
 
     // Reset Drive Direction
     driveController.setDriveDirectionFlipped(false);
@@ -310,16 +307,8 @@ public class Robot extends TimedRobot implements RobotProperties {
       if (button_Pickup) {
         shooterController.extendPickupArm();
         shooterController.setPickupSpeed(.7);
-        // final boolean pickupSensor = distanceSensor.getRange() < 125;
-        final boolean pickupSensor = false;
-        if (pickupSensor && !reverseFeederEdgeTrigger) {
-          // shooterController.runLowerFeeder(-.2, .25);
-          shooterController.runUpperFeeder(-.2, .25);
-        } else {
-          shooterController.setLowerFeederSpeed(.2);
-          shooterController.setUpperFeederSpeed(.3);
-        }
-        reverseFeederEdgeTrigger = pickupSensor;
+        shooterController.setLowerFeederSpeed(.2);
+        shooterController.setUpperFeederSpeed(.3);
       } else if (button_Reverse_Pickup) {
         shooterController.setPickupSpeed(0);
         shooterController.setLowerFeederSpeed(-.5);
