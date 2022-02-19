@@ -268,6 +268,22 @@ public class Shooter implements RobotProperties {
     }
 
     /**
+     * Returns if the velocity of the motor is within the provided percent error
+     * margin.
+     * 
+     * @param percentError The percent error, from 0.0 to 1.0 with 1.0 being
+     *                     equivilent to 100%, allowed to be considered at velocity.
+     * @return true if the motors current velocity is within the given percent
+     *         error, false otherwise.
+     */
+    public boolean isLowerShooterAtVelocity(double percentError) {
+        percentError = Math.abs(percentError);
+        percentError = percentError > 1 ? 1.0 : percentError;
+        final double acceptableError = Math.abs(lowerShooterMotor.getClosedLoopTarget()) * percentError;
+        return Math.abs(lowerShooterMotor.getClosedLoopError()) < acceptableError;
+    }
+
+    /**
      * Returns the velocity of the upper shooter motor in RPM, converted from Units
      * per 100ms.
      * 
@@ -275,6 +291,22 @@ public class Shooter implements RobotProperties {
      */
     public double getUpperShooterVelocity() {
         return (upperShooterMotor.getSelectedSensorVelocity() / 2048.0) * 600;
+    }
+
+    /**
+     * Returns if the velocity of the motor is within the provided percent error
+     * margin.
+     * 
+     * @param percentError The percent error, from 0.0 to 1.0 with 1.0 being
+     *                     equivilent to 100%, allowed to be considered at velocity.
+     * @return true if the motors current velocity is within the given percent
+     *         error, false otherwise.
+     */
+    public boolean isUpperShooterAtVelocity(double percentError) {
+        percentError = Math.abs(percentError);
+        percentError = percentError > 1 ? 1.0 : percentError;
+        final double acceptableError = Math.abs(upperShooterMotor.getClosedLoopTarget()) * percentError;
+        return Math.abs(upperShooterMotor.getClosedLoopError()) < acceptableError;
     }
 
     /**
