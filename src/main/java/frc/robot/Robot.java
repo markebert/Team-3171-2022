@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -123,6 +125,11 @@ public class Robot extends TimedRobot implements RobotProperties {
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
     reverseFeederEdgeTrigger = false;
+
+    // Camera Server for climber camera
+    final UsbCamera camera = CameraServer.startAutomaticCapture();
+    camera.setResolution(640, 360);
+    camera.setFPS(30);
 
     SmartDashboard.putNumber("roboInit:", Timer.getFPGATimestamp() - startTime);
   }
@@ -281,7 +288,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     driveController.mecanumTraction(-leftStickY, rightStickX);
 
     // Shooter Control
-    final int lowerShooterVelocity = 2500, upperShooterVelocity = 6000;
+    final int lowerShooterVelocity = 3500, upperShooterVelocity = 6000;
     if (button_Shooter) {
       shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
       // shooterController.retractPickupArm();
@@ -291,8 +298,8 @@ public class Robot extends TimedRobot implements RobotProperties {
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
         shooterAtSpeedStart = Timer.getFPGATimestamp();
       } else if (isAtSpeed && shooterAtSpeedEdgeTrigger && (Timer.getFPGATimestamp() >= shooterAtSpeedStart + 5)) {
-        shooterController.setLowerFeederSpeed(.8);
-        shooterController.setUpperFeederSpeed(.8);
+        shooterController.setLowerFeederSpeed(.1);
+        shooterController.setUpperFeederSpeed(.25);
       } else {
         shooterController.setLowerFeederSpeed(0);
         shooterController.setUpperFeederSpeed(0);
@@ -310,7 +317,7 @@ public class Robot extends TimedRobot implements RobotProperties {
           // shooterController.runLowerFeeder(-.2, .25);
           shooterController.runUpperFeeder(-.2, .25);
         } else {
-          shooterController.setLowerFeederSpeed(.3);
+          shooterController.setLowerFeederSpeed(.2);
           shooterController.setUpperFeederSpeed(.3);
         }
         reverseFeederEdgeTrigger = pickupSensor;
