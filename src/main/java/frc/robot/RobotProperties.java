@@ -72,11 +72,9 @@ public interface RobotProperties {
      * Inversion Properties
      * 
      * @param LOWER_SHOOTER_INVERTED Whether or not the lower shooter motor need to
-     *                               be
-     *                               inverted.
+     *                               be inverted.
      * @param UPPER_SHOOTER_INVERTED Whether or not the upper shooter motor need to
-     *                               be
-     *                               inverted.
+     *                               be inverted.
      * @param PICKUP_MOTOR_INVERTED  Whether or not the pickup motor needs to be
      *                               inverted.
      * @param LOWER_FEEDER_INVERTED  Whether or not the feeder motors needs to be
