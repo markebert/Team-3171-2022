@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -40,7 +39,7 @@ public class Shooter implements RobotProperties {
     // private final Relay targetLightRelay;
 
     // Double Solenoid used extend the pickup mechanism
-    // private final DoublePistonController pickupArm;
+    private final DoublePistonController pickupArm, shooterBrake;
 
     // Executor Service
     private final ExecutorService executorService;
@@ -74,18 +73,19 @@ public class Shooter implements RobotProperties {
         upperFeederMotor.configFactoryDefault();
 
         // Set if any motors need to be inverted
-        lowerShooterMotor.setInverted(shooterInverted);
-        upperShooterMotor.setInverted(!shooterInverted);
+        lowerShooterMotor.setInverted(lowerShooterInverted);
+        upperShooterMotor.setInverted(upperShooterInverted);
         pickupMotor.setInverted(pickupInverted);
         upperFeederMotor.setInverted(upperFeederInverted);
 
         // Init the shooter motors and pid controller
         initShooterMotorsPID();
 
-        // Init the shooter brake
-        // pickupArm = new DoublePistonController(pcmCANID,
-        // PneumaticsModuleType.REVPH, pickupArmForwardChannel,
-        // pickupArmReverseChannel, pickupArmInverted);
+        // Init the pneumatics
+        pickupArm = new DoublePistonController(pcmCANID, PneumaticsModuleType.REVPH, pickupArmForwardChannel,
+                pickupArmReverseChannel, pickupArmInverted);
+        shooterBrake = new DoublePistonController(pcmCANID, PneumaticsModuleType.REVPH, shooterBrakeForwardChannel,
+                shooterBrakeReverseChannel, shooterBrakeInverted);
 
         // Initialize the executor service for concurrency
         executorService = Executors.newFixedThreadPool(2);
@@ -99,8 +99,6 @@ public class Shooter implements RobotProperties {
 
     /**
      * Sets up the shooter motors and their PID controllers.
-     * 
-     * @param shooterInverted Whether or not the shooter motors need to be inverted.
      */
     private final void initShooterMotorsPID() {
         // Config sensor used for Shooter Motor Velocity PID Controller
@@ -157,32 +155,31 @@ public class Shooter implements RobotProperties {
     }
 
     /**
-     * Controls the {@linkplain DoubleSolenoid} to set whether or not the pickup arm
-     * should be engaged or disengaged.
-     * 
-     * @param enable True to engage the pickup arm and entend it, false to
-     *               disengaged it and retract it.
-     */
-    public void setPickupArm(final boolean enable) {
-        if (enable) {
-            // pickupArm.extend();
-        } else {
-            // pickupArm.retract();
-        }
-    }
-
-    /**
-     * Disengages (retracts) the pickup arm.
+     * Retracts the pickup arm.
      */
     public void retractPickupArm() {
-        setPickupArm(false);
+        pickupArm.retract();
     }
 
     /**
-     * Engages (extends) the pickup arm.
+     * Extends the pickup arm.
      */
     public void extendPickupArm() {
-        setPickupArm(true);
+        pickupArm.extend();
+    }
+
+    /**
+     * Retracts the shooter brake.
+     */
+    public void retractShooterBrake() {
+        shooterBrake.retract();
+    }
+
+    /**
+     * Extends the shooter brake.
+     */
+    public void extendShooterBrake() {
+        shooterBrake.extend();
     }
 
     /**
