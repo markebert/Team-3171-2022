@@ -1,15 +1,5 @@
 package frc.robot;
 
-// FRC Imports
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Solenoid;
-
-// CTRE Imports
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 /**
  * @author Mark Ebert
  */
@@ -19,7 +9,7 @@ public interface RobotProperties {
      * Static Values Properties
      * 
      * @param JOYSTICK_DEADZONE The percent of error allowed, from -1.0 to 1.0, of
-     *                          the {@linkplain Joystick} X and Y values.
+     *                          the joysticks X and Y values.
      * @param MAX_DRIVE_SPEED   The maximum drive speed of the robot, from 0 to 1.0
      */
     public static final double JOYSTICK_DEADZONE = .08;
@@ -29,29 +19,18 @@ public interface RobotProperties {
      * CAN ID Properties
      * 
      * @param LEFT_DRIVE_CAN_ID_ARRAY   An int array representing the CAN IDs used
-     *                                  for
-     *                                  the first left drive motors.
+     *                                  for the first left drive motors.
      * @param RIGHT_DRIVE_CAN_ID_ARRAY  An int array representing the CAN IDs used
-     *                                  for
-     *                                  the first right drive motors.
-     * @param LOWER_SHOOTER_CAN_ID      An int representing the CAN ID of the
-     *                                  {@linkplain TalonFX} motor.
-     * @param UPPER_SHOOTER_CAN_ID      An int representing the CAN ID of the
-     *                                  {@linkplain TalonFX} motor.
-     * @param PICKUP_MOTOR_CAN_ID       An int representing the CAN ID of the
-     *                                  {@linkplain TalonFX} motor.
+     *                                  for the first right drive motors.
+     * @param LOWER_SHOOTER_CAN_ID      An int representing the CAN ID of the motor.
+     * @param UPPER_SHOOTER_CAN_ID      An int representing the CAN ID of the motor.
+     * @param PICKUP_MOTOR_CAN_ID       An int representing the CAN ID of the motor.
      * @param LOWER_FEEDER_CAN_ID_ARRAY An int array containing the CAN IDs of the
-     *                                  {@linkplain TalonSRX} motors
-     * @param UPPER_FEEDER_CAN_ID       An int representing the CAN ID of the
-     *                                  {@linkplain TalonFX} motor.
+     *                                  motors.
+     * @param UPPER_FEEDER_CAN_ID       An int representing the CAN ID of the motor.
      * @param WINCH_CAN_ID_ARRAY        An int array containing the CAN IDs of the
-     *                                  {@linkplain TalonSRX} motors
-     * @param PCM_CAN_ID                An int representing the CAN ID of the PCM
-     *                                  used
-     *                                  for both the
-     *                                  {@linkplain Compressor} motor and all of the
-     *                                  {@linkplain Solenoid} and
-     *                                  {@linkplain DoubleSolenoid}.
+     *                                  motors.
+     * @param PCM_CAN_ID                An int representing the CAN ID of the PCM.
      */
     public static final int[] LEFT_DRIVE_CAN_ID_ARRAY = new int[] { 1, 2 },
             RIGHT_DRIVE_CAN_ID_ARRAY = new int[] { 3, 4 };
