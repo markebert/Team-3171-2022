@@ -58,12 +58,12 @@ public class Shooter implements RobotProperties {
      */
     public Shooter() throws Exception {
         // Init all of the motors
-        lowerShooterMotor = new TalonFX(lowerShooterCANID);
-        upperShooterMotor = new TalonFX(upperShooterCANID);
-        pickupMotor = new TalonFX(pickupCANID);
-        upperFeederMotor = new TalonFX(upperFeederCANID);
-        lowerFeederMotors = new UniversalMotorGroup(lowerFeederInverted, ControllerType.TalonSRX,
-                lowerFeederCANIDArray);
+        lowerShooterMotor = new TalonFX(LOWER_SHOOTER_CAN_ID);
+        upperShooterMotor = new TalonFX(UPPER_SHOOTER_CAN_ID);
+        pickupMotor = new TalonFX(PICKUP_MOTOR_CAN_ID);
+        upperFeederMotor = new TalonFX(UPPER_FEEDER_CAN_ID);
+        lowerFeederMotors = new UniversalMotorGroup(LOWER_FEEDER_INVERTED, ControllerType.TalonSRX,
+                LOWER_FEEDER_CAN_ID_ARRAY);
         // targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
 
         // Factory Default all motors to prevent unexpected behaviour
@@ -73,19 +73,19 @@ public class Shooter implements RobotProperties {
         upperFeederMotor.configFactoryDefault();
 
         // Set if any motors need to be inverted
-        lowerShooterMotor.setInverted(lowerShooterInverted);
-        upperShooterMotor.setInverted(upperShooterInverted);
-        pickupMotor.setInverted(pickupInverted);
-        upperFeederMotor.setInverted(upperFeederInverted);
+        lowerShooterMotor.setInverted(LOWER_SHOOTER_INVERTED);
+        upperShooterMotor.setInverted(UPPER_SHOOTER_INVERTED);
+        pickupMotor.setInverted(PICKUP_MOTOR_INVERTED);
+        upperFeederMotor.setInverted(UPPER_FEEDER_INVERTED);
 
         // Init the shooter motors and pid controller
         initShooterMotorsPID();
 
         // Init the pneumatics
-        pickupArm = new DoublePistonController(pcmCANID, PneumaticsModuleType.REVPH, pickupArmForwardChannel,
-                pickupArmReverseChannel, pickupArmInverted);
-        shooterBrake = new DoublePistonController(pcmCANID, PneumaticsModuleType.REVPH, shooterBrakeForwardChannel,
-                shooterBrakeReverseChannel, shooterBrakeInverted);
+        pickupArm = new DoublePistonController(PCM_CAN_ID, PneumaticsModuleType.REVPH, PICKUP_ARM_FORWARD_CHANNEL,
+                PICKUP_ARM_REVERSE_CHANNEL, PICKUP_ARM_INVERTED);
+        shooterBrake = new DoublePistonController(PCM_CAN_ID, PneumaticsModuleType.REVPH, SHOOTER_BRAKE_FORWARD_CHANNEL,
+                SHOOTER_BRAKE_REVERSE_CHANNEL, SHOOTER_BRAKE_INVERTED);
 
         // Initialize the executor service for concurrency
         executorService = Executors.newFixedThreadPool(2);
@@ -102,10 +102,10 @@ public class Shooter implements RobotProperties {
      */
     private final void initShooterMotorsPID() {
         // Config sensor used for Shooter Motor Velocity PID Controller
-        lowerShooterMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, shooter_kPIDLoopIndex,
-                shooter_kTimeoutMs);
-        upperShooterMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, shooter_kPIDLoopIndex,
-                shooter_kTimeoutMs);
+        lowerShooterMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, SHOOTER_KPID_LOOPINDEX,
+                SHOOTER_KTIMEOUT_MS);
+        upperShooterMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, SHOOTER_KPID_LOOPINDEX,
+                SHOOTER_KTIMEOUT_MS);
 
         /**
          * Set the sensor phase accordingly. Positive sensor reading should match Green
@@ -119,26 +119,26 @@ public class Shooter implements RobotProperties {
         upperShooterMotor.setSelectedSensorPosition(0);
 
         // Config the peak and nominal outputs of the Shooter Motors for PID Control
-        lowerShooterMotor.configNominalOutputForward(0, shooter_kTimeoutMs);
-        lowerShooterMotor.configNominalOutputReverse(0, shooter_kTimeoutMs);
-        lowerShooterMotor.configPeakOutputForward(1, shooter_kTimeoutMs);
-        lowerShooterMotor.configPeakOutputReverse(-1, shooter_kTimeoutMs);
+        lowerShooterMotor.configNominalOutputForward(0, SHOOTER_KTIMEOUT_MS);
+        lowerShooterMotor.configNominalOutputReverse(0, SHOOTER_KTIMEOUT_MS);
+        lowerShooterMotor.configPeakOutputForward(1, SHOOTER_KTIMEOUT_MS);
+        lowerShooterMotor.configPeakOutputReverse(-1, SHOOTER_KTIMEOUT_MS);
 
-        upperShooterMotor.configNominalOutputForward(0, shooter_kTimeoutMs);
-        upperShooterMotor.configNominalOutputReverse(0, shooter_kTimeoutMs);
-        upperShooterMotor.configPeakOutputForward(1, shooter_kTimeoutMs);
-        upperShooterMotor.configPeakOutputReverse(-1, shooter_kTimeoutMs);
+        upperShooterMotor.configNominalOutputForward(0, SHOOTER_KTIMEOUT_MS);
+        upperShooterMotor.configNominalOutputReverse(0, SHOOTER_KTIMEOUT_MS);
+        upperShooterMotor.configPeakOutputForward(1, SHOOTER_KTIMEOUT_MS);
+        upperShooterMotor.configPeakOutputReverse(-1, SHOOTER_KTIMEOUT_MS);
 
         // Config the Velocity closed loop values in slot0
-        lowerShooterMotor.config_kP(shooter_kPIDLoopIndex, shooter_kP, shooter_kTimeoutMs);
-        lowerShooterMotor.config_kI(shooter_kPIDLoopIndex, shooter_kI, shooter_kTimeoutMs);
-        lowerShooterMotor.config_kD(shooter_kPIDLoopIndex, shooter_kD, shooter_kTimeoutMs);
-        lowerShooterMotor.config_kF(shooter_kPIDLoopIndex, shooter_kF, shooter_kTimeoutMs);
+        lowerShooterMotor.config_kP(SHOOTER_KPID_LOOPINDEX, SHOOTER_KP, SHOOTER_KTIMEOUT_MS);
+        lowerShooterMotor.config_kI(SHOOTER_KPID_LOOPINDEX, SHOOTER_KI, SHOOTER_KTIMEOUT_MS);
+        lowerShooterMotor.config_kD(SHOOTER_KPID_LOOPINDEX, SHOOTER_KD, SHOOTER_KTIMEOUT_MS);
+        lowerShooterMotor.config_kF(SHOOTER_KPID_LOOPINDEX, SHOOTER_KF, SHOOTER_KTIMEOUT_MS);
 
-        upperShooterMotor.config_kP(shooter_kPIDLoopIndex, shooter_kP, shooter_kTimeoutMs);
-        upperShooterMotor.config_kI(shooter_kPIDLoopIndex, shooter_kI, shooter_kTimeoutMs);
-        upperShooterMotor.config_kD(shooter_kPIDLoopIndex, shooter_kD, shooter_kTimeoutMs);
-        upperShooterMotor.config_kF(shooter_kPIDLoopIndex, shooter_kF, shooter_kTimeoutMs);
+        upperShooterMotor.config_kP(SHOOTER_KPID_LOOPINDEX, SHOOTER_KP, SHOOTER_KTIMEOUT_MS);
+        upperShooterMotor.config_kI(SHOOTER_KPID_LOOPINDEX, SHOOTER_KI, SHOOTER_KTIMEOUT_MS);
+        upperShooterMotor.config_kD(SHOOTER_KPID_LOOPINDEX, SHOOTER_KD, SHOOTER_KTIMEOUT_MS);
+        upperShooterMotor.config_kF(SHOOTER_KPID_LOOPINDEX, SHOOTER_KF, SHOOTER_KTIMEOUT_MS);
     }
 
     /**

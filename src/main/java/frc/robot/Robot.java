@@ -98,7 +98,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     autonModeChooser = new SendableChooser<>();
     autonModeChooser.setDefaultOption(kDefaultAuton, kDefaultAuton);
     autonModeChooser.addOption(kHardcodedAuton, kHardcodedAuton);
-    for (final String autonMode : autonOptions) {
+    for (final String autonMode : AUTON_OPTIONS) {
       autonModeChooser.addOption(autonMode, autonMode);
     }
     SmartDashboard.putData("Auton Modes:", autonModeChooser);
@@ -110,8 +110,8 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Drive, Shooter and Climber Controller inits
     try {
-      leftMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonSRX, leftDriveCANIDArray);
-      rightMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonSRX, rightDriveCANIDArray);
+      leftMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonSRX, LEFT_DRIVE_CAN_ID_ARRAY);
+      rightMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonSRX, RIGHT_DRIVE_CAN_ID_ARRAY);
       driveController = new TractionDrive(leftMotorGroup, rightMotorGroup);
 
       shooterController = new Shooter();

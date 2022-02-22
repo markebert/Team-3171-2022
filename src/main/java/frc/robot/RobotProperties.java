@@ -1,7 +1,6 @@
 package frc.robot;
 
 // FRC Imports
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
@@ -64,13 +63,13 @@ public interface RobotProperties {
     public static final int PCM_CAN_ID = 14;
 
     /**
-     * Pneumatics
+     * Pneumatics Channels
      */
     public static final int PICKUP_ARM_FORWARD_CHANNEL = 0, PICKUP_ARM_REVERSE_CHANNEL = 1;
     public static final int SHOOTER_BRAKE_FORWARD_CHANNEL = 2, SHOOTER_BRAKE_REVERSE_CHANNEL = 3;
 
     /**
-     * Inversion
+     * Inversion Properties
      * 
      * @param LOWER_SHOOTER_INVERTED Whether or not the lower shooter motor need to
      *                               be
@@ -97,6 +96,13 @@ public interface RobotProperties {
     public static final boolean WINCH_INVERTED = false;
     public static final boolean PICKUP_ARM_INVERTED = true;
     public static final boolean SHOOTER_BRAKE_INVERTED = true;
+
+    /**
+     * Digital Inputs and Outputs. 0-9 are on-board, 10-25 are on the MXP.
+     * 
+     * @param TARGET_LIGHT_CHANNEL The channel to use for the targeting light relay.
+     */
+    public static final int TARGET_LIGHT_CHANNEL = 0;
 
     /**
      * PID Properties
@@ -132,15 +138,6 @@ public interface RobotProperties {
     public static final double LIMELIGHT_KP = .025, LIMELIGHT_KI = .003, LIMELIGHT_KD = .00175;
     public static final double SHOOTER_KP = .01, SHOOTER_KI = .0002, SHOOTER_KD = .0001, SHOOTER_KF = 0;
     public static final int SHOOTER_KPID_LOOPINDEX = 0, SHOOTER_KTIMEOUT_MS = 20;
-
-    /**
-     * @param TARGET_LIGHT_CHANNEL The DIO channel to use for the
-     *                             {@linkplain DigitalOutput} to control the
-     *                             targeting light relay.
-     *                             <P>
-     *                             0-9 are on-board, 10-25 are on the MXP.
-     */
-    public static final int TARGET_LIGHT_CHANNEL = 0;
 
     /** Auton Properties **/
     public static final String[] AUTON_OPTIONS = {
