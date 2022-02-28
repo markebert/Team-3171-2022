@@ -43,8 +43,8 @@ public class Robot extends TimedRobot implements RobotProperties {
   private AutonRecorder autonRecorder;
   private ConcurrentLinkedQueue<AutonRecorderData> autonPlaybackQueue;
   private AutonRecorderData playbackData;
-  private volatile double autonStartTime;
-  private volatile boolean saveNewAuton;
+  private double autonStartTime;
+  private boolean saveNewAuton;
 
   // Auton Mode Constants
   private static final String kDefaultAuton = "Disabled";
@@ -67,7 +67,8 @@ public class Robot extends TimedRobot implements RobotProperties {
 
   // Shooter Controller
   private Shooter shooterController;
-  private volatile boolean shooterAtSpeedEdgeTrigger, ballpickupEdgeTrigger;
+  private double shooterAtSpeedStartTime;
+  private boolean shooterAtSpeedEdgeTrigger, ballpickupEdgeTrigger;
 
   // Climber Controller
   private Climber climberController;
@@ -110,8 +111,8 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Drive, Shooter and Climber Controller inits
     try {
-      leftMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonSRX, LEFT_DRIVE_CAN_ID_ARRAY);
-      rightMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonSRX, RIGHT_DRIVE_CAN_ID_ARRAY);
+      leftMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonFX, LEFT_DRIVE_CAN_ID_ARRAY);
+      rightMotorGroup = new UniversalMotorGroup(false, ControllerType.TalonFX, RIGHT_DRIVE_CAN_ID_ARRAY);
       driveController = new TractionDrive(leftMotorGroup, rightMotorGroup);
 
       shooterController = new Shooter();
@@ -204,7 +205,8 @@ public class Robot extends TimedRobot implements RobotProperties {
       case kDefaultAuton:
         disabledPeriodic();
         break;
-      default: // Plays the recorded auton if theres a valid next step, otherwise disables
+      default:
+        // Plays the recorded auton if theres a valid next step, otherwise disables
         if (playbackData != null) {
           // Get the latest joystick values and calculate their deadzones
           final double leftStickY = playbackData.getLeftY();
@@ -226,8 +228,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("autonomousPeriodic:", Timer.getFPGATimestamp() - startTime);
   }
 
-  double shooterAtSpeedStart = 0;
-
   /**
    * This function is called once at the beginning of operator control.
    */
@@ -235,7 +235,7 @@ public class Robot extends TimedRobot implements RobotProperties {
   public void teleopInit() {
     final double startTime = Timer.getFPGATimestamp();
 
-    shooterAtSpeedStart = startTime;
+    shooterAtSpeedStartTime = 0;
 
     // Reset all of the Edge Triggers
     shooterAtSpeedEdgeTrigger = false;
@@ -272,13 +272,14 @@ public class Robot extends TimedRobot implements RobotProperties {
     final boolean retractClimber = operatorLeftStick.getRawButton(3);
 
     // Get the latest joystick values and calculate their deadzones
+    final double[] joystickValues = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY(), rightStick.getX());
     final double leftStickY, rightStickX;
     if (boost_Button) {
-      leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY());
-      rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX());
+      leftStickY = joystickValues[0];
+      rightStickX = joystickValues[1];
     } else {
-      leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY()) * MAX_DRIVE_SPEED;
-      rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX()) * MAX_DRIVE_SPEED;
+      leftStickY = joystickValues[0] * MAX_DRIVE_SPEED;
+      rightStickX = joystickValues[1] * MAX_DRIVE_SPEED;
     }
 
     // Drive Control
@@ -292,8 +293,8 @@ public class Robot extends TimedRobot implements RobotProperties {
       final boolean isAtSpeed = shooterController.isLowerShooterAtVelocity(.04)
           && shooterController.isUpperShooterAtVelocity(.04);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
-        shooterAtSpeedStart = Timer.getFPGATimestamp();
-      } else if (isAtSpeed && shooterAtSpeedEdgeTrigger && (Timer.getFPGATimestamp() >= shooterAtSpeedStart + 5)) {
+        shooterAtSpeedStartTime = Timer.getFPGATimestamp();
+      } else if (isAtSpeed && shooterAtSpeedEdgeTrigger && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + 5)) {
         shooterController.setLowerFeederSpeed(.1);
         shooterController.setUpperFeederSpeed(.25);
       } else {

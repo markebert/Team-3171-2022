@@ -41,6 +41,27 @@ public class HelperFunctions {
 	}
 
 	/**
+	 * This function returns a value adjusted for the inputed deadzone and maps it
+	 * to the full range.
+	 * 
+	 * @param deadzoneRange The range that will be used when adjusting the inputed
+	 *                      value.
+	 * @param currentValuse An array of the original unaltered values that should
+	 *                      range from -1.0 to 1.0.
+	 * @return An array, in the same order as they were given, of the values
+	 *         adjusted for the given deadzone range.
+	 */
+	public static double[] Deadzone_With_Map(final double deadzoneRange, final double currentValue,
+			final double... currentValues) {
+		final double[] newValues = new double[currentValues.length + 1];
+		newValues[0] = Deadzone_With_Map(deadzoneRange, currentValue);
+		for (int i = 1; i < currentValues.length; i++) {
+			newValues[i] = Deadzone_With_Map(deadzoneRange, currentValues[i]);
+		}
+		return newValues;
+	}
+
+	/**
 	 * Maps the value from the first range to the second range.
 	 * 
 	 * @param x:       the number to map.

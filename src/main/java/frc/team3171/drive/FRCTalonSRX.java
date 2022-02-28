@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;;
 
 /**
@@ -23,6 +24,7 @@ public class FRCTalonSRX extends TalonSRX implements MotorController {
     public FRCTalonSRX(int deviceNumber) {
         super(deviceNumber);
         configFactoryDefault();
+        setNeutralMode(NeutralMode.Brake);
     }
 
     @Override

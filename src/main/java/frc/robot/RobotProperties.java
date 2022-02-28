@@ -36,7 +36,7 @@ public interface RobotProperties {
                         RIGHT_DRIVE_CAN_ID_ARRAY = new int[] { 3, 4 };
         public static final int LOWER_SHOOTER_CAN_ID = 10, UPPER_SHOOTER_CAN_ID = 11;
         public static final int PICKUP_MOTOR_CAN_ID = 5;
-        public static final int[] LOWER_FEEDER_CAN_ID_ARRAY = new int[] { 6, 7 };
+        public static final int LOWER_FEEDER_CAN_ID = 6;
         public static final int UPPER_FEEDER_CAN_ID = 12;
         public static final int[] WINCH_CAN_ID_ARRAY = new int[] { 8, 9 };
         public static final int PCM_CAN_ID = 14;

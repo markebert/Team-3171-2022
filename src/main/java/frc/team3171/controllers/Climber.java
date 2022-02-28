@@ -12,7 +12,7 @@ public class Climber implements RobotProperties {
     private final UniversalMotorGroup winchMotors;
 
     public Climber() throws Exception {
-        winchMotors = new UniversalMotorGroup(WINCH_INVERTED, ControllerType.TalonSRX, WINCH_CAN_ID_ARRAY);
+        winchMotors = new UniversalMotorGroup(WINCH_INVERTED, ControllerType.TalonFX, WINCH_CAN_ID_ARRAY);
     }
 
     public void setClimberSpeed(final double speed) {

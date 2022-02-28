@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 /**
@@ -96,8 +97,10 @@ public class UniversalMotorGroup {
                 // Init the master motor
                 masterMotor = new CANSparkMax(motorController, MotorType.kBrushed);
                 masterMotor.setInverted(inverted);
+                ((CANSparkMax) masterMotor).setIdleMode(IdleMode.kBrake);
                 for (int i = 0; i < slaveMotors.length; i++) {
                     slaveMotors[i] = new CANSparkMax(motorControllers[i], MotorType.kBrushed);
+                    ((CANSparkMax) slaveMotors[i]).setIdleMode(IdleMode.kBrake);
                     ((CANSparkMax) slaveMotors[i]).follow((CANSparkMax) masterMotor);
                 }
                 followSupport = true;
@@ -106,8 +109,10 @@ public class UniversalMotorGroup {
                 // Init the master motor
                 masterMotor = new CANSparkMax(motorController, MotorType.kBrushless);
                 masterMotor.setInverted(inverted);
+                ((CANSparkMax) masterMotor).setIdleMode(IdleMode.kBrake);
                 for (int i = 0; i < slaveMotors.length; i++) {
                     slaveMotors[i] = new CANSparkMax(motorControllers[i], MotorType.kBrushless);
+                    ((CANSparkMax) slaveMotors[i]).setIdleMode(IdleMode.kBrake);
                     ((CANSparkMax) slaveMotors[i]).follow((CANSparkMax) masterMotor);
                 }
                 followSupport = true;

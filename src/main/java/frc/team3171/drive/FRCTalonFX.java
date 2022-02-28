@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;;
 
 /**
@@ -24,6 +25,7 @@ public class FRCTalonFX extends TalonFX implements MotorController {
     public FRCTalonFX(int deviceNumber) {
         super(deviceNumber);
         configFactoryDefault();
+        setNeutralMode(NeutralMode.Brake);
         configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 20);
     }
 
