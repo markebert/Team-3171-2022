@@ -55,7 +55,7 @@ public class HelperFunctions {
 			final double... currentValues) {
 		final double[] newValues = new double[currentValues.length + 1];
 		newValues[0] = Deadzone_With_Map(deadzoneRange, currentValue);
-		for (int i = 1; i < currentValues.length; i++) {
+		for (int i = 1; i < newValues.length; i++) {
 			newValues[i] = Deadzone_With_Map(deadzoneRange, currentValues[i]);
 		}
 		return newValues;

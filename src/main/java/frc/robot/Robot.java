@@ -275,11 +275,11 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double[] joystickValues = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY(), rightStick.getX());
     final double leftStickY, rightStickX;
     if (boost_Button) {
-      leftStickY = leftStick.getY();
-      rightStickX = rightStick.getX();
+      leftStickY = joystickValues[0];
+      rightStickX = joystickValues[1];
     } else {
-      leftStickY = leftStick.getY();
-      rightStickX = rightStick.getX();
+      leftStickY = joystickValues[0] * MAX_DRIVE_SPEED;
+      rightStickX = joystickValues[0] * MAX_DRIVE_SPEED;
     }
 
     // Drive Control
