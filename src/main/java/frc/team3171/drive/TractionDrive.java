@@ -1,5 +1,8 @@
 package frc.team3171.drive;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author Mark Ebert
  */
@@ -9,7 +12,8 @@ public class TractionDrive {
 	private final UniversalMotorGroup leftMotorGroup, rightMotorGroup;
 
 	// Drive Direction
-	private volatile boolean driveDirectionFlipped;
+	private AtomicBoolean driveDirectionFlipped;
+	private ReentrantLock LOCK;
 
 	/**
 	 * Constructor
@@ -27,7 +31,8 @@ public class TractionDrive {
 		rightMotorGroup.setInverted(!inverted);
 		this.leftMotorGroup = leftMotorGroup;
 		this.rightMotorGroup = rightMotorGroup;
-		driveDirectionFlipped = false;
+		driveDirectionFlipped = new AtomicBoolean();
+		LOCK = new ReentrantLock();
 	}
 
 	/**
@@ -51,7 +56,7 @@ public class TractionDrive {
 	 *                    {@code Joystick} y-axis value.
 	 */
 	public void tankTraction(final double leftStickY, final double rightStickY) {
-		if (driveDirectionFlipped) {
+		if (driveDirectionFlipped.get()) {
 			leftMotorGroup.set(-leftStickY);
 			rightMotorGroup.set(rightStickY);
 		} else {
@@ -69,7 +74,7 @@ public class TractionDrive {
 	 *                    {@code Joystick} x-axis value.
 	 */
 	public void mecanumTraction(final double leftStickY, final double rightStickX) {
-		if (driveDirectionFlipped) {
+		if (driveDirectionFlipped.get()) {
 			leftMotorGroup.set(-leftStickY + rightStickX);
 			rightMotorGroup.set(-leftStickY - rightStickX);
 		} else {
@@ -83,15 +88,25 @@ public class TractionDrive {
 	 * 
 	 * @param flipped Whether ot not to flip the drive direction of the robot.
 	 */
-	public synchronized void setDriveDirectionFlipped(final boolean flipped) {
-		driveDirectionFlipped = flipped;
+	public void setDriveDirectionFlipped(final boolean flipped) {
+		try {
+			LOCK.lock();
+			driveDirectionFlipped.set(flipped);
+		} finally {
+			LOCK.unlock();
+		}
 	}
 
 	/**
 	 * Toggles whether or not the drive direction of the robot is flipped.
 	 */
 	public void toggleDriveDirectionFlipped() {
-		setDriveDirectionFlipped(!driveDirectionFlipped);
+		try {
+			LOCK.lock();
+			driveDirectionFlipped.set(driveDirectionFlipped.get());
+		} finally {
+			LOCK.unlock();
+		}
 	}
 
 	/**
@@ -100,7 +115,7 @@ public class TractionDrive {
 	 * @return True if the drive direction if flipped, false otherwise.
 	 */
 	public boolean getDriveDirectionFlipped() {
-		return driveDirectionFlipped;
+		return driveDirectionFlipped.get();
 	}
 
 	/**
