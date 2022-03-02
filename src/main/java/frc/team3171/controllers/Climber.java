@@ -1,26 +1,26 @@
 package frc.team3171.controllers;
 
 import frc.robot.RobotProperties;
-import frc.team3171.drive.UniversalMotorGroup;
-import frc.team3171.drive.UniversalMotorGroup.ControllerType;
+import frc.team3171.drive.FRCTalonFX;
 
 /**
  * @author Mark Ebert
  */
 public class Climber implements RobotProperties {
 
-    private final UniversalMotorGroup winchMotors;
+    private final FRCTalonFX winchMotor;
 
     public Climber() throws Exception {
-        winchMotors = new UniversalMotorGroup(WINCH_INVERTED, ControllerType.TalonFX, WINCH_CAN_ID_ARRAY);
+        winchMotor = new FRCTalonFX(WINCH_CAN_ID);
+        winchMotor.setInverted(WINCH_INVERTED);
     }
 
     public void setClimberSpeed(final double speed) {
-        winchMotors.set(speed);
+        winchMotor.set(speed);
     }
 
     public void disable() {
-        winchMotors.disable();
+        winchMotor.disable();
     }
 
 }

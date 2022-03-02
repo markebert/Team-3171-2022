@@ -275,11 +275,11 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double[] joystickValues = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY(), rightStick.getX());
     final double leftStickY, rightStickX;
     if (boost_Button) {
-      leftStickY = joystickValues[0];
-      rightStickX = joystickValues[1];
+      leftStickY = leftStick.getY();
+      rightStickX = rightStick.getX();
     } else {
-      leftStickY = joystickValues[0] * MAX_DRIVE_SPEED;
-      rightStickX = joystickValues[1] * MAX_DRIVE_SPEED;
+      leftStickY = leftStick.getY();
+      rightStickX = rightStick.getX();
     }
 
     // Drive Control
@@ -333,7 +333,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else if (retractClimber) {
       climberController.setClimberSpeed(-.5);
     } else {
-      climberController.setClimberSpeed(0);
+      climberController.setClimberSpeed(operatorLeftStick.getY());
     }
 
     // Auton Recording

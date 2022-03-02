@@ -34,11 +34,11 @@ public interface RobotProperties {
          */
         public static final int[] LEFT_DRIVE_CAN_ID_ARRAY = new int[] { 1, 2 },
                         RIGHT_DRIVE_CAN_ID_ARRAY = new int[] { 3, 4 };
-        public static final int LOWER_SHOOTER_CAN_ID = 10, UPPER_SHOOTER_CAN_ID = 11;
+        public static final int LOWER_SHOOTER_CAN_ID = 8, UPPER_SHOOTER_CAN_ID = 9;
         public static final int PICKUP_MOTOR_CAN_ID = 5;
         public static final int LOWER_FEEDER_CAN_ID = 6;
-        public static final int UPPER_FEEDER_CAN_ID = 12;
-        public static final int[] WINCH_CAN_ID_ARRAY = new int[] { 8, 9 };
+        public static final int UPPER_FEEDER_CAN_ID = 10;
+        public static final int WINCH_CAN_ID = 7;
         public static final int PCM_CAN_ID = 14;
 
         /**
@@ -82,7 +82,7 @@ public interface RobotProperties {
          */
         public static final boolean LOWER_SHOOTER_INVERTED = false, UPPER_SHOOTER_INVERTED = true;
         public static final boolean PICKUP_MOTOR_INVERTED = false;
-        public static final boolean LOWER_FEEDER_INVERTED = true, UPPER_FEEDER_INVERTED = false;
+        public static final boolean LOWER_FEEDER_INVERTED = false, UPPER_FEEDER_INVERTED = false;
         public static final boolean WINCH_INVERTED = false;
         public static final boolean PICKUP_ARM_INVERTED = true;
         public static final boolean SHOOTER_BRAKE_INVERTED = true;

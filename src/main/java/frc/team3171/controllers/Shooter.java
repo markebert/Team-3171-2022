@@ -31,7 +31,7 @@ import frc.team3171.pnuematics.DoublePistonController;
 public class Shooter implements RobotProperties {
 
     // Motor Controllers
-    private final TalonFX lowerShooterMotor, upperShooterMotor, pickupMotor, upperFeederMotor, lowerFeederMotors;
+    private final TalonFX lowerShooterMotor, upperShooterMotor, pickupMotor, upperFeederMotor, lowerFeederMotor;
 
     // Relay for the targeting light
     // private final Relay targetLightRelay;
@@ -60,7 +60,7 @@ public class Shooter implements RobotProperties {
         upperShooterMotor = new TalonFX(UPPER_SHOOTER_CAN_ID);
         pickupMotor = new TalonFX(PICKUP_MOTOR_CAN_ID);
         upperFeederMotor = new TalonFX(UPPER_FEEDER_CAN_ID);
-        lowerFeederMotors = new TalonFX(LOWER_FEEDER_CAN_ID);
+        lowerFeederMotor = new TalonFX(LOWER_FEEDER_CAN_ID);
         // targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
 
         // Factory Default all motors to prevent unexpected behaviour
@@ -68,21 +68,21 @@ public class Shooter implements RobotProperties {
         upperShooterMotor.configFactoryDefault();
         pickupMotor.configFactoryDefault();
         upperFeederMotor.configFactoryDefault();
-        lowerFeederMotors.configFactoryDefault();
+        lowerFeederMotor.configFactoryDefault();
 
         // Set if any motors need to be inverted
         lowerShooterMotor.setInverted(LOWER_SHOOTER_INVERTED);
         upperShooterMotor.setInverted(UPPER_SHOOTER_INVERTED);
         pickupMotor.setInverted(PICKUP_MOTOR_INVERTED);
         upperFeederMotor.setInverted(UPPER_FEEDER_INVERTED);
-        lowerFeederMotors.setInverted(LOWER_FEEDER_INVERTED);
+        lowerFeederMotor.setInverted(LOWER_FEEDER_INVERTED);
 
         // Set motor brakes
         lowerShooterMotor.setNeutralMode(NeutralMode.Brake);
         upperShooterMotor.setNeutralMode(NeutralMode.Brake);
         pickupMotor.setNeutralMode(NeutralMode.Brake);
         upperFeederMotor.setNeutralMode(NeutralMode.Brake);
-        lowerFeederMotors.setNeutralMode(NeutralMode.Brake);
+        lowerFeederMotor.setNeutralMode(NeutralMode.Brake);
 
         // Init the shooter motors and pid controller
         initShooterMotorsPID();
@@ -362,7 +362,7 @@ public class Shooter implements RobotProperties {
      * @param speed The speed, from -1.0 to 1.0, to set the feeder motors to.
      */
     public void setLowerFeederSpeed(final double speed) {
-        lowerFeederMotors.set(ControlMode.PercentOutput, speed);
+        lowerFeederMotor.set(ControlMode.PercentOutput, speed);
     }
 
     /**
@@ -497,7 +497,7 @@ public class Shooter implements RobotProperties {
         lowerShooterMotor.set(ControlMode.Disabled, 0);
         upperShooterMotor.set(ControlMode.Disabled, 0);
         pickupMotor.set(ControlMode.Disabled, 0);
-        lowerFeederMotors.set(ControlMode.Disabled, 0);
+        lowerFeederMotor.set(ControlMode.Disabled, 0);
         upperFeederMotor.set(ControlMode.Disabled, 0);
         // targetLightRelay.set(Value.kOff);
         // pickupArm.disable();
