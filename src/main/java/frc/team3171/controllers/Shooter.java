@@ -12,18 +12,14 @@ import edu.wpi.first.wpilibj.Timer;
 //import edu.wpi.first.wpilibj.Relay.Direction;
 //import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 // Team 3171 Imports
 import frc.robot.RobotProperties;
-import frc.team3171.pnuematics.DoublePistonController;
+import frc.team3171.drive.FRCTalonFX;
 
 /**
  * @author Mark Ebert
@@ -31,13 +27,10 @@ import frc.team3171.pnuematics.DoublePistonController;
 public class Shooter implements RobotProperties {
 
     // Motor Controllers
-    private final TalonFX lowerShooterMotor, upperShooterMotor, pickupMotor, upperFeederMotor, lowerFeederMotor;
+    private final FRCTalonFX lowerShooterMotor, upperShooterMotor, pickupMotor, upperFeederMotor, lowerFeederMotor;
 
     // Relay for the targeting light
     // private final Relay targetLightRelay;
-
-    // Double Solenoid used extend the pickup mechanism
-    private final DoublePistonController pickupArm, shooterBrake;
 
     // Executor Service
     private final ExecutorService executorService;
@@ -56,19 +49,12 @@ public class Shooter implements RobotProperties {
      */
     public Shooter() throws Exception {
         // Init all of the motors
-        lowerShooterMotor = new TalonFX(LOWER_SHOOTER_CAN_ID);
-        upperShooterMotor = new TalonFX(UPPER_SHOOTER_CAN_ID);
-        pickupMotor = new TalonFX(PICKUP_MOTOR_CAN_ID);
-        upperFeederMotor = new TalonFX(UPPER_FEEDER_CAN_ID);
-        lowerFeederMotor = new TalonFX(LOWER_FEEDER_CAN_ID);
+        lowerShooterMotor = new FRCTalonFX(LOWER_SHOOTER_CAN_ID);
+        upperShooterMotor = new FRCTalonFX(UPPER_SHOOTER_CAN_ID);
+        pickupMotor = new FRCTalonFX(PICKUP_MOTOR_CAN_ID);
+        upperFeederMotor = new FRCTalonFX(UPPER_FEEDER_CAN_ID);
+        lowerFeederMotor = new FRCTalonFX(LOWER_FEEDER_CAN_ID);
         // targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
-
-        // Factory Default all motors to prevent unexpected behaviour
-        lowerShooterMotor.configFactoryDefault();
-        upperShooterMotor.configFactoryDefault();
-        pickupMotor.configFactoryDefault();
-        upperFeederMotor.configFactoryDefault();
-        lowerFeederMotor.configFactoryDefault();
 
         // Set if any motors need to be inverted
         lowerShooterMotor.setInverted(LOWER_SHOOTER_INVERTED);
@@ -77,21 +63,16 @@ public class Shooter implements RobotProperties {
         upperFeederMotor.setInverted(UPPER_FEEDER_INVERTED);
         lowerFeederMotor.setInverted(LOWER_FEEDER_INVERTED);
 
-        // Set motor brakes
-        lowerShooterMotor.setNeutralMode(NeutralMode.Brake);
-        upperShooterMotor.setNeutralMode(NeutralMode.Brake);
-        pickupMotor.setNeutralMode(NeutralMode.Brake);
-        upperFeederMotor.setNeutralMode(NeutralMode.Brake);
-        lowerFeederMotor.setNeutralMode(NeutralMode.Brake);
+        // Configure the velocity closed loop values
+        lowerShooterMotor.config_kP(0, SHOOTER_KP);
+        lowerShooterMotor.config_kI(0, SHOOTER_KI);
+        lowerShooterMotor.config_kD(0, SHOOTER_KD);
+        lowerShooterMotor.config_kF(0, SHOOTER_KF);
 
-        // Init the shooter motors and pid controller
-        initShooterMotorsPID();
-
-        // Init the pneumatics
-        pickupArm = new DoublePistonController(PCM_CAN_ID, PneumaticsModuleType.REVPH, PICKUP_ARM_FORWARD_CHANNEL,
-                PICKUP_ARM_REVERSE_CHANNEL, PICKUP_ARM_INVERTED);
-        shooterBrake = new DoublePistonController(PCM_CAN_ID, PneumaticsModuleType.REVPH, SHOOTER_BRAKE_FORWARD_CHANNEL,
-                SHOOTER_BRAKE_REVERSE_CHANNEL, SHOOTER_BRAKE_INVERTED);
+        upperShooterMotor.config_kP(0, SHOOTER_KP);
+        upperShooterMotor.config_kI(0, SHOOTER_KI);
+        upperShooterMotor.config_kD(0, SHOOTER_KD);
+        upperShooterMotor.config_kF(0, SHOOTER_KF);
 
         // Initialize the executor service for concurrency
         executorService = Executors.newFixedThreadPool(2);
@@ -101,50 +82,6 @@ public class Shooter implements RobotProperties {
         // Initialize the AtomicBooleans to control the thread executors
         lowerFeederExecutorActive = new AtomicBoolean(false);
         upperFeederExecutorActive = new AtomicBoolean(false);
-    }
-
-    /**
-     * Sets up the shooter motors and their PID controllers.
-     */
-    private final void initShooterMotorsPID() {
-        // Config sensor used for Shooter Motor Velocity PID Controller
-        lowerShooterMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, SHOOTER_KPID_LOOPINDEX,
-                SHOOTER_KTIMEOUT_MS);
-        upperShooterMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, SHOOTER_KPID_LOOPINDEX,
-                SHOOTER_KTIMEOUT_MS);
-
-        /**
-         * Set the sensor phase accordingly. Positive sensor reading should match Green
-         * (blinking) Leds on Talon when the motor is being driven.
-         */
-        lowerShooterMotor.setSensorPhase(lowerShooterMotor.getInverted());
-        upperShooterMotor.setSensorPhase(upperShooterMotor.getInverted());
-
-        // Resets the ingrated encoders on the Shooter Motors
-        lowerShooterMotor.setSelectedSensorPosition(0);
-        upperShooterMotor.setSelectedSensorPosition(0);
-
-        // Config the peak and nominal outputs of the Shooter Motors for PID Control
-        lowerShooterMotor.configNominalOutputForward(0, SHOOTER_KTIMEOUT_MS);
-        lowerShooterMotor.configNominalOutputReverse(0, SHOOTER_KTIMEOUT_MS);
-        lowerShooterMotor.configPeakOutputForward(1, SHOOTER_KTIMEOUT_MS);
-        lowerShooterMotor.configPeakOutputReverse(-1, SHOOTER_KTIMEOUT_MS);
-
-        upperShooterMotor.configNominalOutputForward(0, SHOOTER_KTIMEOUT_MS);
-        upperShooterMotor.configNominalOutputReverse(0, SHOOTER_KTIMEOUT_MS);
-        upperShooterMotor.configPeakOutputForward(1, SHOOTER_KTIMEOUT_MS);
-        upperShooterMotor.configPeakOutputReverse(-1, SHOOTER_KTIMEOUT_MS);
-
-        // Config the Velocity closed loop values in slot0
-        lowerShooterMotor.config_kP(SHOOTER_KPID_LOOPINDEX, SHOOTER_KP, SHOOTER_KTIMEOUT_MS);
-        lowerShooterMotor.config_kI(SHOOTER_KPID_LOOPINDEX, SHOOTER_KI, SHOOTER_KTIMEOUT_MS);
-        lowerShooterMotor.config_kD(SHOOTER_KPID_LOOPINDEX, SHOOTER_KD, SHOOTER_KTIMEOUT_MS);
-        lowerShooterMotor.config_kF(SHOOTER_KPID_LOOPINDEX, SHOOTER_KF, SHOOTER_KTIMEOUT_MS);
-
-        upperShooterMotor.config_kP(SHOOTER_KPID_LOOPINDEX, SHOOTER_KP, SHOOTER_KTIMEOUT_MS);
-        upperShooterMotor.config_kI(SHOOTER_KPID_LOOPINDEX, SHOOTER_KI, SHOOTER_KTIMEOUT_MS);
-        upperShooterMotor.config_kD(SHOOTER_KPID_LOOPINDEX, SHOOTER_KD, SHOOTER_KTIMEOUT_MS);
-        upperShooterMotor.config_kF(SHOOTER_KPID_LOOPINDEX, SHOOTER_KF, SHOOTER_KTIMEOUT_MS);
     }
 
     /**
@@ -158,34 +95,6 @@ public class Shooter implements RobotProperties {
         } else {
             // targetLightRelay.set(Value.kOff);
         }
-    }
-
-    /**
-     * Retracts the pickup arm.
-     */
-    public void retractPickupArm() {
-        pickupArm.retract();
-    }
-
-    /**
-     * Extends the pickup arm.
-     */
-    public void extendPickupArm() {
-        pickupArm.extend();
-    }
-
-    /**
-     * Retracts the shooter brake.
-     */
-    public void retractShooterBrake() {
-        shooterBrake.retract();
-    }
-
-    /**
-     * Extends the shooter brake.
-     */
-    public void extendShooterBrake() {
-        shooterBrake.extend();
     }
 
     /**
@@ -500,7 +409,6 @@ public class Shooter implements RobotProperties {
         lowerFeederMotor.set(ControlMode.Disabled, 0);
         upperFeederMotor.set(ControlMode.Disabled, 0);
         // targetLightRelay.set(Value.kOff);
-        // pickupArm.disable();
     }
 
 }

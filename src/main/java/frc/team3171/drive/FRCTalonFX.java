@@ -26,7 +26,12 @@ public class FRCTalonFX extends TalonFX implements MotorController {
         super(deviceNumber);
         configFactoryDefault();
         setNeutralMode(NeutralMode.Brake);
-        configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 20);
+        configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+        configNominalOutputForward(0);
+        configNominalOutputReverse(0);
+        configPeakOutputForward(1);
+        configPeakOutputReverse(-1);
+        setSelectedSensorPosition(0);
     }
 
     @Override
@@ -47,6 +52,12 @@ public class FRCTalonFX extends TalonFX implements MotorController {
     @Override
     public void stopMotor() {
         set(ControlMode.Disabled, 0);
+    }
+
+    @Override
+    public void setInverted(final boolean invert) {
+        super.setInverted(invert);
+        setSensorPhase(invert);
     }
 
     /**

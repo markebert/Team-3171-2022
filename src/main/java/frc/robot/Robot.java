@@ -306,7 +306,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       shooterController.setShooterVelocity(0);
       // Ball Pickup Controls
       if (button_Pickup) {
-        shooterController.extendPickupArm();
+        // shooterController.extendPickupArm();
         shooterController.setPickupSpeed(.7);
         shooterController.setLowerFeederSpeed(.2);
         shooterController.setUpperFeederSpeed(.3);
@@ -316,7 +316,7 @@ public class Robot extends TimedRobot implements RobotProperties {
         shooterController.setUpperFeederSpeed(-.5);
       } else {
         shooterController.setPickupSpeed(0);
-        shooterController.retractPickupArm();
+        // shooterController.retractPickupArm();
         shooterController.setLowerFeederSpeed(0);
         if (ballpickupEdgeTrigger) {
           shooterController.runUpperFeeder(-.2, .25);
@@ -329,11 +329,11 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Climber Control
     if (extendClimber) {
-      climberController.setClimberSpeed(.5);
+      climberController.setPrimaryClimberSpeed(.5);
     } else if (retractClimber) {
-      climberController.setClimberSpeed(-.5);
+      climberController.setPrimaryClimberSpeed(-.5);
     } else {
-      climberController.setClimberSpeed(operatorLeftStick.getY());
+      climberController.setPrimaryClimberSpeed(operatorLeftStick.getY());
     }
 
     // Auton Recording
