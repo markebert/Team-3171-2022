@@ -59,7 +59,7 @@ public class Robot extends TimedRobot implements RobotProperties {
   private SendableChooser<String> autonModeChooser;
 
   // Joysticks
-  private Joystick leftStick, rightStick, operatorLeftStick;
+  private Joystick leftStick, rightStick, operatorLeftStick, operatorRightStick;
 
   // Drive Controller
   private UniversalMotorGroup leftMotorGroup, rightMotorGroup;
@@ -108,6 +108,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     leftStick = new Joystick(0);
     rightStick = new Joystick(1);
     operatorLeftStick = new Joystick(2);
+    operatorRightStick = new Joystick(3);
 
     // Drive, Shooter and Climber Controller inits
     try {
@@ -335,6 +336,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else {
       climberController.setPrimaryClimberSpeed(operatorLeftStick.getY());
     }
+
+    climberController.setSecondaryClimberSpeed(operatorRightStick.getY());
 
     // Auton Recording
     if (saveNewAuton) {
