@@ -338,7 +338,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
 
     climberController.setSecondaryClimberSpeed(operatorRightStick.getY());
-    climberController.setSecondaryClimberPosition((int) (-operatorRightStick.getY() * 1000));
+    //climberController.setSecondaryClimberPosition((int) (-operatorRightStick.getY() * 1000));
 
     // Auton Recording
     if (saveNewAuton) {
