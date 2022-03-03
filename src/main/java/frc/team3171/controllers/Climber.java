@@ -74,8 +74,13 @@ public class Climber implements RobotProperties {
      * @param position
      */
     public void setSecondaryClimberPosition(final int position) {
-        secondaryWinchOne.set(ControlMode.Position, position);
-        secondaryWinchTwo.set(ControlMode.Position, position);
+        if (position < 0) {
+            secondaryWinchOne.set(ControlMode.PercentOutput, 0);
+            secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
+        } else {
+            secondaryWinchOne.set(ControlMode.Position, position);
+            secondaryWinchTwo.set(ControlMode.Position, position);
+        }
     }
 
     /**
