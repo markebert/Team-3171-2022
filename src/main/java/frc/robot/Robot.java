@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -67,6 +68,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
   // Shooter Controller
   private Shooter shooterController;
+  private DigitalInput feedSensor;
   private double shooterAtSpeedStartTime;
   private boolean shooterAtSpeedEdgeTrigger, ballpickupEdgeTrigger;
 
@@ -122,6 +124,8 @@ public class Robot extends TimedRobot implements RobotProperties {
       System.err.println(e.getMessage());
     }
 
+    feedSensor = new DigitalInput(9);
+
     // Edge Trigger init
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
@@ -150,6 +154,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("Lower Shooter Target Velocity:", shooterController.getLowerShooterTargetVelocity());
     SmartDashboard.putNumber("Upper Shooter Velocity:", shooterController.getUpperShooterVelocity());
     SmartDashboard.putNumber("Upper Shooter Target Velocity:", shooterController.getUpperShooterTargetVelocity());
+
+    SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
 
     SmartDashboard.putNumber("robotPeriodic:", Timer.getFPGATimestamp() - startTime);
   }
@@ -338,7 +344,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
 
     climberController.setSecondaryClimberSpeed(operatorRightStick.getY());
-    //climberController.setSecondaryClimberPosition((int) (-operatorRightStick.getY() * 1000));
+    // climberController.setSecondaryClimberPosition((int)
+    // (-operatorRightStick.getY() * 1000));
 
     // Auton Recording
     if (saveNewAuton) {
