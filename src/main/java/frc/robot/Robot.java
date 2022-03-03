@@ -280,7 +280,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       rightStickX = joystickValues[1];
     } else {
       leftStickY = joystickValues[0] * MAX_DRIVE_SPEED;
-      rightStickX = joystickValues[0] * MAX_DRIVE_SPEED;
+      rightStickX = joystickValues[1] * MAX_DRIVE_SPEED;
     }
 
     // Drive Control
