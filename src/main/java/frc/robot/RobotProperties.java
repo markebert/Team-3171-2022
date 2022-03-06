@@ -40,6 +40,7 @@ public interface RobotProperties {
         public static final int UPPER_FEEDER_CAN_ID = 10;
         public static final int PRIMARY_WINCH_CAN_ID = 7;
         public static final int SECONDARY_WINCH_ONE_CAN_ID = 11, SECONDARY_WINCH_TWO_CAN_ID = 12;
+        public static final int PICKUP_ARM_CAN_ID = 13;
 
         /**
          * Inversion Properties
