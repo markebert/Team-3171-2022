@@ -472,16 +472,10 @@ public class Shooter implements RobotProperties {
     }
 
     public void extendPickupArm() {
-        if (pickupArmMotor.getIdleMode() == IdleMode.kBrake) {
-            pickupArmMotor.setIdleMode(IdleMode.kCoast);
-        }
         pickupArmPIDController.setReference(2, ControlType.kPosition);
     }
 
     public void retractPickupArm() {
-        if (pickupArmMotor.getIdleMode() == IdleMode.kCoast) {
-            pickupArmMotor.setIdleMode(IdleMode.kBrake);
-        }
         pickupArmPIDController.setReference(0, ControlType.kPosition);
     }
 
