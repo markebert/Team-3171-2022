@@ -320,6 +320,9 @@ public class Robot extends TimedRobot implements RobotProperties {
           && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + desiredAtSpeedTime)) {
         shooterController.setLowerFeederSpeed(.1);
         shooterController.setUpperFeederSpeed(.25);
+      } else if (feedSensor.get()) {
+        shooterController.setLowerFeederSpeed(0);
+        shooterController.setUpperFeederSpeed(-.1);
       } else {
         shooterController.setLowerFeederSpeed(0);
         shooterController.setUpperFeederSpeed(0);
@@ -331,8 +334,12 @@ public class Robot extends TimedRobot implements RobotProperties {
       if (button_Pickup) {
         // shooterController.extendPickupArm();
         shooterController.setPickupSpeed(.7);
+        if (feedSensor.get()) {
+          shooterController.setUpperFeederSpeed(0);
+        } else {
+          shooterController.setUpperFeederSpeed(.2);
+        }
         shooterController.setLowerFeederSpeed(.2);
-        shooterController.setUpperFeederSpeed(.3);
       } else if (button_Reverse_Pickup) {
         shooterController.setPickupSpeed(0);
         shooterController.setLowerFeederSpeed(-.5);
@@ -341,7 +348,7 @@ public class Robot extends TimedRobot implements RobotProperties {
         shooterController.setPickupSpeed(0);
         // shooterController.retractPickupArm();
         shooterController.setLowerFeederSpeed(0);
-        if (ballpickupEdgeTrigger) {
+        if (ballpickupEdgeTrigger && feedSensor.get()) {
           shooterController.runUpperFeeder(-.2, .25);
         } else {
           shooterController.setUpperFeederSpeed(0);
