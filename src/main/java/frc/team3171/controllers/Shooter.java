@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -34,6 +36,7 @@ public class Shooter implements RobotProperties {
     private final FRCTalonFX lowerShooterMotor, upperShooterMotor, pickupMotor, upperFeederMotor, lowerFeederMotor;
     private final CANSparkMax pickupArmMotor;
     private final RelativeEncoder pickupArmEncoder;
+    private final SparkMaxPIDController pickupArmPIDController;
 
     // Relay for the targeting light
     // private final Relay targetLightRelay;
@@ -61,7 +64,7 @@ public class Shooter implements RobotProperties {
         upperFeederMotor = new FRCTalonFX(UPPER_FEEDER_CAN_ID);
         lowerFeederMotor = new FRCTalonFX(LOWER_FEEDER_CAN_ID);
         pickupArmMotor = new CANSparkMax(PICKUP_ARM_CAN_ID, MotorType.kBrushless);
-        pickupArmMotor.restoreFactoryDefaults();
+        pickupArmMotor.restoreFactoryDefaults(true);
         pickupArmMotor.setIdleMode(IdleMode.kBrake);
 
         // targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
@@ -76,6 +79,18 @@ public class Shooter implements RobotProperties {
 
         // Gets the Neo Spark Max encoder
         pickupArmEncoder = pickupArmMotor.getEncoder();
+        pickupArmPIDController = pickupArmMotor.getPIDController();
+
+        // set PID coefficients
+        pickupArmPIDController.setP(PICKUP_ARM_KP);
+        pickupArmPIDController.setI(PICKUP_ARM_KI);
+        pickupArmPIDController.setD(PICKUP_ARM_KD);
+        pickupArmPIDController.setFF(PICKUP_ARM_KF);
+        pickupArmPIDController.setOutputRange(-1, 1);
+        pickupArmPIDController.setSmartMotionMaxVelocity(2000, 0);
+        pickupArmPIDController.setSmartMotionMinOutputVelocity(0, 0);
+        pickupArmPIDController.setSmartMotionMaxAccel(1500, 0);
+        pickupArmPIDController.setSmartMotionAllowedClosedLoopError(0, 0);
 
         // Configure the velocity closed loop values
         lowerShooterMotor.config_kP(0, SHOOTER_KP);
@@ -454,6 +469,20 @@ public class Shooter implements RobotProperties {
             pickupArmMotor.setIdleMode(IdleMode.kBrake);
         }
         pickupArmMotor.set(speed);
+    }
+
+    public void extendPickupArm() {
+        if (pickupArmMotor.getIdleMode() == IdleMode.kBrake) {
+            pickupArmMotor.setIdleMode(IdleMode.kCoast);
+        }
+        pickupArmPIDController.setReference(2, ControlType.kPosition);
+    }
+
+    public void retractPickupArm() {
+        if (pickupArmMotor.getIdleMode() == IdleMode.kCoast) {
+            pickupArmMotor.setIdleMode(IdleMode.kBrake);
+        }
+        pickupArmPIDController.setReference(0, ControlType.kPosition);
     }
 
     /**

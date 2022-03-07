@@ -91,53 +91,63 @@ public interface RobotProperties {
         /**
          * PID Properties
          * 
-         * @param GYRO_KP      The proportional value for the Gyro PID
-         *                     Controller.
-         * @param GYRO_KI      The integral value for the Gyro PID Controller.
-         * @param GYRO_KD      The derivative value for the Gyro PID
-         *                     Controller.
-         * @param LIMELIGHT_KP The proportional value for the Limelight PID
-         *                     Controller.
-         * @param LIMELIGHT_KI The integral value for the Limelight PID
-         *                     Controller.
-         * @param LIMELIGHT_KD The derivative value for the Limelight PID
-         *                     Controller.
-         * @param SHOOTER_KP   The proportional value for the Shooter PID
-         *                     Controller.
-         * @param SHOOTER_KI   The integral value for the Shooter PID
-         *                     Controller.
-         * @param SHOOTER_KD   The derivative value for the Shooter PID
-         *                     Controller.
-         * @param SHOOTER_KF   The feed-forward value for the Shooter PID
-         *                     Controller. kF: 1.0 represents output value to
-         *                     TalonFX at 100%, 6380/600 represents Velocity
-         *                     units per 100 ms at 100% output.
-         * @param WINCH_KP     The proportional value for the Winch PID
-         *                     Controller.
-         * @param WINCH_KI     The integral value for the Winch PID
-         *                     Controller.
-         * @param WINCH_KD     The derivative value for the Winch PID
-         *                     Controller.
-         * @param WINCH_KF     The feed-forward value for the Winch PID
-         *                     Controller. kF: 1.0 represents output value to
-         *                     TalonFX at 100%, 6380/600 represents Velocity
-         *                     units per 100 ms at 100% output.
-         * @param DRIVE_KP     The proportional value for the Drive PID
-         *                     Controller.
-         * @param DRIVE_KI     The integral value for the Drive PID
-         *                     Controller.
-         * @param DRIVE_KD     The derivative value for the Drive PID
-         *                     Controller.
-         * @param DRIVE_KF     The feed-forward value for the Drive PID
-         *                     Controller. kF: 1.0 represents output value to
-         *                     TalonFX at 100%, 6380/600 represents Velocity
-         *                     units per 100 ms at 100% output.
+         * @param GYRO_KP       The proportional value for the Gyro PID
+         *                      Controller.
+         * @param GYRO_KI       The integral value for the Gyro PID Controller.
+         * @param GYRO_KD       The derivative value for the Gyro PID
+         *                      Controller.
+         * @param LIMELIGHT_KP  The proportional value for the Limelight PID
+         *                      Controller.
+         * @param LIMELIGHT_KI  The integral value for the Limelight PID
+         *                      Controller.
+         * @param LIMELIGHT_KD  The derivative value for the Limelight PID
+         *                      Controller.
+         * @param SHOOTER_KP    The proportional value for the Shooter PID
+         *                      Controller.
+         * @param SHOOTER_KI    The integral value for the Shooter PID
+         *                      Controller.
+         * @param SHOOTER_KD    The derivative value for the Shooter PID
+         *                      Controller.
+         * @param SHOOTER_KF    The feed-forward value for the Shooter PID
+         *                      Controller. kF: 1.0 represents output value to
+         *                      TalonFX at 100%, 6380/600 represents Velocity
+         *                      units per 100 ms at 100% output.
+         * @param WINCH_KP      The proportional value for the Winch PID
+         *                      Controller.
+         * @param WINCH_KI      The integral value for the Winch PID
+         *                      Controller.
+         * @param WINCH_KD      The derivative value for the Winch PID
+         *                      Controller.
+         * @param WINCH_KF      The feed-forward value for the Winch PID
+         *                      Controller. kF: 1.0 represents output value to
+         *                      TalonFX at 100%, 6380/600 represents Velocity
+         *                      units per 100 ms at 100% output.
+         * @param DRIVE_KP      The proportional value for the Drive PID
+         *                      Controller.
+         * @param DRIVE_KI      The integral value for the Drive PID
+         *                      Controller.
+         * @param DRIVE_KD      The derivative value for the Drive PID
+         *                      Controller.
+         * @param DRIVE_KF      The feed-forward value for the Drive PID
+         *                      Controller. kF: 1.0 represents output value to
+         *                      TalonFX at 100%, 6380/600 represents Velocity
+         *                      units per 100 ms at 100% output.
+         * @param PICKUP_ARM_KP The proportional value for the Pickup Arm PID
+         *                      Controller.
+         * @param PICKUP_ARM_KI The integral value for the Pickup Arm PID
+         *                      Controller.
+         * @param PICKUP_ARM_KD The derivative value for the Pickup Arm PID
+         *                      Controller.
+         * @param PICKUP_ARM_KF The feed-forward value for the Pickup Arm PID
+         *                      Controller. kF: 1.0 represents output value to
+         *                      Neo Spark Max Brushless at 100%.
          */
         public static final double GYRO_KP = .0045, GYRO_KI = .0001, GYRO_KD = .0001;
         public static final double LIMELIGHT_KP = .025, LIMELIGHT_KI = .003, LIMELIGHT_KD = .00175;
         public static final double SHOOTER_KP = .01, SHOOTER_KI = .0002, SHOOTER_KD = .0001, SHOOTER_KF = 0;
         public static final double WINCH_KP = .01, WINCH_KI = .0002, WINCH_KD = .0001, WINCH_KF = 0;
         public static final double DRIVE_KP = .01, DRIVE_KI = .0002, DRIVE_KD = .0001, DRIVE_KF = 0;
+        public static final double PICKUP_ARM_KP = 5e-5, PICKUP_ARM_KI = 1e-6, PICKUP_ARM_KD = 0, PICKUP_ARM_KF = 0.000156;
 
         /** Auton Properties **/
         public static final String[] AUTON_OPTIONS = {
