@@ -30,6 +30,7 @@ import static frc.team3171.HelperFunctions.Deadzone_With_Map;
 import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.TractionDrive;
 import frc.team3171.drive.UniversalMotorGroup.ControllerType;
+import frc.team3171.sensors.BNO055_I2C;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -65,6 +66,7 @@ public class Robot extends TimedRobot implements RobotProperties {
   // Drive Controller
   private UniversalMotorGroup leftMotorGroup, rightMotorGroup;
   private TractionDrive driveController;
+  private BNO055_I2C imu;
 
   // Shooter Controller
   private Shooter shooterController;
@@ -82,6 +84,9 @@ public class Robot extends TimedRobot implements RobotProperties {
   @Override
   public void robotInit() {
     final double startTime = Timer.getFPGATimestamp();
+
+    // Gyro init
+    imu = BNO055_I2C.getInstance(BNO055_I2C.opmode_t.OPERATION_MODE_IMUPLUS, BNO055_I2C.vector_type_t.VECTOR_EULER);
 
     // Auton Recorder init
     autonRecorder = new AutonRecorder();
@@ -124,7 +129,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       System.err.println(e.getMessage());
     }
 
-    feedSensor = new DigitalInput(9);
+    feedSensor = new DigitalInput(FEED_SENSOR_CHANNEL);
 
     // Edge Trigger init
     shooterAtSpeedEdgeTrigger = false;
@@ -156,6 +161,13 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("Upper Shooter Target Velocity:", shooterController.getUpperShooterTargetVelocity());
 
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
+    SmartDashboard.putBoolean("BNO055 Present:", imu.isSensorPresent());
+    SmartDashboard.putBoolean("BNO055 Initialized:", imu.isInitialized());
+    SmartDashboard.putBoolean("BNO055 Calibrated:", imu.isCalibrated());
+
+    if (imu.isSensorPresent() && imu.isInitialized()) {
+      SmartDashboard.putNumber("BNO055 Heading:", imu.getHeading());
+    }
 
     SmartDashboard.putNumber("robotPeriodic:", Timer.getFPGATimestamp() - startTime);
   }
@@ -294,14 +306,15 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Shooter Control
     final int lowerShooterVelocity = 3500, upperShooterVelocity = 6000;
+    final double desiredPercentAccuracy = .04, desiredAtSpeedTime = 5.0;
     if (button_Shooter) {
       shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
       // shooterController.retractPickupArm();
-      final boolean isAtSpeed = shooterController.isLowerShooterAtVelocity(.04)
-          && shooterController.isUpperShooterAtVelocity(.04);
+      final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(desiredPercentAccuracy);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
         shooterAtSpeedStartTime = Timer.getFPGATimestamp();
-      } else if (isAtSpeed && shooterAtSpeedEdgeTrigger && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + 5)) {
+      } else if (isAtSpeed && shooterAtSpeedEdgeTrigger
+          && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + desiredAtSpeedTime)) {
         shooterController.setLowerFeederSpeed(.1);
         shooterController.setUpperFeederSpeed(.25);
       } else {

@@ -266,6 +266,24 @@ public class Shooter implements RobotProperties {
     }
 
     /**
+     * Returns if the velocity of the both shooter motors is within the
+     * provided percent error margin.
+     * 
+     * @param percentError The percent error, from 0.0 to 1.0 with 1.0 being
+     *                     equivilent to 100%, allowed to be considered at velocity.
+     * @return true if the motors current velocity is within the given percent
+     *         error, false otherwise.
+     */
+    public boolean isBothShootersAtVelocity(double percentError) {
+        percentError = Math.abs(percentError);
+        percentError = percentError > 1 ? 1.0 : percentError;
+        final double upperAcceptableError = Math.abs(upperShooterMotor.getClosedLoopTarget()) * percentError;
+        final double lowerAcceptableError = Math.abs(lowerShooterMotor.getClosedLoopTarget()) * percentError;
+        return Math.abs(upperShooterMotor.getClosedLoopError()) < upperAcceptableError
+                && Math.abs(lowerShooterMotor.getClosedLoopError()) < lowerAcceptableError;
+    }
+
+    /**
      * Sets the speed of the feeder motors to the given value.
      * 
      * @param speed The speed, from -1.0 to 1.0, to set the feeder motors to.
