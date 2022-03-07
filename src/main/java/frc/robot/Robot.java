@@ -129,6 +129,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       System.err.println(e.getMessage());
     }
 
+    // Feed Sensor init
     feedSensor = new DigitalInput(FEED_SENSOR_CHANNEL);
 
     // Edge Trigger init
@@ -168,6 +169,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     if (imu.isSensorPresent() && imu.isInitialized()) {
       SmartDashboard.putNumber("BNO055 Heading:", imu.getHeading());
     }
+
+    SmartDashboard.putNumber("Pickup Arm Position:", shooterController.getPickupArmPoisition());
 
     SmartDashboard.putNumber("robotPeriodic:", Timer.getFPGATimestamp() - startTime);
   }

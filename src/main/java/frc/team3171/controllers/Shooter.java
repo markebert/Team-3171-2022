@@ -16,6 +16,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 // Team 3171 Imports
 import frc.robot.RobotProperties;
@@ -28,6 +32,8 @@ public class Shooter implements RobotProperties {
 
     // Motor Controllers
     private final FRCTalonFX lowerShooterMotor, upperShooterMotor, pickupMotor, upperFeederMotor, lowerFeederMotor;
+    private final CANSparkMax pickupArmMotor;
+    private final RelativeEncoder pickupArmEncoder;
 
     // Relay for the targeting light
     // private final Relay targetLightRelay;
@@ -54,6 +60,10 @@ public class Shooter implements RobotProperties {
         pickupMotor = new FRCTalonFX(PICKUP_MOTOR_CAN_ID);
         upperFeederMotor = new FRCTalonFX(UPPER_FEEDER_CAN_ID);
         lowerFeederMotor = new FRCTalonFX(LOWER_FEEDER_CAN_ID);
+        pickupArmMotor = new CANSparkMax(PICKUP_ARM_CAN_ID, MotorType.kBrushless);
+        pickupArmMotor.restoreFactoryDefaults();
+        pickupArmMotor.setIdleMode(IdleMode.kBrake);
+
         // targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
 
         // Set if any motors need to be inverted
@@ -62,6 +72,10 @@ public class Shooter implements RobotProperties {
         pickupMotor.setInverted(PICKUP_MOTOR_INVERTED);
         upperFeederMotor.setInverted(UPPER_FEEDER_INVERTED);
         lowerFeederMotor.setInverted(LOWER_FEEDER_INVERTED);
+        pickupArmMotor.setInverted(PICKUP_ARM_MOTOR_INVERTED);
+
+        // Gets the Neo Spark Max encoder
+        pickupArmEncoder = pickupArmMotor.getEncoder();
 
         // Configure the velocity closed loop values
         lowerShooterMotor.config_kP(0, SHOOTER_KP);
@@ -415,6 +429,17 @@ public class Shooter implements RobotProperties {
      */
     public void setPickupSpeed(final double speed) {
         pickupMotor.set(ControlMode.PercentOutput, speed);
+    }
+
+    /**
+     * Returns the number of rotations that the pickup arm encoder differs from its
+     * starting position.
+     * 
+     * @return The difference in the number of rotations that the motor is currently
+     *         located at relative to its startup position.
+     */
+    public double getPickupArmPoisition() {
+        return pickupArmEncoder.getPosition();
     }
 
     /**
