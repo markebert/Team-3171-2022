@@ -443,6 +443,20 @@ public class Shooter implements RobotProperties {
     }
 
     /**
+     * Sets the speed of the pickup arm motor to the given value.
+     * 
+     * @param speed The speed, from -1.0 to 1.0, to set the pickup motors to.
+     */
+    public void setPickupArmSpeed(final double speed) {
+        if (speed > 0 && pickupArmMotor.getIdleMode() == IdleMode.kBrake) {
+            pickupArmMotor.setIdleMode(IdleMode.kCoast);
+        } else if (pickupArmMotor.getIdleMode() == IdleMode.kCoast) {
+            pickupArmMotor.setIdleMode(IdleMode.kBrake);
+        }
+        pickupArmMotor.set(speed);
+    }
+
+    /**
      * Disables all motors in the {@link Shooter} class.
      */
     public final void disable() {
@@ -451,6 +465,8 @@ public class Shooter implements RobotProperties {
         pickupMotor.set(ControlMode.Disabled, 0);
         lowerFeederMotor.set(ControlMode.Disabled, 0);
         upperFeederMotor.set(ControlMode.Disabled, 0);
+        pickupArmMotor.setIdleMode(IdleMode.kBrake);
+        pickupArmMotor.disable();
         // targetLightRelay.set(Value.kOff);
     }
 
