@@ -314,7 +314,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     final boolean button_Reverse_Pickup = leftStick.getRawButton(4);
 
     final boolean button_Shooter = rightStick.getTrigger();
-    final boolean button_Full_Yeet = rightStick.getRawButton(2);
+    //final boolean button_Full_Yeet = rightStick.getRawButton(2);
     final boolean button_Retract_Pickup_Arm = rightStick.getRawButton(3);
     final boolean button_Extend_Pickup_Arm = rightStick.getRawButton(4);
 
