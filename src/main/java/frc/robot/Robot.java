@@ -145,9 +145,9 @@ public class Robot extends TimedRobot implements RobotProperties {
     ballpickupEdgeTrigger = false;
 
     // Camera Server for climber camera
-    // final UsbCamera camera = CameraServer.startAutomaticCapture();
-    // camera.setResolution(640, 360);
-    // camera.setFPS(30);
+    final UsbCamera camera = CameraServer.startAutomaticCapture();
+    camera.setResolution(640, 360);
+    camera.setFPS(30);
 
     // PID Logging init
     if (PID_LOGGING && !DriverStation.isFMSAttached()) {

@@ -91,6 +91,8 @@ public interface RobotProperties {
         /**
          * PID Properties
          * 
+         * @param PID_LOGGING   Whether or not to enable logging of the set PID
+         *                      Controller.
          * @param GYRO_KP       The proportional value for the Gyro PID
          *                      Controller.
          * @param GYRO_KI       The integral value for the Gyro PID Controller.
@@ -142,14 +144,14 @@ public interface RobotProperties {
          *                      Controller. kF: 1.0 represents output value to
          *                      Neo Spark Max Brushless at 100%.
          */
+        public static final boolean PID_LOGGING = true;
         public static final double GYRO_KP = .0045, GYRO_KI = .0001, GYRO_KD = .0001;
         public static final double LIMELIGHT_KP = .025, LIMELIGHT_KI = .003, LIMELIGHT_KD = .00175;
         public static final double SHOOTER_KP = .01, SHOOTER_KI = .0002, SHOOTER_KD = .0001, SHOOTER_KF = 0;
         public static final double WINCH_KP = .01, WINCH_KI = .0002, WINCH_KD = .0001, WINCH_KF = 0;
         public static final double DRIVE_KP = .01, DRIVE_KI = .0002, DRIVE_KD = .0001, DRIVE_KF = 0;
-        public static final double PICKUP_ARM_KP = 8e-3, PICKUP_ARM_KI = 2e-6, PICKUP_ARM_KD = 3e-6, PICKUP_ARM_KF = 0.00412;
-
-        public static final boolean PID_LOGGING = true;
+        public static final double PICKUP_ARM_KP = 8e-3, PICKUP_ARM_KI = 2e-6, PICKUP_ARM_KD = 3e-6,
+                        PICKUP_ARM_KF = 0.00412;
 
         /** Auton Properties **/
         public static final String[] AUTON_OPTIONS = {
