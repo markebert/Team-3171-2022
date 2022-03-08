@@ -6,8 +6,11 @@
 /*----------------------------------------------------------------------------*/
 package frc.robot;
 
+import java.io.IOException;
 // Java Imports
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import com.kauailabs.navx.frc.AHRS;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -16,7 +19,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 
 // Team 3171 Imports
@@ -30,7 +35,6 @@ import static frc.team3171.HelperFunctions.Deadzone_With_Map;
 import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.TractionDrive;
 import frc.team3171.drive.UniversalMotorGroup.ControllerType;
-import frc.team3171.sensors.BNO055_I2C;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -66,7 +70,7 @@ public class Robot extends TimedRobot implements RobotProperties {
   // Drive Controller
   private UniversalMotorGroup leftMotorGroup, rightMotorGroup;
   private TractionDrive driveController;
-  private BNO055_I2C imu;
+  private AHRS gyro;
 
   // Shooter Controller
   private Shooter shooterController;
@@ -77,6 +81,10 @@ public class Robot extends TimedRobot implements RobotProperties {
   // Climber Controller
   private Climber climberController;
 
+  // Shooter PID Logging
+  public ConcurrentLinkedQueue<String> outgoingMessages;
+  private UDPClient udpClient = null;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
@@ -86,7 +94,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Gyro init
-    imu = BNO055_I2C.getInstance(BNO055_I2C.opmode_t.OPERATION_MODE_IMUPLUS, BNO055_I2C.vector_type_t.VECTOR_EULER);
+    gyro = new AHRS(SPI.Port.kMXP);
 
     // Auton Recorder init
     autonRecorder = new AutonRecorder();
@@ -137,11 +145,22 @@ public class Robot extends TimedRobot implements RobotProperties {
     ballpickupEdgeTrigger = false;
 
     // Camera Server for climber camera
-    final UsbCamera camera = CameraServer.startAutomaticCapture();
-    camera.setResolution(640, 360);
-    camera.setFPS(30);
+    // final UsbCamera camera = CameraServer.startAutomaticCapture();
+    // camera.setResolution(640, 360);
+    // camera.setFPS(30);
 
-    SmartDashboard.putNumber("roboInit:", Timer.getFPGATimestamp() - startTime);
+    // PID Logging init
+    if (PID_LOGGING && !DriverStation.isFMSAttached()) {
+      try {
+        outgoingMessages = new ConcurrentLinkedQueue<>();
+        udpClient = new UDPClient(outgoingMessages, "10.31.71.201", 5801);
+        udpClient.start();
+      } catch (IOException e) {
+        System.err.println("Invalid destination IP Address!");
+      }
+    }
+
+    SmartDashboard.putString("roboInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -160,19 +179,23 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("Lower Shooter Target Velocity:", shooterController.getLowerShooterTargetVelocity());
     SmartDashboard.putNumber("Upper Shooter Velocity:", shooterController.getUpperShooterVelocity());
     SmartDashboard.putNumber("Upper Shooter Target Velocity:", shooterController.getUpperShooterTargetVelocity());
+    if (PID_LOGGING && !DriverStation.isFMSAttached()) {
+      outgoingMessages.add(String.format("%%.3f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
+          shooterController.getUpperShooterVelocity(), shooterController.getUpperShooterTargetVelocity(),
+          shooterController.getUpperShooterSpeed()));
+    }
 
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
-    SmartDashboard.putBoolean("BNO055 Present:", imu.isSensorPresent());
-    SmartDashboard.putBoolean("BNO055 Initialized:", imu.isInitialized());
-    SmartDashboard.putBoolean("BNO055 Calibrated:", imu.isCalibrated());
+    SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
+    SmartDashboard.putBoolean("NavX Calibrating:", gyro.isCalibrating());
 
-    if (imu.isSensorPresent() && imu.isInitialized()) {
-      SmartDashboard.putNumber("BNO055 Heading:", imu.getHeading());
+    if (gyro.isConnected() && !gyro.isCalibrating()) {
+      SmartDashboard.putNumber("NavX Heading:", gyro.getYaw());
     }
 
     SmartDashboard.putNumber("Pickup Arm Position:", shooterController.getPickupArmPoisition());
 
-    SmartDashboard.putNumber("robotPeriodic:", Timer.getFPGATimestamp() - startTime);
+    SmartDashboard.putString("robotPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -209,7 +232,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Update the autonStartTime
     autonStartTime = Timer.getFPGATimestamp();
 
-    SmartDashboard.putNumber("autonomousInit:", Timer.getFPGATimestamp() - startTime);
+    SmartDashboard.putString("autonInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -247,7 +270,7 @@ public class Robot extends TimedRobot implements RobotProperties {
         break;
     }
 
-    SmartDashboard.putNumber("autonomousPeriodic:", Timer.getFPGATimestamp() - startTime);
+    SmartDashboard.putString("autonPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -275,7 +298,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Update the autonStartTime
     autonStartTime = Timer.getFPGATimestamp();
 
-    SmartDashboard.putNumber("teleopInit:", Timer.getFPGATimestamp() - startTime);
+    SmartDashboard.putString("teleopInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -308,8 +331,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     driveController.mecanumTraction(-leftStickY, rightStickX);
 
     // Shooter Control
-    final int lowerShooterVelocity = 3500, upperShooterVelocity = 6000;
-    final double desiredPercentAccuracy = .04, desiredAtSpeedTime = 5.0;
+    final int lowerShooterVelocity = 2750, upperShooterVelocity = 3000;
+    final double desiredPercentAccuracy = .015f, desiredAtSpeedTime = .75f;
     if (button_Shooter) {
       shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
       // shooterController.retractPickupArm();
@@ -320,10 +343,13 @@ public class Robot extends TimedRobot implements RobotProperties {
           && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + desiredAtSpeedTime)) {
         shooterController.setLowerFeederSpeed(.1);
         shooterController.setUpperFeederSpeed(.25);
-      } else if (feedSensor.get()) {
+        shooterController.setPickupSpeed(.1);
+      } else if (!feedSensor.get()) {
+        shooterController.setPickupSpeed(0);
         shooterController.setLowerFeederSpeed(0);
-        shooterController.setUpperFeederSpeed(-.1);
+        shooterController.setUpperFeederSpeed(-.4);
       } else {
+        shooterController.setPickupSpeed(0);
         shooterController.setLowerFeederSpeed(0);
         shooterController.setUpperFeederSpeed(0);
       }
@@ -332,29 +358,38 @@ public class Robot extends TimedRobot implements RobotProperties {
       shooterController.setShooterVelocity(0);
       // Ball Pickup Controls
       if (button_Pickup) {
-        // shooterController.extendPickupArm();
-        shooterController.setPickupSpeed(.7);
-        if (feedSensor.get()) {
+        shooterController.extendPickupArm();
+        shooterController.setPickupSpeed(.4);
+        if (!feedSensor.get()) {
+          shooterController.setLowerFeederSpeed(.3);
           shooterController.setUpperFeederSpeed(0);
         } else {
+          shooterController.setLowerFeederSpeed(.45);
           shooterController.setUpperFeederSpeed(.2);
         }
-        shooterController.setLowerFeederSpeed(.2);
       } else if (button_Reverse_Pickup) {
-        shooterController.setPickupSpeed(0);
-        shooterController.setLowerFeederSpeed(-.5);
-        shooterController.setUpperFeederSpeed(-.5);
+        shooterController.setPickupSpeed(-.5);
+        shooterController.setLowerFeederSpeed(-.75);
+        shooterController.setUpperFeederSpeed(-.75);
       } else {
         shooterController.setPickupSpeed(0);
-        // shooterController.retractPickupArm();
+        shooterController.retractPickupArm();
         shooterController.setLowerFeederSpeed(0);
-        if (ballpickupEdgeTrigger && feedSensor.get()) {
-          shooterController.runUpperFeeder(-.2, .25);
+        if (ballpickupEdgeTrigger && !feedSensor.get()) {
+          shooterController.runUpperFeeder(-.4, .2);
         } else {
           shooterController.setUpperFeederSpeed(0);
         }
       }
       ballpickupEdgeTrigger = button_Pickup;
+    }
+
+    if (rightStick.getRawButton(4)) {
+      //shooterController.extendPickupArm();
+    } else if (rightStick.getRawButton(3)) {
+      //shooterController.retractPickupArm();
+    } else {
+      //shooterController.setPickupArmSpeed(Deadzone_With_Map(JOYSTICK_DEADZONE, operatorRightStick.getY()));
     }
 
     // Climber Control
@@ -366,7 +401,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       climberController.setPrimaryClimberSpeed(operatorLeftStick.getY());
     }
 
-    climberController.setSecondaryClimberSpeed(operatorRightStick.getY());
+    // climberController.setSecondaryClimberSpeed(operatorRightStick.getY());
     // climberController.setSecondaryClimberPosition((int)
     // (-operatorRightStick.getY() * 1000));
 
@@ -392,7 +427,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       }
     }
 
-    SmartDashboard.putNumber("teleopPeriodic:", Timer.getFPGATimestamp() - startTime);
+    SmartDashboard.putString("teleopPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -421,7 +456,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       }
     }
 
-    SmartDashboard.putNumber("disabledInit:", Timer.getFPGATimestamp() - startTime);
+    SmartDashboard.putString("disabledInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -431,7 +466,7 @@ public class Robot extends TimedRobot implements RobotProperties {
   public void disabledPeriodic() {
     final double startTime = Timer.getFPGATimestamp();
 
-    SmartDashboard.putNumber("disabledPeriodic:", Timer.getFPGATimestamp() - startTime);
+    SmartDashboard.putString("disabledPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
 }

@@ -8,6 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.Relay;
 //import edu.wpi.first.wpilibj.Relay.Direction;
 //import edu.wpi.first.wpilibj.Relay.Value;
@@ -64,7 +65,7 @@ public class Shooter implements RobotProperties {
         upperFeederMotor = new FRCTalonFX(UPPER_FEEDER_CAN_ID);
         lowerFeederMotor = new FRCTalonFX(LOWER_FEEDER_CAN_ID);
         pickupArmMotor = new CANSparkMax(PICKUP_ARM_CAN_ID, MotorType.kBrushless);
-        pickupArmMotor.restoreFactoryDefaults(true);
+        pickupArmMotor.restoreFactoryDefaults();
         pickupArmMotor.setIdleMode(IdleMode.kBrake);
 
         // targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
@@ -465,18 +466,20 @@ public class Shooter implements RobotProperties {
     public void setPickupArmSpeed(final double speed) {
         if (speed > 0 && pickupArmMotor.getIdleMode() == IdleMode.kBrake) {
             pickupArmMotor.setIdleMode(IdleMode.kCoast);
-        } else if (pickupArmMotor.getIdleMode() == IdleMode.kCoast) {
+            SmartDashboard.putString("Pickup Arm:", "Coast");
+        } else if (speed < 0 && pickupArmMotor.getIdleMode() == IdleMode.kCoast) {
             pickupArmMotor.setIdleMode(IdleMode.kBrake);
+            SmartDashboard.putString("Pickup Arm:", "Brake");
         }
         pickupArmMotor.set(speed);
     }
 
     public void extendPickupArm() {
-        pickupArmPIDController.setReference(2, ControlType.kPosition);
+        pickupArmPIDController.setReference(40, ControlType.kPosition);
     }
 
     public void retractPickupArm() {
-        pickupArmPIDController.setReference(0, ControlType.kPosition);
+        pickupArmPIDController.setReference(-9, ControlType.kPosition);
     }
 
     /**
