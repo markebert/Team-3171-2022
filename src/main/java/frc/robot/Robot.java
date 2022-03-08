@@ -309,23 +309,31 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Get the latest joystick button values
-    final boolean boost_Button = leftStick.getRawButton(2);
     final boolean button_Pickup = leftStick.getTrigger();
+    final boolean button_Boost = leftStick.getRawButton(2);
     final boolean button_Reverse_Pickup = leftStick.getRawButton(4);
+
     final boolean button_Shooter = rightStick.getTrigger();
-    final boolean extendClimber = operatorLeftStick.getRawButton(4);
-    final boolean retractClimber = operatorLeftStick.getRawButton(3);
+    final boolean button_Full_Yeet = rightStick.getRawButton(2);
+    final boolean button_Retract_Pickup_Arm = rightStick.getRawButton(3);
+    final boolean button_Extend_Pickup_Arm = rightStick.getRawButton(4);
+
+    final boolean button_Retract_Climber = operatorLeftStick.getRawButton(3);
+    final boolean button_Extend_Climber = operatorLeftStick.getRawButton(4);
 
     // Get the latest joystick values and calculate their deadzones
-    final double[] joystickValues = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY(), rightStick.getX());
-    final double leftStickY, rightStickX;
-    if (boost_Button) {
+    final double[] joystickValues = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY(), rightStick.getX(),
+        operatorLeftStick.getY(), operatorRightStick.getY());
+    final double leftStickY, rightStickX, operatorLeftStickY, operatorRightStickY;
+    if (button_Boost) {
       leftStickY = joystickValues[0];
       rightStickX = joystickValues[1];
     } else {
       leftStickY = joystickValues[0] * MAX_DRIVE_SPEED;
       rightStickX = joystickValues[1] * MAX_DRIVE_SPEED;
     }
+    operatorLeftStickY = joystickValues[2];
+    operatorRightStickY = joystickValues[3];
 
     // Drive Control
     driveController.mecanumTraction(-leftStickY, rightStickX);
@@ -384,26 +392,23 @@ public class Robot extends TimedRobot implements RobotProperties {
       ballpickupEdgeTrigger = button_Pickup;
     }
 
-    if (rightStick.getRawButton(4)) {
-      //shooterController.extendPickupArm();
-    } else if (rightStick.getRawButton(3)) {
-      //shooterController.retractPickupArm();
-    } else {
-      //shooterController.setPickupArmSpeed(Deadzone_With_Map(JOYSTICK_DEADZONE, operatorRightStick.getY()));
+    if (button_Retract_Pickup_Arm) {
+      shooterController.retractPickupArm();
+    } else if (button_Extend_Pickup_Arm) {
+      shooterController.extendPickupArm();
     }
 
     // Climber Control
-    if (extendClimber) {
+    if (button_Extend_Climber) {
       climberController.setPrimaryClimberSpeed(.5);
-    } else if (retractClimber) {
+    } else if (button_Retract_Climber) {
       climberController.setPrimaryClimberSpeed(-.5);
     } else {
       climberController.setPrimaryClimberSpeed(operatorLeftStick.getY());
     }
 
-    // climberController.setSecondaryClimberSpeed(operatorRightStick.getY());
-    // climberController.setSecondaryClimberPosition((int)
-    // (-operatorRightStick.getY() * 1000));
+    // climberController.setSecondaryClimberSpeed(operatorRightStickY);
+    climberController.setSecondaryClimberPosition((int) (-operatorRightStickY * 1000));
 
     // Auton Recording
     if (saveNewAuton) {
