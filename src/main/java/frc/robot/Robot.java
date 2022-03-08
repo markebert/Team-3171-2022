@@ -6,10 +6,11 @@
 /*----------------------------------------------------------------------------*/
 package frc.robot;
 
-import java.io.IOException;
 // Java Imports
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.io.IOException;
 
+// NavX MXP Imports
 import com.kauailabs.navx.frc.AHRS;
 
 // FRC Imports
@@ -29,7 +30,6 @@ import frc.team3171.auton.AutonRecorder;
 import frc.team3171.auton.AutonRecorderData;
 import frc.team3171.controllers.Climber;
 import frc.team3171.controllers.Shooter;
-
 //import frc.team3171.auton.HardcodedAutons;
 import static frc.team3171.HelperFunctions.Deadzone_With_Map;
 import frc.team3171.drive.UniversalMotorGroup;
