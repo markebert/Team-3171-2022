@@ -404,7 +404,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else if (button_Retract_Climber) {
       climberController.setPrimaryClimberSpeed(-.5);
     } else {
-      climberController.setPrimaryClimberSpeed(operatorLeftStick.getY());
+      climberController.setPrimaryClimberSpeed(operatorLeftStickY);
     }
 
     // climberController.setSecondaryClimberSpeed(operatorRightStickY);
