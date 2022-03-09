@@ -287,10 +287,6 @@ public class Robot extends TimedRobot implements RobotProperties {
   public void teleopInit() {
     final double startTime = Timer.getFPGATimestamp();
 
-    gyroPIDController.enablePID();
-
-    shooterAtSpeedStartTime = 0;
-
     // Reset all of the Edge Triggers
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
@@ -306,6 +302,10 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Update the autonStartTime
     autonStartTime = Timer.getFPGATimestamp();
+
+    shooterAtSpeedStartTime = 0;
+
+    gyroPIDController.enablePID();
 
     SmartDashboard.putString("teleopInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
