@@ -145,9 +145,13 @@ public class Robot extends TimedRobot implements RobotProperties {
     ballpickupEdgeTrigger = false;
 
     // Camera Server for climber camera
-    final UsbCamera camera = CameraServer.startAutomaticCapture();
-    camera.setResolution(640, 360);
-    camera.setFPS(30);
+    final UsbCamera camera0 = CameraServer.startAutomaticCapture();
+    final UsbCamera camera1 = CameraServer.startAutomaticCapture();
+    Timer.delay(.1f);
+    camera0.setResolution(160, 90);
+    camera0.setFPS(20);
+    camera1.setResolution(160, 90);
+    camera1.setFPS(20);
 
     // PID Logging init
     if (PID_LOGGING && !DriverStation.isFMSAttached()) {
@@ -194,6 +198,9 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
 
     SmartDashboard.putNumber("Pickup Arm Position:", shooterController.getPickupArmPoisition());
+    SmartDashboard.putNumber("Primary Winch Position:", climberController.getPrimaryClimberPosition());
+    SmartDashboard.putNumber("Secodary Winch One Position:", climberController.getSecondryClimberOnePosition());
+    SmartDashboard.putNumber("Secondary Winch Two Position:", climberController.getSecondryClimberTwoPosition());
 
     SmartDashboard.putString("robotPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
@@ -314,7 +321,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     final boolean button_Reverse_Pickup = leftStick.getRawButton(4);
 
     final boolean button_Shooter = rightStick.getTrigger();
-    //final boolean button_Full_Yeet = rightStick.getRawButton(2);
+    // final boolean button_Full_Yeet = rightStick.getRawButton(2);
     final boolean button_Retract_Pickup_Arm = rightStick.getRawButton(3);
     final boolean button_Extend_Pickup_Arm = rightStick.getRawButton(4);
 
@@ -381,12 +388,12 @@ public class Robot extends TimedRobot implements RobotProperties {
         shooterController.setUpperFeederSpeed(-.75);
       } else {
         shooterController.setPickupSpeed(0);
-        shooterController.retractPickupArm();
         shooterController.setLowerFeederSpeed(0);
         if (ballpickupEdgeTrigger && !feedSensor.get()) {
           shooterController.runUpperFeeder(-.4, .2);
         } else {
           shooterController.setUpperFeederSpeed(0);
+          shooterController.retractPickupArm();
         }
       }
       ballpickupEdgeTrigger = button_Pickup;
@@ -404,11 +411,12 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else if (button_Retract_Climber) {
       climberController.setPrimaryClimberSpeed(-.5);
     } else {
-      climberController.setPrimaryClimberSpeed(operatorLeftStickY);
+      climberController.setPrimaryClimberSpeed(-operatorLeftStickY);
     }
 
-    // climberController.setSecondaryClimberSpeed(operatorRightStickY);
-    climberController.setSecondaryClimberPosition((int) (-operatorRightStickY * 1000));
+    climberController.setSecondaryClimberSpeed(operatorRightStickY);
+    // climberController.setSecondaryClimberPosition((int) (-operatorRightStickY *
+    // 100000));
 
     // Auton Recording
     if (saveNewAuton) {

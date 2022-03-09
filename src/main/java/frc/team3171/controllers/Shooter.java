@@ -475,11 +475,11 @@ public class Shooter implements RobotProperties {
     }
 
     public void extendPickupArm() {
-        pickupArmPIDController.setReference(40, ControlType.kPosition);
+        pickupArmPIDController.setReference(45, ControlType.kPosition);
     }
 
     public void retractPickupArm() {
-        pickupArmPIDController.setReference(-9, ControlType.kPosition);
+        pickupArmPIDController.setReference(5, ControlType.kPosition);
     }
 
     /**

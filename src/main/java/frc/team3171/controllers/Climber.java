@@ -60,6 +60,10 @@ public class Climber implements RobotProperties {
         primaryWinch.set(ControlMode.Position, position);
     }
 
+    public int getPrimaryClimberPosition() {
+        return primaryWinch.getEncoderValue();
+    }
+
     /**
      * 
      * @param speed
@@ -81,6 +85,14 @@ public class Climber implements RobotProperties {
             secondaryWinchOne.set(ControlMode.Position, position);
             secondaryWinchTwo.set(ControlMode.Position, position);
         }
+    }
+
+    public int getSecondryClimberOnePosition() {
+        return secondaryWinchOne.getEncoderValue();
+    }
+
+    public int getSecondryClimberTwoPosition() {
+        return secondaryWinchTwo.getEncoderValue();
     }
 
     /**
