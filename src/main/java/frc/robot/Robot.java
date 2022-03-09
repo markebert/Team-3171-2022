@@ -10,9 +10,6 @@ package frc.robot;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.io.IOException;
 
-// NavX MXP Imports
-import com.kauailabs.navx.frc.AHRS;
-
 // FRC Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -22,7 +19,6 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 
 // Team 3171 Imports
@@ -35,6 +31,8 @@ import static frc.team3171.HelperFunctions.Deadzone_With_Map;
 import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.TractionDrive;
 import frc.team3171.drive.UniversalMotorGroup.ControllerType;
+import frc.team3171.sensors.GyroPIDController;
+import frc.team3171.sensors.NavXMXP;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -70,7 +68,8 @@ public class Robot extends TimedRobot implements RobotProperties {
   // Drive Controller
   private UniversalMotorGroup leftMotorGroup, rightMotorGroup;
   private TractionDrive driveController;
-  private AHRS gyro;
+  private NavXMXP gyro;
+  private GyroPIDController gyroPIDController;
 
   // Shooter Controller
   private Shooter shooterController;
@@ -94,7 +93,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Gyro init
-    gyro = new AHRS(SPI.Port.kMXP);
+    gyro = new NavXMXP();
+    gyroPIDController = new GyroPIDController(gyro, GYRO_KP, GYRO_KI, GYRO_KD, -1.0f, 1.0f);
 
     // Auton Recorder init
     autonRecorder = new AutonRecorder();
