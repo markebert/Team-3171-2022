@@ -431,9 +431,9 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Primary Climber Control
     if (button_Extend_Climber) {
-      climberController.setPrimaryClimberSpeed(.5, 500, 200000);
+      climberController.setPrimaryClimberSpeed(1, 500, 200000);
     } else if (button_Retract_Climber) {
-      climberController.setPrimaryClimberSpeed(-.5, 500, 200000);
+      climberController.setPrimaryClimberSpeed(-1, 500, 200000);
     } else if (button_Override_Primary_Climb) {
       climberController.setPrimaryClimberSpeed(-operatorLeftStickY);
     } else {
