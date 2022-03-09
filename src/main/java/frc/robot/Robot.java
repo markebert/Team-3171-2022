@@ -95,6 +95,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Gyro init
     gyro = new NavXMXP();
     gyroPIDController = new GyroPIDController(gyro, GYRO_KP, GYRO_KI, GYRO_KD, -1.0f, 1.0f);
+    gyroPIDController.start();
 
     // Auton Recorder init
     autonRecorder = new AutonRecorder();
@@ -286,6 +287,8 @@ public class Robot extends TimedRobot implements RobotProperties {
   public void teleopInit() {
     final double startTime = Timer.getFPGATimestamp();
 
+    gyroPIDController.enablePID();
+
     shooterAtSpeedStartTime = 0;
 
     // Reset all of the Edge Triggers
@@ -342,7 +345,12 @@ public class Robot extends TimedRobot implements RobotProperties {
     operatorRightStickY = joystickValues[3];
 
     // Drive Control
-    driveController.mecanumTraction(-leftStickY, rightStickX);
+    if (rightStickX != 0) {
+      driveController.mecanumTraction(-leftStickY, rightStickX);
+      gyroPIDController.updateSensorLockValue();
+    } else {
+      driveController.mecanumTraction(-leftStickY, gyroPIDController.getPIDValue());
+    }
 
     // Shooter Control
     final int lowerShooterVelocity = 2750, upperShooterVelocity = 3000;
@@ -466,6 +474,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     driveController.disable();
     shooterController.disable();
     climberController.disable();
+
+    gyroPIDController.disablePID();
 
     if (saveNewAuton) {
       saveNewAuton = false;
