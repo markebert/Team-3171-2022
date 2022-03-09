@@ -8,10 +8,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.wpilibj.Relay;
-//import edu.wpi.first.wpilibj.Relay.Direction;
-//import edu.wpi.first.wpilibj.Relay.Value;
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Relay.Direction;
+import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -40,7 +39,7 @@ public class Shooter implements RobotProperties {
     private final SparkMaxPIDController pickupArmPIDController;
 
     // Relay for the targeting light
-    // private final Relay targetLightRelay;
+    private final Relay targetLightRelay;
 
     // Executor Service
     private final ExecutorService executorService;
@@ -68,7 +67,7 @@ public class Shooter implements RobotProperties {
         pickupArmMotor.restoreFactoryDefaults();
         pickupArmMotor.setIdleMode(IdleMode.kBrake);
 
-        // targetLightRelay = new Relay(targetLightChannel, Direction.kForward);
+        targetLightRelay = new Relay(TARGET_LIGHT_CHANNEL, Direction.kForward);
 
         // Set if any motors need to be inverted
         lowerShooterMotor.setInverted(LOWER_SHOOTER_INVERTED);
@@ -121,9 +120,9 @@ public class Shooter implements RobotProperties {
      */
     public void enableTargetingLight(final boolean enable) {
         if (enable) {
-            // targetLightRelay.set(Value.kOn);
+            targetLightRelay.set(Value.kOn);
         } else {
-            // targetLightRelay.set(Value.kOff);
+            targetLightRelay.set(Value.kOff);
         }
     }
 
@@ -466,20 +465,28 @@ public class Shooter implements RobotProperties {
     public void setPickupArmSpeed(final double speed) {
         if (speed > 0 && pickupArmMotor.getIdleMode() == IdleMode.kBrake) {
             pickupArmMotor.setIdleMode(IdleMode.kCoast);
-            SmartDashboard.putString("Pickup Arm:", "Coast");
         } else if (speed < 0 && pickupArmMotor.getIdleMode() == IdleMode.kCoast) {
             pickupArmMotor.setIdleMode(IdleMode.kBrake);
-            SmartDashboard.putString("Pickup Arm:", "Brake");
         }
         pickupArmMotor.set(speed);
     }
 
     public void extendPickupArm() {
-        pickupArmPIDController.setReference(45, ControlType.kPosition);
+        if (pickupArmEncoder.getPosition() > 45) {
+            pickupArmMotor.disable();
+            pickupArmMotor.setIdleMode(IdleMode.kCoast);
+        } else {
+            pickupArmPIDController.setReference(45, ControlType.kPosition);
+        }
     }
 
     public void retractPickupArm() {
-        pickupArmPIDController.setReference(5, ControlType.kPosition);
+        if (pickupArmEncoder.getPosition() < 4) {
+            pickupArmMotor.disable();
+            pickupArmMotor.setIdleMode(IdleMode.kBrake);
+        } else {
+            pickupArmPIDController.setReference(4, ControlType.kPosition);
+        }
     }
 
     /**
@@ -493,7 +500,7 @@ public class Shooter implements RobotProperties {
         upperFeederMotor.set(ControlMode.Disabled, 0);
         pickupArmMotor.setIdleMode(IdleMode.kBrake);
         pickupArmMotor.disable();
-        // targetLightRelay.set(Value.kOff);
+        targetLightRelay.set(Value.kOff);
     }
 
 }
