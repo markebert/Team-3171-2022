@@ -348,9 +348,12 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Shooter Control
     final int lowerShooterVelocity = 2750, upperShooterVelocity = 3000;
     final double desiredPercentAccuracy = .015f, desiredAtSpeedTime = .75f;
+    boolean retract_Pickup_Arm = false, extend_Pickup_Arm = false;
     if (button_Shooter) {
+      shooterController.enableTargetingLight(true);
       shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
-      // shooterController.retractPickupArm();
+      retract_Pickup_Arm = true;
+
       final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(desiredPercentAccuracy);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
         shooterAtSpeedStartTime = Timer.getFPGATimestamp();
@@ -370,10 +373,12 @@ public class Robot extends TimedRobot implements RobotProperties {
       }
       shooterAtSpeedEdgeTrigger = isAtSpeed;
     } else {
+      shooterController.enableTargetingLight(false);
       shooterController.setShooterVelocity(0);
+
       // Ball Pickup Controls
       if (button_Pickup) {
-        shooterController.extendPickupArm();
+        extend_Pickup_Arm = true;
         shooterController.setPickupSpeed(.4);
         if (!feedSensor.get()) {
           shooterController.setLowerFeederSpeed(.3);
@@ -383,6 +388,7 @@ public class Robot extends TimedRobot implements RobotProperties {
           shooterController.setUpperFeederSpeed(.2);
         }
       } else if (button_Reverse_Pickup) {
+        retract_Pickup_Arm = true;
         shooterController.setPickupSpeed(-.5);
         shooterController.setLowerFeederSpeed(-.75);
         shooterController.setUpperFeederSpeed(-.75);
@@ -391,17 +397,18 @@ public class Robot extends TimedRobot implements RobotProperties {
         shooterController.setLowerFeederSpeed(0);
         if (ballpickupEdgeTrigger && !feedSensor.get()) {
           shooterController.runUpperFeeder(-.4, .2);
+          extend_Pickup_Arm = true;
         } else {
           shooterController.setUpperFeederSpeed(0);
-          shooterController.retractPickupArm();
+          retract_Pickup_Arm = true;
         }
       }
       ballpickupEdgeTrigger = button_Pickup;
     }
 
-    if (button_Retract_Pickup_Arm) {
+    if (button_Retract_Pickup_Arm || retract_Pickup_Arm) {
       shooterController.retractPickupArm();
-    } else if (button_Extend_Pickup_Arm) {
+    } else if (button_Extend_Pickup_Arm || extend_Pickup_Arm) {
       shooterController.extendPickupArm();
     }
 
