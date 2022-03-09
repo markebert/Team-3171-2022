@@ -327,8 +327,11 @@ public class Robot extends TimedRobot implements RobotProperties {
     final boolean button_Retract_Pickup_Arm = rightStick.getRawButton(3);
     final boolean button_Extend_Pickup_Arm = rightStick.getRawButton(4);
 
+    final boolean button_Override_Primary_Climb = operatorLeftStick.getRawButton(2);
     final boolean button_Retract_Climber = operatorLeftStick.getRawButton(3);
     final boolean button_Extend_Climber = operatorLeftStick.getRawButton(4);
+
+    final boolean button_Override_Secondary_Climb = operatorRightStick.getRawButton(2);
 
     // Get the latest joystick values and calculate their deadzones
     final double[] joystickValues = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY(), rightStick.getX(),
@@ -428,15 +431,21 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Primary Climber Control
     if (button_Extend_Climber) {
-      climberController.setPrimaryClimberSpeed(.5);
+      climberController.setPrimaryClimberSpeed(.5, 500, 200000);
     } else if (button_Retract_Climber) {
-      climberController.setPrimaryClimberSpeed(-.5);
-    } else {
+      climberController.setPrimaryClimberSpeed(-.5, 500, 200000);
+    } else if (button_Override_Primary_Climb) {
       climberController.setPrimaryClimberSpeed(-operatorLeftStickY);
+    } else {
+      climberController.setPrimaryClimberSpeed(-operatorLeftStickY, 500, 200000);
     }
 
     // Secondary Climber Control
-    climberController.setSecondaryClimberSpeed(operatorRightStickY);
+    if (button_Override_Secondary_Climb) {
+      climberController.setSecondaryClimberSpeed(-operatorRightStickY);
+    } else {
+      climberController.setSecondaryClimberSpeed(-operatorRightStickY, 500, 200000);
+    }
     // climberController.setSecondaryClimberPosition((int) (-operatorRightStickY *
     // 100000));
 

@@ -54,6 +54,20 @@ public class Climber implements RobotProperties {
 
     /**
      * 
+     * @param speed
+     */
+    public void setPrimaryClimberSpeed(final double speed, final int lowerBound, final int upperBound) {
+        if (speed < 0 && primaryWinch.getEncoderValue() < lowerBound) {
+            primaryWinch.set(ControlMode.PercentOutput, 0);
+        } else if (speed > 0 && primaryWinch.getEncoderValue() > upperBound) {
+            primaryWinch.set(ControlMode.PercentOutput, 0);
+        } else {
+            primaryWinch.set(ControlMode.PercentOutput, speed);
+        }
+    }
+
+    /**
+     * 
      * @param position
      */
     public void setPrimaryClimberPosition(final int position) {
@@ -71,6 +85,28 @@ public class Climber implements RobotProperties {
     public void setSecondaryClimberSpeed(final double speed) {
         secondaryWinchOne.set(ControlMode.PercentOutput, speed);
         secondaryWinchTwo.set(ControlMode.PercentOutput, speed);
+    }
+
+    /**
+     * 
+     * @param speed
+     */
+    public void setSecondaryClimberSpeed(final double speed, final int lowerBound, final int upperBound) {
+        if (speed < 0 && secondaryWinchOne.getEncoderValue() < lowerBound) {
+            secondaryWinchOne.set(ControlMode.PercentOutput, 0);
+        } else if (speed > 0 && secondaryWinchOne.getEncoderValue() > upperBound) {
+            secondaryWinchOne.set(ControlMode.PercentOutput, 0);
+        } else {
+            secondaryWinchOne.set(ControlMode.PercentOutput, speed);
+        }
+
+        if (speed < 0 && secondaryWinchTwo.getEncoderValue() < lowerBound) {
+            secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
+        } else if (speed > 0 && secondaryWinchTwo.getEncoderValue() > upperBound) {
+            secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
+        } else {
+            secondaryWinchTwo.set(ControlMode.PercentOutput, speed);
+        }
     }
 
     /**
