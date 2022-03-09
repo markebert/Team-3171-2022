@@ -147,7 +147,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Camera Server for climber camera
     final UsbCamera camera0 = CameraServer.startAutomaticCapture();
     final UsbCamera camera1 = CameraServer.startAutomaticCapture();
-    Timer.delay(.1f);
     camera0.setResolution(160, 90);
     camera0.setFPS(20);
     camera1.setResolution(160, 90);
