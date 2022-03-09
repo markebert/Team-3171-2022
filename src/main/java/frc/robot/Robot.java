@@ -192,7 +192,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
     SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
     SmartDashboard.putBoolean("NavX Calibrating:", gyro.isCalibrating());
-
+    SmartDashboard.putNumber("Gyro Lock:", gyroPIDController.getSensorLockValue());
     if (gyro.isConnected() && !gyro.isCalibrating()) {
       SmartDashboard.putNumber("NavX Heading:", gyro.getYaw());
     }
@@ -349,7 +349,9 @@ public class Robot extends TimedRobot implements RobotProperties {
       driveController.mecanumTraction(-leftStickY, rightStickX);
       gyroPIDController.updateSensorLockValue();
     } else {
-      driveController.mecanumTraction(-leftStickY, gyroPIDController.getPIDValue());
+      // driveController.mecanumTraction(-leftStickY,
+      // gyroPIDController.getPIDValue());
+      driveController.mecanumTraction(-leftStickY, 0);
     }
 
     // Shooter Control
