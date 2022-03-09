@@ -321,7 +321,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     final boolean button_Reverse_Pickup = leftStick.getRawButton(4);
 
     final boolean button_Shooter = rightStick.getTrigger();
-    // final boolean button_Full_Yeet = rightStick.getRawButton(2);
+    final boolean button_Full_Yeet = rightStick.getRawButton(2);
     final boolean button_Retract_Pickup_Arm = rightStick.getRawButton(3);
     final boolean button_Extend_Pickup_Arm = rightStick.getRawButton(4);
 
@@ -357,8 +357,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(desiredPercentAccuracy);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
         shooterAtSpeedStartTime = Timer.getFPGATimestamp();
-      } else if (isAtSpeed && shooterAtSpeedEdgeTrigger
-          && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + desiredAtSpeedTime)) {
+      } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + desiredAtSpeedTime)) {
         shooterController.setLowerFeederSpeed(.1);
         shooterController.setUpperFeederSpeed(.25);
         shooterController.setPickupSpeed(.1);
@@ -372,9 +371,14 @@ public class Robot extends TimedRobot implements RobotProperties {
         shooterController.setUpperFeederSpeed(0);
       }
       shooterAtSpeedEdgeTrigger = isAtSpeed;
+    } else if (button_Full_Yeet) {
+      shooterController.setShooterSpeed(1, 1);
+      shooterController.setLowerFeederSpeed(1);
+      shooterController.setUpperFeederSpeed(1);
     } else {
       shooterController.enableTargetingLight(false);
       shooterController.setShooterVelocity(0);
+      shooterAtSpeedEdgeTrigger = false;
 
       // Ball Pickup Controls
       if (button_Pickup) {
@@ -406,13 +410,14 @@ public class Robot extends TimedRobot implements RobotProperties {
       ballpickupEdgeTrigger = button_Pickup;
     }
 
+    // Pickup Arm Control
     if (button_Retract_Pickup_Arm || retract_Pickup_Arm) {
       shooterController.retractPickupArm();
     } else if (button_Extend_Pickup_Arm || extend_Pickup_Arm) {
       shooterController.extendPickupArm();
     }
 
-    // Climber Control
+    // Primary Climber Control
     if (button_Extend_Climber) {
       climberController.setPrimaryClimberSpeed(.5);
     } else if (button_Retract_Climber) {
@@ -421,6 +426,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       climberController.setPrimaryClimberSpeed(-operatorLeftStickY);
     }
 
+    // Secondary Climber Control
     climberController.setSecondaryClimberSpeed(operatorRightStickY);
     // climberController.setSecondaryClimberPosition((int) (-operatorRightStickY *
     // 100000));
