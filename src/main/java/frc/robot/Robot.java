@@ -95,6 +95,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Gyro init
     gyro = new NavXMXP();
     gyroPIDController = new GyroPIDController(gyro, GYRO_KP, GYRO_KI, GYRO_KD, -1.0f, 1.0f);
+    gyroPIDController.start();
 
     // Auton Recorder init
     autonRecorder = new AutonRecorder();
@@ -191,7 +192,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
     SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
     SmartDashboard.putBoolean("NavX Calibrating:", gyro.isCalibrating());
-
+    SmartDashboard.putNumber("Gyro Lock:", gyroPIDController.getSensorLockValue());
     if (gyro.isConnected() && !gyro.isCalibrating()) {
       SmartDashboard.putNumber("NavX Heading:", gyro.getYaw());
     }
@@ -286,8 +287,6 @@ public class Robot extends TimedRobot implements RobotProperties {
   public void teleopInit() {
     final double startTime = Timer.getFPGATimestamp();
 
-    shooterAtSpeedStartTime = 0;
-
     // Reset all of the Edge Triggers
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
@@ -303,6 +302,10 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Update the autonStartTime
     autonStartTime = Timer.getFPGATimestamp();
+
+    shooterAtSpeedStartTime = 0;
+
+    gyroPIDController.enablePID();
 
     SmartDashboard.putString("teleopInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
@@ -342,7 +345,14 @@ public class Robot extends TimedRobot implements RobotProperties {
     operatorRightStickY = joystickValues[3];
 
     // Drive Control
-    driveController.mecanumTraction(-leftStickY, rightStickX);
+    if (rightStickX != 0) {
+      driveController.mecanumTraction(-leftStickY, rightStickX);
+      gyroPIDController.updateSensorLockValue();
+    } else {
+      // driveController.mecanumTraction(-leftStickY,
+      // gyroPIDController.getPIDValue());
+      driveController.mecanumTraction(-leftStickY, 0);
+    }
 
     // Shooter Control
     final int lowerShooterVelocity = 2750, upperShooterVelocity = 3000;
@@ -466,6 +476,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     driveController.disable();
     shooterController.disable();
     climberController.disable();
+
+    gyroPIDController.disablePID();
 
     if (saveNewAuton) {
       saveNewAuton = false;
