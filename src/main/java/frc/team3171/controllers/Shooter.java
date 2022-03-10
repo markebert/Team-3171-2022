@@ -472,20 +472,20 @@ public class Shooter implements RobotProperties {
     }
 
     public void extendPickupArm() {
-        if (pickupArmEncoder.getPosition() > 45) {
+        if (pickupArmEncoder.getPosition() > 75) {
             pickupArmMotor.disable();
             pickupArmMotor.setIdleMode(IdleMode.kCoast);
         } else {
-            pickupArmPIDController.setReference(45, ControlType.kPosition);
+            pickupArmPIDController.setReference(75, ControlType.kPosition);
         }
     }
 
     public void retractPickupArm() {
-        if (pickupArmEncoder.getPosition() < 4) {
+        if (pickupArmEncoder.getPosition() < 10) {
             pickupArmMotor.disable();
             pickupArmMotor.setIdleMode(IdleMode.kBrake);
         } else {
-            pickupArmPIDController.setReference(4, ControlType.kPosition);
+            pickupArmPIDController.setReference(10, ControlType.kPosition);
         }
     }
 

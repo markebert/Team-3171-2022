@@ -154,7 +154,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     camera1.setFPS(20);
 
     // PID Logging init
-    if (PID_LOGGING && !DriverStation.isFMSAttached()) {
+    if (PID_LOGGING) {
       try {
         outgoingMessages = new ConcurrentLinkedQueue<>();
         udpClient = new UDPClient(outgoingMessages, "10.31.71.201", 5801);
@@ -183,7 +183,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("Lower Shooter Target Velocity:", shooterController.getLowerShooterTargetVelocity());
     SmartDashboard.putNumber("Upper Shooter Velocity:", shooterController.getUpperShooterVelocity());
     SmartDashboard.putNumber("Upper Shooter Target Velocity:", shooterController.getUpperShooterTargetVelocity());
-    if (PID_LOGGING && !DriverStation.isFMSAttached()) {
+    if (PID_LOGGING) {
       outgoingMessages.add(String.format("%%.3f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
           shooterController.getUpperShooterVelocity(), shooterController.getUpperShooterTargetVelocity(),
           shooterController.getUpperShooterSpeed()));
@@ -358,13 +358,12 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
 
     // Shooter Control
-    final int lowerShooterVelocity = 2750, upperShooterVelocity = 3000;
+    final int lowerShooterVelocity = 2750, upperShooterVelocity = 6000;
     final double desiredPercentAccuracy = .015f, desiredAtSpeedTime = .75f;
-    boolean retract_Pickup_Arm = false, extend_Pickup_Arm = false;
+    boolean extend_Pickup_Arm = button_Extend_Pickup_Arm;
     if (button_Shooter) {
       shooterController.enableTargetingLight(true);
       shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
-      retract_Pickup_Arm = true;
 
       final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(desiredPercentAccuracy);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
@@ -404,7 +403,6 @@ public class Robot extends TimedRobot implements RobotProperties {
           shooterController.setUpperFeederSpeed(.2);
         }
       } else if (button_Reverse_Pickup) {
-        retract_Pickup_Arm = true;
         shooterController.setPickupSpeed(-.5);
         shooterController.setLowerFeederSpeed(-.75);
         shooterController.setUpperFeederSpeed(-.75);
@@ -412,22 +410,23 @@ public class Robot extends TimedRobot implements RobotProperties {
         shooterController.setPickupSpeed(0);
         shooterController.setLowerFeederSpeed(0);
         if (ballpickupEdgeTrigger && !feedSensor.get()) {
-          shooterController.runUpperFeeder(-.4, .2);
+          shooterController.runUpperFeeder(-.3, .2);
+          shooterController.runLowerFeeder(.15, .2);
           extend_Pickup_Arm = true;
         } else {
           shooterController.setUpperFeederSpeed(0);
-          retract_Pickup_Arm = true;
         }
       }
       ballpickupEdgeTrigger = button_Pickup;
     }
 
     // Pickup Arm Control
-    if (button_Retract_Pickup_Arm || retract_Pickup_Arm) {
-      shooterController.retractPickupArm();
-    } else if (button_Extend_Pickup_Arm || extend_Pickup_Arm) {
+    if (extend_Pickup_Arm) {
       shooterController.extendPickupArm();
+    } else {
+      shooterController.retractPickupArm();
     }
+    //shooterController.setPickupArmSpeed(rightStick.getY());
 
     // Primary Climber Control
     if (button_Extend_Climber) {

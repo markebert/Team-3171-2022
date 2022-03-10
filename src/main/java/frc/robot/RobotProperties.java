@@ -150,7 +150,7 @@ public interface RobotProperties {
         public static final double SHOOTER_KP = .01, SHOOTER_KI = .0002, SHOOTER_KD = .0001, SHOOTER_KF = 0;
         public static final double WINCH_KP = .01, WINCH_KI = .0002, WINCH_KD = .0001, WINCH_KF = 0;
         public static final double DRIVE_KP = .01, DRIVE_KI = .0002, DRIVE_KD = .0001, DRIVE_KF = 0;
-        public static final double PICKUP_ARM_KP = 8e-3, PICKUP_ARM_KI = 2e-6, PICKUP_ARM_KD = 3e-6,
+        public static final double PICKUP_ARM_KP = 1.5e-2, PICKUP_ARM_KI = 2e-6, PICKUP_ARM_KD = 3e-6,
                         PICKUP_ARM_KF = 0.00412;
 
         /** Auton Properties **/
