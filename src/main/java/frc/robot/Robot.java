@@ -154,7 +154,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     camera1.setFPS(20);
 
     // PID Logging init
-    if (PID_LOGGING) {
+    if (PID_LOGGING && !DriverStation.isFMSAttached()) {
       try {
         outgoingMessages = new ConcurrentLinkedQueue<>();
         udpClient = new UDPClient(outgoingMessages, "10.31.71.201", 5801);
@@ -183,7 +183,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("Lower Shooter Target Velocity:", shooterController.getLowerShooterTargetVelocity());
     SmartDashboard.putNumber("Upper Shooter Velocity:", shooterController.getUpperShooterVelocity());
     SmartDashboard.putNumber("Upper Shooter Target Velocity:", shooterController.getUpperShooterTargetVelocity());
-    if (PID_LOGGING) {
+    if (PID_LOGGING && !DriverStation.isFMSAttached()) {
       outgoingMessages.add(String.format("%.3f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
           shooterController.getUpperShooterVelocity(), shooterController.getUpperShooterTargetVelocity(),
           shooterController.getUpperShooterSpeed()));
