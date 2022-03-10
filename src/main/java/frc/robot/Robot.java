@@ -184,7 +184,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("Upper Shooter Velocity:", shooterController.getUpperShooterVelocity());
     SmartDashboard.putNumber("Upper Shooter Target Velocity:", shooterController.getUpperShooterTargetVelocity());
     if (PID_LOGGING) {
-      outgoingMessages.add(String.format("%%.3f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
+      outgoingMessages.add(String.format("%.3f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
           shooterController.getUpperShooterVelocity(), shooterController.getUpperShooterTargetVelocity(),
           shooterController.getUpperShooterSpeed()));
     }
@@ -324,7 +324,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     final boolean button_Shooter = rightStick.getTrigger();
     final boolean button_Full_Yeet = rightStick.getRawButton(2);
-    final boolean button_Retract_Pickup_Arm = rightStick.getRawButton(3);
+    //final boolean button_Retract_Pickup_Arm = rightStick.getRawButton(3);
     final boolean button_Extend_Pickup_Arm = rightStick.getRawButton(4);
 
     final boolean button_Override_Primary_Climb = operatorLeftStick.getRawButton(2);
