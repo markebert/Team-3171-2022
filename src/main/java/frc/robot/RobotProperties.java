@@ -80,12 +80,18 @@ public interface RobotProperties {
         public static final boolean SECONDARY_WINCH_ONE_INVERTED = false, SECONDARY_WINCH_TWO_INVERTED = true;
 
         /**
-         * Digital Inputs and Outputs. 0-9 are on-board, 10-25 are on the MXP.
+         * Relay Channels. 0-4 are on-board.
          * 
-         * @param TARGET_LIGHT_CHANNEL The channel to use for the targeting light relay.
-         * @param FEED_SENSOR_CHANNEL  The channel to use for the feed sensor.
+         * @param TARGET_LIGHT_CHANNEL The relay channel to use for the targeting light
+         *                             relay.
          */
         public static final int TARGET_LIGHT_CHANNEL = 0;
+
+        /**
+         * Digital Inputs and Outputs. 0-9 are on-board, 10-25 are on the MXP.
+         * 
+         * @param FEED_SENSOR_CHANNEL The dio channel to use for the feed sensor.
+         */
         public static final int FEED_SENSOR_CHANNEL = 9;
 
         /**
@@ -150,7 +156,7 @@ public interface RobotProperties {
         public static final double SHOOTER_KP = .01, SHOOTER_KI = .0002, SHOOTER_KD = .0001, SHOOTER_KF = 0;
         public static final double WINCH_KP = .01, WINCH_KI = .0002, WINCH_KD = .0001, WINCH_KF = 0;
         public static final double DRIVE_KP = .01, DRIVE_KI = .0002, DRIVE_KD = .0001, DRIVE_KF = 0;
-        public static final double PICKUP_ARM_KP = 1.5e-2, PICKUP_ARM_KI = 2e-6, PICKUP_ARM_KD = 3e-6,
+        public static final double PICKUP_ARM_KP = 1.75e-2, PICKUP_ARM_KI = 2e-6, PICKUP_ARM_KD = 3e-6,
                         PICKUP_ARM_KF = 0.00412;
 
         /** Auton Properties **/
