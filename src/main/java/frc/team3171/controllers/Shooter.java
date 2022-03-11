@@ -317,7 +317,9 @@ public class Shooter implements RobotProperties {
      * @param speed The speed, from -1.0 to 1.0, to set the feeder motors to.
      */
     public void setLowerFeederSpeed(final double speed) {
-        lowerFeederMotor.set(ControlMode.PercentOutput, speed);
+        if (!lowerFeederExecutorActive.get()) {
+            lowerFeederMotor.set(ControlMode.PercentOutput, speed);
+        }
     }
 
     /**
@@ -339,10 +341,10 @@ public class Shooter implements RobotProperties {
                             if (DriverStation.isDisabled()) {
                                 break;
                             }
-                            setLowerFeederSpeed(speed);
+                            lowerFeederMotor.set(ControlMode.PercentOutput, speed);
                             Timer.delay(TimedRobot.kDefaultPeriod);
                         }
-                        setLowerFeederSpeed(0);
+                        lowerFeederMotor.set(ControlMode.PercentOutput, 0);
                     } finally {
                         lowerFeederExecutorActive.set(false);
                     }
@@ -359,7 +361,9 @@ public class Shooter implements RobotProperties {
      * @param speed The speed, from -1.0 to 1.0, to set the feeder motors to.
      */
     public void setUpperFeederSpeed(final double speed) {
-        upperFeederMotor.set(ControlMode.PercentOutput, speed);
+        if (!upperFeederExecutorActive.get()) {
+            upperFeederMotor.set(ControlMode.PercentOutput, speed);
+        }
     }
 
     /**
@@ -381,10 +385,10 @@ public class Shooter implements RobotProperties {
                             if (DriverStation.isDisabled()) {
                                 break;
                             }
-                            setUpperFeederSpeed(speed);
+                            upperFeederMotor.set(ControlMode.PercentOutput, speed);
                             Timer.delay(TimedRobot.kDefaultPeriod);
                         }
-                        setUpperFeederSpeed(0);
+                        upperFeederMotor.set(ControlMode.PercentOutput, 0);
                     } finally {
                         upperFeederExecutorActive.set(false);
                     }
@@ -414,7 +418,7 @@ public class Shooter implements RobotProperties {
                             if (DriverStation.isDisabled()) {
                                 break;
                             }
-                            setUpperFeederSpeed(speed);
+                            upperFeederMotor.set(ControlMode.PercentOutput, speed);
                             Timer.delay(.02);
                         }
                         endTime = Timer.getFPGATimestamp() + runTime;
@@ -422,10 +426,10 @@ public class Shooter implements RobotProperties {
                             if (DriverStation.isDisabled()) {
                                 break;
                             }
-                            setUpperFeederSpeed(0);
+                            upperFeederMotor.set(ControlMode.PercentOutput, 0);
                             Timer.delay(.02);
                         }
-                        setUpperFeederSpeed(0);
+                        upperFeederMotor.set(ControlMode.PercentOutput, 0);
                     } finally {
                         upperFeederExecutorActive.set(false);
                     }
