@@ -57,10 +57,9 @@ public class Climber implements RobotProperties {
      * @param speed
      */
     public void setPrimaryClimberSpeed(final double speed, final int lowerBound, final int upperBound) {
-        final int winchPosition = primaryWinch.getEncoderValue();
-        if (speed < 0 && winchPosition <= lowerBound) {
+        if (speed < 0 && primaryWinch.getEncoderValue() < lowerBound) {
             primaryWinch.set(ControlMode.PercentOutput, 0);
-        } else if (speed > 0 && winchPosition >= upperBound) {
+        } else if (speed > 0 && primaryWinch.getEncoderValue() > upperBound) {
             primaryWinch.set(ControlMode.PercentOutput, 0);
         } else {
             primaryWinch.set(ControlMode.PercentOutput, speed);
@@ -71,15 +70,8 @@ public class Climber implements RobotProperties {
      * 
      * @param position
      */
-    public void setPrimaryClimberPosition(final int position, final int lowerBound, final int upperBound) {
-        final int winchPosition = primaryWinch.getEncoderValue();
-        if (position < winchPosition && winchPosition <= lowerBound) {
-            primaryWinch.set(ControlMode.PercentOutput, 0);
-        } else if (position > winchPosition && winchPosition >= upperBound) {
-            primaryWinch.set(ControlMode.PercentOutput, 0);
-        } else {
-            primaryWinch.set(ControlMode.Position, position);
-        }
+    public void setPrimaryClimberPosition(final int position) {
+        primaryWinch.set(ControlMode.Position, position);
     }
 
     public int getPrimaryClimberPosition() {
@@ -100,19 +92,17 @@ public class Climber implements RobotProperties {
      * @param speed
      */
     public void setSecondaryClimberSpeed(final double speed, final int lowerBound, final int upperBound) {
-        final int winchOnePosition = secondaryWinchOne.getEncoderValue(),
-                winchTwoPosition = secondaryWinchTwo.getEncoderValue();
-        if (speed < 0 && winchOnePosition <= lowerBound) {
+        if (speed < 0 && secondaryWinchOne.getEncoderValue() < lowerBound) {
             secondaryWinchOne.set(ControlMode.PercentOutput, 0);
-        } else if (speed > 0 && winchOnePosition >= upperBound) {
+        } else if (speed > 0 && secondaryWinchOne.getEncoderValue() > upperBound) {
             secondaryWinchOne.set(ControlMode.PercentOutput, 0);
         } else {
             secondaryWinchOne.set(ControlMode.PercentOutput, speed);
         }
 
-        if (speed < 0 && winchTwoPosition <= lowerBound) {
+        if (speed < 0 && secondaryWinchTwo.getEncoderValue() < lowerBound) {
             secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
-        } else if (speed > 0 && winchTwoPosition >= upperBound) {
+        } else if (speed > 0 && secondaryWinchTwo.getEncoderValue() > upperBound) {
             secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
         } else {
             secondaryWinchTwo.set(ControlMode.PercentOutput, speed);
@@ -123,22 +113,12 @@ public class Climber implements RobotProperties {
      * 
      * @param position
      */
-    public void setSecondaryClimberPosition(final int position, final int lowerBound, final int upperBound) {
-        final int winchOnePosition = secondaryWinchOne.getEncoderValue(),
-                winchTwoPosition = secondaryWinchTwo.getEncoderValue();
-        if (position < winchOnePosition && winchOnePosition <= lowerBound) {
+    public void setSecondaryClimberPosition(final int position) {
+        if (position < 0) {
             secondaryWinchOne.set(ControlMode.PercentOutput, 0);
-        } else if (position > winchOnePosition && winchOnePosition >= upperBound) {
-            secondaryWinchOne.set(ControlMode.PercentOutput, 0);
+            secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
         } else {
             secondaryWinchOne.set(ControlMode.Position, position);
-        }
-
-        if (position < winchTwoPosition && winchTwoPosition <= lowerBound) {
-            secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
-        } else if (position > winchTwoPosition && winchTwoPosition >= upperBound) {
-            secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
-        } else {
             secondaryWinchTwo.set(ControlMode.Position, position);
         }
     }
