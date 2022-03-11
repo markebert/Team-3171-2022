@@ -371,7 +371,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + desiredAtSpeedTime)) {
         shooterController.setLowerFeederSpeed(.1);
         shooterController.setUpperFeederSpeed(.25);
-        shooterController.setPickupSpeed(.1);
+        shooterController.setPickupSpeed(0);
       } else if (!feedSensor.get()) {
         shooterController.setPickupSpeed(0);
         shooterController.setLowerFeederSpeed(0);
