@@ -14,6 +14,7 @@ public interface RobotProperties {
          */
         public static final double JOYSTICK_DEADZONE = .08;
         public static final double MAX_DRIVE_SPEED = .75;
+        public static final double MAX_SECONDARY_CLIMBER_SPEED = .4;
 
         /**
          * CAN ID Properties
