@@ -179,19 +179,15 @@ public class Robot extends TimedRobot implements RobotProperties {
   public void robotPeriodic() {
     final double startTime = Timer.getFPGATimestamp();
 
-    SmartDashboard.putNumber("Lower Shooter Velocity:", shooterController.getLowerShooterVelocity());
-    SmartDashboard.putNumber("Lower Shooter Target Velocity:", shooterController.getLowerShooterTargetVelocity());
-    SmartDashboard.putNumber("Upper Shooter Velocity:", shooterController.getUpperShooterVelocity());
-    SmartDashboard.putNumber("Upper Shooter Target Velocity:", shooterController.getUpperShooterTargetVelocity());
-    if (PID_LOGGING && !DriverStation.isFMSAttached()) {
-      outgoingMessages.add(String.format("%.3f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
-          shooterController.getUpperShooterVelocity(), shooterController.getUpperShooterTargetVelocity(),
-          shooterController.getUpperShooterSpeed()));
-    }
+    final String lowerShooterVelocity = String.format("%.1f / %.1f", shooterController.getLowerShooterVelocity(),
+        shooterController.getLowerShooterTargetVelocity());
+    final String upperShooterVelocity = String.format("%.1f / %.1f", shooterController.getUpperShooterVelocity(),
+        shooterController.getUpperShooterTargetVelocity());
+    SmartDashboard.putString("Lower Shooter Velocity:", lowerShooterVelocity);
+    SmartDashboard.putString("Upper Shooter Velocity:", upperShooterVelocity);
 
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
     SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
-    SmartDashboard.putBoolean("NavX Calibrating:", gyro.isCalibrating());
     SmartDashboard.putNumber("Gyro Lock:", gyroPIDController.getSensorLockValue());
     if (gyro.isConnected() && !gyro.isCalibrating()) {
       SmartDashboard.putNumber("NavX Heading:", gyro.getYaw());
@@ -201,6 +197,12 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("Primary Winch Position:", climberController.getPrimaryClimberPosition());
     SmartDashboard.putNumber("Secodary Winch One Position:", climberController.getSecondryClimberOnePosition());
     SmartDashboard.putNumber("Secondary Winch Two Position:", climberController.getSecondryClimberTwoPosition());
+
+    if (PID_LOGGING && !DriverStation.isFMSAttached()) {
+      outgoingMessages.add(String.format("%.3f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
+          shooterController.getUpperShooterVelocity(), shooterController.getUpperShooterTargetVelocity(),
+          shooterController.getUpperShooterSpeed()));
+    }
 
     SmartDashboard.putString("robotPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
@@ -324,7 +326,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     final boolean button_Shooter = rightStick.getTrigger();
     final boolean button_Full_Yeet = rightStick.getRawButton(2);
-    //final boolean button_Retract_Pickup_Arm = rightStick.getRawButton(3);
+    // final boolean button_Retract_Pickup_Arm = rightStick.getRawButton(3);
     final boolean button_Extend_Pickup_Arm = rightStick.getRawButton(4);
 
     final boolean button_Override_Primary_Climb = operatorLeftStick.getRawButton(2);
@@ -345,7 +347,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       rightStickX = joystickValues[1] * MAX_DRIVE_SPEED;
     }
     operatorLeftStickY = joystickValues[2];
-    operatorRightStickY = joystickValues[3];
+    operatorRightStickY = joystickValues[3] * .5f;
 
     // Drive Control
     if (rightStickX != 0) {
@@ -359,7 +361,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Shooter Control
     final int lowerShooterVelocity = 1500, upperShooterVelocity = 4000;
-    final double desiredPercentAccuracy = .015f, desiredAtSpeedTime = .75f;
+    final double desiredPercentAccuracy = .03f, desiredAtSpeedTime = .5f;
     boolean extend_Pickup_Arm = button_Extend_Pickup_Arm;
     if (button_Shooter) {
       shooterController.enableTargetingLight(true);
@@ -426,24 +428,24 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else {
       shooterController.retractPickupArm();
     }
-    //shooterController.setPickupArmSpeed(rightStick.getY());
+    // shooterController.setPickupArmSpeed(rightStick.getY());
 
     // Primary Climber Control
     if (button_Extend_Climber) {
-      climberController.setPrimaryClimberSpeed(1, 500, 200000);
+      climberController.setPrimaryClimberSpeed(1, 5000, 1250000);
     } else if (button_Retract_Climber) {
-      climberController.setPrimaryClimberSpeed(-1, 500, 200000);
+      climberController.setPrimaryClimberSpeed(-1, 5000, 1250000);
     } else if (button_Override_Primary_Climb) {
       climberController.setPrimaryClimberSpeed(-operatorLeftStickY);
     } else {
-      climberController.setPrimaryClimberSpeed(-operatorLeftStickY, 500, 200000);
+      climberController.setPrimaryClimberSpeed(-operatorLeftStickY, 5000, 1250000);
     }
 
     // Secondary Climber Control
     if (button_Override_Secondary_Climb) {
       climberController.setSecondaryClimberSpeed(-operatorRightStickY);
     } else {
-      climberController.setSecondaryClimberSpeed(-operatorRightStickY, 500, 200000);
+      climberController.setSecondaryClimberSpeed(-operatorRightStickY, 3000, 180000);
     }
     // climberController.setSecondaryClimberPosition((int) (-operatorRightStickY *
     // 100000));

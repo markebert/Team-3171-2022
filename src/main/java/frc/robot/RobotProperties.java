@@ -77,7 +77,7 @@ public interface RobotProperties {
         public static final boolean PICKUP_MOTOR_INVERTED = false, PICKUP_ARM_MOTOR_INVERTED = false;
         public static final boolean LOWER_FEEDER_INVERTED = false, UPPER_FEEDER_INVERTED = false;
         public static final boolean PRIMARY_WINCH_INVERTED = false;
-        public static final boolean SECONDARY_WINCH_ONE_INVERTED = false, SECONDARY_WINCH_TWO_INVERTED = true;
+        public static final boolean SECONDARY_WINCH_ONE_INVERTED = true, SECONDARY_WINCH_TWO_INVERTED = false;
 
         /**
          * Relay Channels. 0-4 are on-board.
