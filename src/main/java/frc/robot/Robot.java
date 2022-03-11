@@ -358,7 +358,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
 
     // Shooter Control
-    final int lowerShooterVelocity = 2750, upperShooterVelocity = 6000;
+    final int lowerShooterVelocity = 1500, upperShooterVelocity = 4000;
     final double desiredPercentAccuracy = .015f, desiredAtSpeedTime = .75f;
     boolean extend_Pickup_Arm = button_Extend_Pickup_Arm;
     if (button_Shooter) {
