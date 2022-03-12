@@ -9,6 +9,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.DoubleSupplier;
 
+// FRC Imports
+import edu.wpi.first.wpilibj.Timer;
+
 // Team 3171 Imports
 import static frc.team3171.HelperFunctions.Get_Gyro_Displacement;
 import static frc.team3171.HelperFunctions.Normalize_Gryo_Value;
@@ -32,8 +35,8 @@ public class GyroPIDController {
     private volatile double pidValue, sensorValue, sensorLockValue;
     private double sum = 0, rate = 0;
     private double proportionalTemp, sumTemp, rateTemp;
-    private long currentTime = 0, lastTime = 0;
-    private volatile boolean disablePID = true;
+    private double currentTime = 0, lastTime = 0;
+    private final AtomicBoolean disablePID = new AtomicBoolean(true);
 
     /**
      * Constants
@@ -77,8 +80,8 @@ public class GyroPIDController {
     public GyroPIDController(DoubleSupplier sensor, double kP, double kI, double kD, double PID_MIN, double PID_MAX) {
         this.sensor = sensor;
         this.es = Executors.newSingleThreadScheduledExecutor();
-        this.START_LOCK = new ReentrantLock(true);
-        this.PID_LOCK = new ReentrantLock(true);
+        this.START_LOCK = new ReentrantLock();
+        this.PID_LOCK = new ReentrantLock();
         this.started = new AtomicBoolean();
 
         this.pidValue = 0;
@@ -104,18 +107,18 @@ public class GyroPIDController {
     public void start(final int updateRate, final boolean defaultZero, final ConcurrentLinkedQueue<String> logData) {
         try {
             START_LOCK.lock();
-            final long startTime = System.currentTimeMillis();
+            final double startTime = Timer.getFPGATimestamp();
             if (started.compareAndSet(false, true)) {
                 es.scheduleAtFixedRate(() -> {
                     sensorValue = sensor.getAsDouble();
-                    if (disablePID) {
+                    if (disablePID.get()) {
                         if (defaultZero) {
                             updateSensorLockValue(0);
                         } else {
                             updateSensorLockValue();
                         }
                         if (logData != null) {
-                            logData.add(String.format("%d,%.2f,%.2f,0,0,0,0", (System.currentTimeMillis() - startTime),
+                            logData.add(String.format("%.4f,%.2f,%.2f,0,0,0,0", (Timer.getFPGATimestamp() - startTime),
                                     sensorValue, sensorLockValue));
                         }
                     } else {
@@ -126,12 +129,12 @@ public class GyroPIDController {
                             PID_LOCK.unlock();
                         }
                         if (logData != null) {
-                            logData.add(String.format("%d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
-                                    (System.currentTimeMillis() - startTime), getSensorValue(), getSensorLockValue(),
+                            logData.add(String.format("%.4f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
+                                    (Timer.getFPGATimestamp() - startTime), getSensorValue(), getSensorLockValue(),
                                     getPIDValue(), proportionalTemp, sumTemp, rateTemp));
                         }
                     }
-                }, 0, updateRate, TimeUnit.MILLISECONDS);
+                }, 0L, updateRate, TimeUnit.MILLISECONDS);
             }
         } finally {
             START_LOCK.unlock();
@@ -173,8 +176,8 @@ public class GyroPIDController {
      */
     private final double calculatePID(final double displacement) {
         double pid = 0, sum = this.sum;
-        currentTime = System.currentTimeMillis();
-        rate = (displacement / (currentTime - lastTime));
+        currentTime = Timer.getFPGATimestamp();
+        rate = (displacement / ((currentTime - lastTime) * 1000));
         sum += rate;
         proportionalTemp = (kP * displacement);
         sumTemp = (kI * sum);
@@ -224,7 +227,7 @@ public class GyroPIDController {
             this.pidValue = 0;
             this.sum = 0;
             this.rate = 0;
-            this.lastTime = System.currentTimeMillis();
+            this.lastTime = Timer.getFPGATimestamp();
         } finally {
             PID_LOCK.unlock();
         }
@@ -264,7 +267,7 @@ public class GyroPIDController {
      * current sensor value.
      */
     public void disablePID() {
-        this.disablePID = true;
+        disablePID.compareAndSet(false, true);
     }
 
     /**
@@ -272,21 +275,21 @@ public class GyroPIDController {
      * value again.
      */
     public void enablePID() {
-        this.disablePID = false;
+        disablePID.compareAndSet(true, false);
     }
 
     /**
      * Returns if the {@code PIDController} is disabled.
      */
     public boolean isDisabled() {
-        return disablePID;
+        return disablePID.get();
     }
 
     /**
      * Returns if the {@code PIDController} is enabled.
      */
     public boolean isEnabled() {
-        return !disablePID;
+        return !isDisabled();
     }
 
     /**
@@ -300,7 +303,12 @@ public class GyroPIDController {
      * @param kP the kP to set
      */
     public void setkP(double kP) {
-        this.kP = kP;
+        try {
+            PID_LOCK.lock();
+            this.kP = kP;
+        } finally {
+            PID_LOCK.unlock();
+        }
     }
 
     /**
@@ -314,7 +322,12 @@ public class GyroPIDController {
      * @param kI the kI to set
      */
     public void setkI(double kI) {
-        this.kI = kI;
+        try {
+            PID_LOCK.lock();
+            this.kI = kI;
+        } finally {
+            PID_LOCK.unlock();
+        }
     }
 
     /**
@@ -328,7 +341,12 @@ public class GyroPIDController {
      * @param kD the kD to set
      */
     public void setkD(double kD) {
-        this.kD = kD;
+        try {
+            PID_LOCK.lock();
+            this.kD = kD;
+        } finally {
+            PID_LOCK.unlock();
+        }
     }
 
 }

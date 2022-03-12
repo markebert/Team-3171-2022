@@ -8,13 +8,27 @@ public interface RobotProperties {
         /**
          * Static Values Properties
          * 
-         * @param JOYSTICK_DEADZONE The percent of error allowed, from -1.0 to 1.0, of
-         *                          the joysticks X and Y values.
-         * @param MAX_DRIVE_SPEED   The maximum drive speed of the robot, from 0 to 1.0
+         * @param JOYSTICK_DEADZONE            The percent of error allowed, from -1.0
+         *                                     to
+         *                                     1.0, of
+         *                                     the joysticks X and Y values.
+         * @param MAX_DRIVE_SPEED              The maximum drive speed of the robot,
+         *                                     from
+         *                                     0 to 1.0
+         * @param MAX_SECONDARY_CLIMBER_SPEED
+         * @param LOWER_SHOOTER_VELOCITY
+         * @param UPPER_SHOOTER_VELOCITY
+         * @param LOWER_SHOOTER_SHORT_VELOCITY
+         * @param UPPER_SHOOTER_SHORT_VELOCITY
+         * @param DESIRED_PERCENT_ACCURACY
+         * @param DESIRED_AT_SPEED_TIME
          */
         public static final double JOYSTICK_DEADZONE = .08;
         public static final double MAX_DRIVE_SPEED = .75;
         public static final double MAX_SECONDARY_CLIMBER_SPEED = .4;
+        public static final int LOWER_SHOOTER_VELOCITY = 1500, UPPER_SHOOTER_VELOCITY = 4000; // High shot
+        public static final int LOWER_SHOOTER_SHORT_VELOCITY = 1250, UPPER_SHOOTER_SHORT_VELOCITY = 1900; // Low shot
+        public static final double DESIRED_PERCENT_ACCURACY = .075, DESIRED_AT_SPEED_TIME = .1; // Accuracy Settings
 
         /**
          * CAN ID Properties

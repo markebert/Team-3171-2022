@@ -180,12 +180,12 @@ public class Robot extends TimedRobot implements RobotProperties {
   public void robotPeriodic() {
     final double startTime = Timer.getFPGATimestamp();
 
-    final String lowerShooterVelocity = String.format("%.1f / %.1f", shooterController.getLowerShooterVelocity(),
-        shooterController.getLowerShooterTargetVelocity());
-    final String upperShooterVelocity = String.format("%.1f / %.1f", shooterController.getUpperShooterVelocity(),
-        shooterController.getUpperShooterTargetVelocity());
-    SmartDashboard.putString("Lower Shooter Velocity:", lowerShooterVelocity);
-    SmartDashboard.putString("Upper Shooter Velocity:", upperShooterVelocity);
+    SmartDashboard.putString("Lower Shooter Velocity:", String.format("%d / %d",
+        Math.round(shooterController.getLowerShooterVelocity()),
+        Math.round(shooterController.getLowerShooterTargetVelocity())));
+    SmartDashboard.putString("Upper Shooter Velocity:", String.format("%d / %d",
+        Math.round(shooterController.getUpperShooterVelocity()),
+        Math.round(shooterController.getUpperShooterTargetVelocity())));
 
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
     SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
@@ -200,7 +200,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("Secondary Winch Two Position:", climberController.getSecondryClimberTwoPosition());
 
     if (PID_LOGGING && !DriverStation.isFMSAttached()) {
-      outgoingMessages.add(String.format("%.3f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
+      outgoingMessages.add(String.format("%.4f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
           shooterController.getUpperShooterVelocity(), shooterController.getUpperShooterTargetVelocity(),
           shooterController.getUpperShooterSpeed()));
     }
@@ -219,10 +219,12 @@ public class Robot extends TimedRobot implements RobotProperties {
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
+    shooterAtSpeedStartTime = 0;
 
     // Reset Drive Direction
     driveController.setDriveDirectionFlipped(false);
 
+    // Enable the Gyro PID Controller
     gyroPIDController.enablePID();
 
     // Update Auton Selected Mode and load the auton
@@ -272,14 +274,10 @@ public class Robot extends TimedRobot implements RobotProperties {
         if (playbackData != null) {
           // Get the latest joystick button values
           final boolean button_Pickup = playbackData.getPickup();
-
           final boolean button_Shooter = playbackData.getShooter();
 
           // Get the latest joystick values and calculate their deadzones
-          final double leftStickY, rightStickX;
-
-          leftStickY = playbackData.getLeftY();
-          rightStickX = playbackData.getRightX();
+          final double leftStickY = playbackData.getLeftY(), rightStickX = playbackData.getRightX();
 
           // Drive Control
           if (gyroPIDController.isEnabled()) {
@@ -287,16 +285,16 @@ public class Robot extends TimedRobot implements RobotProperties {
               driveController.mecanumTraction(-leftStickY, rightStickX);
               gyroPIDController.updateSensorLockValue();
             } else {
-              // driveController.mecanumTraction(-leftStickY,
-              // gyroPIDController.getPIDValue());
-              driveController.mecanumTraction(-leftStickY, 0);
+              driveController.mecanumTraction(-leftStickY, gyroPIDController.getPIDValue());
             }
           } else {
             driveController.mecanumTraction(-leftStickY, rightStickX);
           }
 
           // Shooter Control
-          final int lowerShooterVelocity = 1500, upperShooterVelocity = 4000; // High shot
+          // High Shot Settings
+          final int lowerShooterVelocity = 1500, upperShooterVelocity = 4000;
+          // Accuracy Settings
           final double desiredPercentAccuracy = .1, desiredAtSpeedTime = .15;
           boolean extend_Pickup_Arm = false;
           if (button_Shooter && !shooterButtonEdgeTrigger) {
@@ -388,9 +386,13 @@ public class Robot extends TimedRobot implements RobotProperties {
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
+    shooterAtSpeedStartTime = 0;
 
     // Reset Drive Direction
     driveController.setDriveDirectionFlipped(false);
+
+    // Enable the Gyro PID Controller
+    gyroPIDController.enablePID();
 
     // Update Auton Selected Mode and reset the data recorder
     selectedAutonType = autonTypeChooser.getSelected();
@@ -400,10 +402,6 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Update the autonStartTime
     autonStartTime = Timer.getFPGATimestamp();
-
-    shooterAtSpeedStartTime = 0;
-
-    gyroPIDController.enablePID();
 
     SmartDashboard.putString("teleopInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
@@ -423,7 +421,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     final boolean button_Shooter = rightStick.getTrigger();
     final boolean button_Short_Shot = rightStick.getRawButton(2);
     final boolean button_Full_Yeet = rightStick.getRawButton(3);
-    // final boolean button_Retract_Pickup_Arm = rightStick.getRawButton(3);
     final boolean button_Extend_Pickup_Arm = rightStick.getRawButton(4);
 
     final boolean button_Override_Primary_Climber = operatorLeftStick.getRawButton(2);
@@ -435,18 +432,17 @@ public class Robot extends TimedRobot implements RobotProperties {
     final boolean button_Extend_Secondary_Climber = operatorRightStick.getRawButton(4);
 
     // Get the latest joystick values and calculate their deadzones
-    final double[] joystickValues = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY(), rightStick.getX(),
-        operatorLeftStick.getY(), operatorRightStick.getY());
     final double leftStickY, rightStickX, operatorLeftStickY, operatorRightStickY;
     if (button_Boost) {
-      leftStickY = joystickValues[0];
-      rightStickX = joystickValues[1];
+      leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY());
+      rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX());
     } else {
-      leftStickY = joystickValues[0] * MAX_DRIVE_SPEED;
-      rightStickX = joystickValues[1] * MAX_DRIVE_SPEED;
+      leftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, leftStick.getY()) * MAX_DRIVE_SPEED;
+      rightStickX = Deadzone_With_Map(JOYSTICK_DEADZONE, rightStick.getX()) * MAX_DRIVE_SPEED;
     }
-    operatorLeftStickY = joystickValues[2];
-    operatorRightStickY = joystickValues[3] * MAX_SECONDARY_CLIMBER_SPEED;
+    operatorLeftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, operatorLeftStick.getY());
+    operatorRightStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, operatorRightStick.getY()) * MAX_SECONDARY_CLIMBER_SPEED;
+    SmartDashboard.putString("Joystick Time:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
 
     // Drive Control
     if (gyroPIDController.isEnabled()) {
@@ -454,41 +450,38 @@ public class Robot extends TimedRobot implements RobotProperties {
         driveController.mecanumTraction(-leftStickY, rightStickX);
         gyroPIDController.updateSensorLockValue();
       } else {
-        // driveController.mecanumTraction(-leftStickY,
-        // gyroPIDController.getPIDValue());
-        driveController.mecanumTraction(-leftStickY, 0);
+        driveController.mecanumTraction(-leftStickY, gyroPIDController.getPIDValue());
       }
     } else {
       driveController.mecanumTraction(-leftStickY, rightStickX);
     }
 
+    // Disables the gyro if the climber is enaged at all
     if (button_Extend_Primary_Climber || button_Extend_Secondary_Climber || operatorLeftStickY != 0
         || operatorRightStickY != 0) {
       gyroPIDController.disablePID();
     }
+    SmartDashboard.putString("Drive Time:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
 
     // Shooter Control
-    final int lowerShooterVelocity = 1500, upperShooterVelocity = 4000; // High shot
-    final int lowerShooterShortVelocity = 1250, upperShooterShortVelocity = 1900; // Low shot
-    final double desiredPercentAccuracy = .1, desiredAtSpeedTime = .15;
     boolean extend_Pickup_Arm = button_Extend_Pickup_Arm;
     if (button_Shooter && !shooterButtonEdgeTrigger) {
       // Sets the shooter speed and the targeting light
       shooterAtSpeedEdgeTrigger = false;
       shooterController.enableTargetingLight(true);
-      shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
+      shooterController.setShooterVelocity(LOWER_SHOOTER_VELOCITY, UPPER_SHOOTER_VELOCITY);
     } else if (button_Short_Shot && !shooterButtonEdgeTrigger) {
       // Sets the shooter speed for a short shot and the targeting light
       shooterAtSpeedEdgeTrigger = false;
       shooterController.enableTargetingLight(true);
-      shooterController.setShooterVelocity(lowerShooterShortVelocity, upperShooterShortVelocity);
+      shooterController.setShooterVelocity(LOWER_SHOOTER_SHORT_VELOCITY, UPPER_SHOOTER_SHORT_VELOCITY);
     } else if (button_Shooter || button_Short_Shot) {
       // Check if the shooter is at speed
-      final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(desiredPercentAccuracy);
+      final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(DESIRED_PERCENT_ACCURACY);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
         // Get time that shooter first designated at speed
         shooterAtSpeedStartTime = Timer.getFPGATimestamp();
-      } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + desiredAtSpeedTime)) {
+      } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + DESIRED_AT_SPEED_TIME)) {
         // Feed the ball through the shooter
         shooterController.setLowerFeederSpeed(.1);
         shooterController.setUpperFeederSpeed(.25);
@@ -521,10 +514,10 @@ public class Robot extends TimedRobot implements RobotProperties {
         extend_Pickup_Arm = true;
         shooterController.setPickupSpeed(.4);
         if (!feedSensor.get()) {
-          shooterController.setLowerFeederSpeed(.3);
+          shooterController.setLowerFeederSpeed(.2);
           shooterController.setUpperFeederSpeed(0);
         } else {
-          shooterController.setLowerFeederSpeed(.45);
+          shooterController.setLowerFeederSpeed(.3);
           shooterController.setUpperFeederSpeed(.2);
         }
       } else if (button_Reverse_Pickup) {
@@ -544,6 +537,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
     shooterButtonEdgeTrigger = button_Shooter || button_Short_Shot;
     ballpickupEdgeTrigger = button_Pickup;
+    SmartDashboard.putString("Shooter Time:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
 
     // Pickup Arm Control
     if (extend_Pickup_Arm) {
@@ -552,6 +546,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       shooterController.retractPickupArm();
     }
     // shooterController.setPickupArmSpeed(rightStick.getY());
+    SmartDashboard.putString("Pickup Time:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
 
     // Primary Climber Control
     if (button_Extend_Primary_Climber) {
@@ -574,6 +569,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else {
       climberController.setSecondaryClimberSpeed(-operatorRightStickY, 3000, 180000);
     }
+    SmartDashboard.putString("Climber Time:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
 
     // Auton Recording
     if (saveNewAuton) {
