@@ -442,7 +442,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
     operatorLeftStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, operatorLeftStick.getY());
     operatorRightStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, operatorRightStick.getY()) * MAX_SECONDARY_CLIMBER_SPEED;
-    SmartDashboard.putString("Joystick Time:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
 
     // Drive Control
     if (gyroPIDController.isEnabled()) {
@@ -461,7 +460,6 @@ public class Robot extends TimedRobot implements RobotProperties {
         || operatorRightStickY != 0) {
       gyroPIDController.disablePID();
     }
-    SmartDashboard.putString("Drive Time:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
 
     // Shooter Control
     boolean extend_Pickup_Arm = button_Extend_Pickup_Arm;
@@ -537,7 +535,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
     shooterButtonEdgeTrigger = button_Shooter || button_Short_Shot;
     ballpickupEdgeTrigger = button_Pickup;
-    SmartDashboard.putString("Shooter Time:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
 
     // Pickup Arm Control
     if (extend_Pickup_Arm) {
@@ -546,22 +543,21 @@ public class Robot extends TimedRobot implements RobotProperties {
       shooterController.retractPickupArm();
     }
     // shooterController.setPickupArmSpeed(rightStick.getY());
-    SmartDashboard.putString("Pickup Time:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
 
     // Primary Climber Control
     if (button_Extend_Primary_Climber) {
-      climberController.setPrimaryClimberSpeed(1, 5000, 1250000);
+      climberController.setPrimaryClimberSpeed(1, -460000, 935000);
     } else if (button_Retract_Primary_Climber) {
-      climberController.setPrimaryClimberSpeed(-1, 5000, 1250000);
+      climberController.setPrimaryClimberSpeed(-1, -460000, 935000);
     } else if (button_Override_Primary_Climber) {
       climberController.setPrimaryClimberSpeed(-operatorLeftStickY);
     } else {
-      climberController.setPrimaryClimberSpeed(-operatorLeftStickY, 5000, 1250000);
+      climberController.setPrimaryClimberSpeed(-operatorLeftStickY, -460000, 935000);
     }
 
     // Secondary Climber Control
     if (button_Extend_Secondary_Climber) {
-      climberController.setSecondaryClimberSpeed(.35, 5000, 1250000);
+      climberController.setSecondaryClimberSpeed(.25, 5000, 1250000);
     } else if (button_Retract_Secondary_Climber) {
       climberController.setSecondaryClimberSpeed(-.5, 5000, 1250000);
     } else if (button_Override_Secondary_Climber) {
@@ -569,7 +565,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else {
       climberController.setSecondaryClimberSpeed(-operatorRightStickY, 3000, 180000);
     }
-    SmartDashboard.putString("Climber Time:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
 
     // Auton Recording
     if (saveNewAuton) {

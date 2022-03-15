@@ -64,7 +64,7 @@ public class Shooter implements RobotProperties {
         upperFeederMotor = new FRCTalonFX(UPPER_FEEDER_CAN_ID);
         lowerFeederMotor = new FRCTalonFX(LOWER_FEEDER_CAN_ID);
         pickupArmMotor = new CANSparkMax(PICKUP_ARM_CAN_ID, MotorType.kBrushless);
-        pickupArmMotor.setIdleMode(IdleMode.kBrake);
+        pickupArmMotor.setIdleMode(IdleMode.kCoast);
 
         targetLightRelay = new Relay(TARGET_LIGHT_CHANNEL, Direction.kForward);
 
@@ -466,29 +466,20 @@ public class Shooter implements RobotProperties {
      * @param speed The speed, from -1.0 to 1.0, to set the pickup motors to.
      */
     public void setPickupArmSpeed(final double speed) {
-        if (speed > 0 && pickupArmMotor.getIdleMode() == IdleMode.kBrake) {
-            pickupArmMotor.setIdleMode(IdleMode.kCoast);
-        } else if (speed < 0 && pickupArmMotor.getIdleMode() == IdleMode.kCoast) {
-            pickupArmMotor.setIdleMode(IdleMode.kBrake);
-        }
         pickupArmMotor.set(speed);
     }
 
     public void extendPickupArm() {
-        if (pickupArmMotor.getIdleMode() != IdleMode.kCoast) {
-            pickupArmMotor.setIdleMode(IdleMode.kCoast);
-        }
-        if (pickupArmEncoder.getPosition() > 75) {
+        // pickupArmMotor.setIdleMode(IdleMode.kCoast);
+        if (pickupArmEncoder.getPosition() > 78) {
             pickupArmMotor.disable();
         } else {
-            pickupArmPIDController.setReference(75, ControlType.kPosition);
+            pickupArmPIDController.setReference(78, ControlType.kPosition);
         }
     }
 
     public void retractPickupArm() {
-        if (pickupArmMotor.getIdleMode() != IdleMode.kBrake) {
-            pickupArmMotor.setIdleMode(IdleMode.kBrake);
-        }
+        // pickupArmMotor.setIdleMode(IdleMode.kBrake);
         if (pickupArmEncoder.getPosition() < 10) {
             pickupArmMotor.disable();
         } else {
