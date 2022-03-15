@@ -194,7 +194,8 @@ public class Robot extends TimedRobot implements RobotProperties {
       SmartDashboard.putNumber("NavX Heading:", gyro.getYaw());
     }
 
-    SmartDashboard.putNumber("Pickup Arm Position:", shooterController.getPickupArmPoisition());
+    // SmartDashboard.putNumber("Pickup Arm Position:",
+    // shooterController.getPickupArmPoisition());
     SmartDashboard.putNumber("Primary Winch Position:", climberController.getPrimaryClimberPosition());
     SmartDashboard.putNumber("Secodary Winch One Position:", climberController.getSecondryClimberOnePosition());
     SmartDashboard.putNumber("Secondary Winch Two Position:", climberController.getSecondryClimberTwoPosition());
