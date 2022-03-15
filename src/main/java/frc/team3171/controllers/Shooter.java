@@ -37,6 +37,8 @@ public class Shooter implements RobotProperties {
     private final CANSparkMax pickupArmMotor;
     private final RelativeEncoder pickupArmEncoder;
     private final SparkMaxPIDController pickupArmPIDController;
+    private final double pickupArmDelay = 0.5;
+    private double pickupArmLastTime;
 
     // Relay for the targeting light
     private final Relay targetLightRelay;
@@ -65,6 +67,7 @@ public class Shooter implements RobotProperties {
         lowerFeederMotor = new FRCTalonFX(LOWER_FEEDER_CAN_ID);
         pickupArmMotor = new CANSparkMax(PICKUP_ARM_CAN_ID, MotorType.kBrushless);
         pickupArmMotor.setIdleMode(IdleMode.kCoast);
+        pickupArmLastTime = 0;
 
         targetLightRelay = new Relay(TARGET_LIGHT_CHANNEL, Direction.kForward);
 
@@ -466,7 +469,11 @@ public class Shooter implements RobotProperties {
      * @param speed The speed, from -1.0 to 1.0, to set the pickup motors to.
      */
     public void setPickupArmSpeed(final double speed) {
-        pickupArmMotor.set(speed);
+        final double currentTime = Timer.getFPGATimestamp();
+        if (currentTime > pickupArmLastTime + pickupArmDelay) {
+            pickupArmMotor.set(speed);
+            pickupArmLastTime = currentTime;
+        }
     }
 
     public void extendPickupArm() {
@@ -474,7 +481,11 @@ public class Shooter implements RobotProperties {
         if (pickupArmEncoder.getPosition() > 78) {
             pickupArmMotor.disable();
         } else {
-            pickupArmPIDController.setReference(78, ControlType.kPosition);
+            final double currentTime = Timer.getFPGATimestamp();
+            if (currentTime > pickupArmLastTime + pickupArmDelay) {
+                pickupArmPIDController.setReference(78, ControlType.kPosition);
+                pickupArmLastTime = currentTime;
+            }
         }
     }
 
@@ -483,7 +494,11 @@ public class Shooter implements RobotProperties {
         if (pickupArmEncoder.getPosition() < 10) {
             pickupArmMotor.disable();
         } else {
-            pickupArmPIDController.setReference(10, ControlType.kPosition);
+            final double currentTime = Timer.getFPGATimestamp();
+            if (currentTime > pickupArmLastTime + pickupArmDelay) {
+                pickupArmPIDController.setReference(10, ControlType.kPosition);
+                pickupArmLastTime = currentTime;
+            }
         }
     }
 
