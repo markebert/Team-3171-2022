@@ -30,6 +30,25 @@ public interface RobotProperties {
         public static final int LOWER_SHOOTER_SHORT_VELOCITY = 1250, UPPER_SHOOTER_SHORT_VELOCITY = 1900; // Low shot
         public static final double DESIRED_PERCENT_ACCURACY = .08, DESIRED_AT_SPEED_TIME = .06; // Accuracy Settings
 
+        public static final double SHOOTER_UPPER_FEED_SPEED = .25, SHOOTER_LOWER_FEED_SPEED = .1;
+
+        public static final double PICKUP_SPEED = .3, LOWER_FEEDER_SPEED_SLOW = .2, LOWER_FEEDER_SPEED = .3,
+                        UPPER_FEEDER_SPEED = .2;
+        public static final double UPPER_FEEDER_BACKFEED_SPEED = -.4;
+
+        public static final double UPPER_FEED_END_SPEED = -.3, LOWER_FEED_END_SPEED = .15;
+        public static final double UPPER_FEED_END_TIME = .2, LOWER_FEED_END_TIME = .2;
+
+        public static final double REVERSE_PICKUP_SPEED = -.5, REVERSE_LOWER_FEEDER_SPEED = -.75,
+                        REVERSE_UPPER_FEEDER_SPEED = -.75;
+
+        public static int PICKUP_ARM_MAX_CURRENT = 90;
+
+        public static final double PRIMARY_CLIMBER_RETRACT_SPEED = -1, PRIMARY_CLIMBER_EXTEND_SPEED = 1;
+        public static final double SECONDARY_CLIMBER_RETRACT_SPEED = -.5, SECONDARY_CLIMBER_EXTEND_SPEED = .25;
+        public static final int PRIMARY_CLIMBER_MIN_TICK = -460000, PRIMARY_CLIMBER_MAX_TICK = 935000;
+        public static final int SECONDARY_CLIMBER_MIN_TICK = 5000, SECONDARY_CLIMBER_MAX_TICK = 1250000;
+
         /**
          * CAN ID Properties
          * 

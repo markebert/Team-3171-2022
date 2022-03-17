@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Relay.Direction;
 import edu.wpi.first.wpilibj.Relay.Value;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -461,6 +460,23 @@ public class Shooter implements RobotProperties {
         return pickupArmEncoder.getPosition();
     }
 
+    public double getPickupArmTemp() {
+        return pickupArmMotor.getMotorTemperature();
+    }
+
+    public double getPickupArmCurrent() {
+        return pickupArmMotor.getOutputCurrent();
+    }
+
+    /**
+     * Sets the speed of the pickup arm motor to the given value.
+     * 
+     * @param speed The speed, from -1.0 to 1.0, to set the pickup motors to.
+     */
+    public void setPickupArmSpeed(final double speed) {
+        pickupArmMotor.set(speed);
+    }
+
     public void extendPickupArm() {
         // pickupArmMotor.setIdleMode(IdleMode.kCoast);
         if (pickupArmEncoder.getPosition() > 81) {
@@ -470,15 +486,8 @@ public class Shooter implements RobotProperties {
         }
     }
 
-    double maxCurrent = 0;
-
     public void retractPickupArm() {
-        SmartDashboard.putNumber("Neo: Temp", pickupArmMotor.getMotorTemperature());
-        double current = pickupArmMotor.getOutputCurrent();
-        maxCurrent = current > maxCurrent ? current : maxCurrent;
-        SmartDashboard.putNumber("Max Current", maxCurrent);
-        // pickupArmMotor.setIdleMode(IdleMode.kBrake);
-        if (pickupArmEncoder.getPosition() < 10 || current > 90) {
+        if (pickupArmEncoder.getPosition() < 10) {
             pickupArmMotor.disable();
         } else {
             pickupArmPIDController.setReference(10, ControlType.kPosition);
@@ -494,7 +503,6 @@ public class Shooter implements RobotProperties {
         pickupMotor.set(ControlMode.Disabled, 0);
         lowerFeederMotor.set(ControlMode.Disabled, 0);
         upperFeederMotor.set(ControlMode.Disabled, 0);
-        pickupArmMotor.setIdleMode(IdleMode.kBrake);
         pickupArmMotor.disable();
         targetLightRelay.set(Value.kOff);
     }
