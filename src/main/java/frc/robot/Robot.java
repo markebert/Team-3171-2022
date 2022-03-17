@@ -294,22 +294,20 @@ public class Robot extends TimedRobot implements RobotProperties {
 
           // Shooter Control
           // High Shot Settings
-          final int lowerShooterVelocity = 1500, upperShooterVelocity = 4000;
           // Accuracy Settings
-          final double desiredPercentAccuracy = .1, desiredAtSpeedTime = .15;
           boolean extend_Pickup_Arm = false;
           if (button_Shooter && !shooterButtonEdgeTrigger) {
             // Sets the shooter speed and the targeting light
             shooterAtSpeedEdgeTrigger = false;
             shooterController.enableTargetingLight(true);
-            shooterController.setShooterVelocity(lowerShooterVelocity, upperShooterVelocity);
+            shooterController.setShooterVelocity(LOWER_SHOOTER_VELOCITY, UPPER_SHOOTER_VELOCITY);
           } else if (button_Shooter) {
             // Check if the shooter is at speed
-            final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(desiredPercentAccuracy);
+            final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(DESIRED_PERCENT_ACCURACY);
             if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
               // Get time that shooter first designated at speed
               shooterAtSpeedStartTime = Timer.getFPGATimestamp();
-            } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + desiredAtSpeedTime)) {
+            } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + DESIRED_AT_SPEED_TIME)) {
               // Feed the ball through the shooter
               shooterController.setLowerFeederSpeed(.1);
               shooterController.setUpperFeederSpeed(.25);
@@ -333,7 +331,7 @@ public class Robot extends TimedRobot implements RobotProperties {
             // Ball Pickup Controls
             if (button_Pickup) {
               extend_Pickup_Arm = true;
-              shooterController.setPickupSpeed(.4);
+              shooterController.setPickupSpeed(.3);
               if (!feedSensor.get()) {
                 shooterController.setLowerFeederSpeed(.3);
                 shooterController.setUpperFeederSpeed(0);
@@ -511,7 +509,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       // Ball Pickup Controls
       if (button_Pickup) {
         extend_Pickup_Arm = true;
-        shooterController.setPickupSpeed(.4);
+        shooterController.setPickupSpeed(.3);
         if (!feedSensor.get()) {
           shooterController.setLowerFeederSpeed(.2);
           shooterController.setUpperFeederSpeed(0);

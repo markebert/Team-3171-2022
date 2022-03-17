@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Relay.Direction;
 import edu.wpi.first.wpilibj.Relay.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -37,8 +38,6 @@ public class Shooter implements RobotProperties {
     private final CANSparkMax pickupArmMotor;
     private final RelativeEncoder pickupArmEncoder;
     private final SparkMaxPIDController pickupArmPIDController;
-    private final double pickupArmDelay = 0.5;
-    private double pickupArmLastTime;
 
     // Relay for the targeting light
     private final Relay targetLightRelay;
@@ -67,7 +66,6 @@ public class Shooter implements RobotProperties {
         lowerFeederMotor = new FRCTalonFX(LOWER_FEEDER_CAN_ID);
         pickupArmMotor = new CANSparkMax(PICKUP_ARM_CAN_ID, MotorType.kBrushless);
         pickupArmMotor.setIdleMode(IdleMode.kCoast);
-        pickupArmLastTime = 0;
 
         targetLightRelay = new Relay(TARGET_LIGHT_CHANNEL, Direction.kForward);
 
@@ -463,42 +461,27 @@ public class Shooter implements RobotProperties {
         return pickupArmEncoder.getPosition();
     }
 
-    /**
-     * Sets the speed of the pickup arm motor to the given value.
-     * 
-     * @param speed The speed, from -1.0 to 1.0, to set the pickup motors to.
-     */
-    public void setPickupArmSpeed(final double speed) {
-        final double currentTime = Timer.getFPGATimestamp();
-        if (currentTime > pickupArmLastTime + pickupArmDelay) {
-            pickupArmMotor.set(speed);
-            pickupArmLastTime = currentTime;
-        }
-    }
-
     public void extendPickupArm() {
         // pickupArmMotor.setIdleMode(IdleMode.kCoast);
-        if (pickupArmEncoder.getPosition() > 78) {
+        if (pickupArmEncoder.getPosition() > 81) {
             pickupArmMotor.disable();
         } else {
-            final double currentTime = Timer.getFPGATimestamp();
-            if (currentTime > pickupArmLastTime + pickupArmDelay) {
-                pickupArmPIDController.setReference(78, ControlType.kPosition);
-                pickupArmLastTime = currentTime;
-            }
+            pickupArmPIDController.setReference(81, ControlType.kPosition);
         }
     }
 
+    double maxCurrent = 0;
+
     public void retractPickupArm() {
+        SmartDashboard.putNumber("Neo: Temp", pickupArmMotor.getMotorTemperature());
+        double current = pickupArmMotor.getOutputCurrent();
+        maxCurrent = current > maxCurrent ? current : maxCurrent;
+        SmartDashboard.putNumber("Max Current", maxCurrent);
         // pickupArmMotor.setIdleMode(IdleMode.kBrake);
-        if (pickupArmEncoder.getPosition() < 10) {
+        if (pickupArmEncoder.getPosition() < 10 || current > 90) {
             pickupArmMotor.disable();
         } else {
-            final double currentTime = Timer.getFPGATimestamp();
-            if (currentTime > pickupArmLastTime + pickupArmDelay) {
-                pickupArmPIDController.setReference(10, ControlType.kPosition);
-                pickupArmLastTime = currentTime;
-            }
+            pickupArmPIDController.setReference(10, ControlType.kPosition);
         }
     }
 

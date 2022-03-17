@@ -26,9 +26,9 @@ public interface RobotProperties {
         public static final double JOYSTICK_DEADZONE = .08;
         public static final double MAX_DRIVE_SPEED = .75;
         public static final double MAX_SECONDARY_CLIMBER_SPEED = .4;
-        public static final int LOWER_SHOOTER_VELOCITY = 1500, UPPER_SHOOTER_VELOCITY = 4000; // High shot
+        public static final int LOWER_SHOOTER_VELOCITY = 1400, UPPER_SHOOTER_VELOCITY = 4000; // High shot
         public static final int LOWER_SHOOTER_SHORT_VELOCITY = 1250, UPPER_SHOOTER_SHORT_VELOCITY = 1900; // Low shot
-        public static final double DESIRED_PERCENT_ACCURACY = .1, DESIRED_AT_SPEED_TIME = .05; // Accuracy Settings
+        public static final double DESIRED_PERCENT_ACCURACY = .08, DESIRED_AT_SPEED_TIME = .06; // Accuracy Settings
 
         /**
          * CAN ID Properties
