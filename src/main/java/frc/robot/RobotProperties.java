@@ -32,7 +32,7 @@ public interface RobotProperties {
 
         public static final double SHOOTER_UPPER_FEED_SPEED = .25, SHOOTER_LOWER_FEED_SPEED = .1;
 
-        public static final double PICKUP_SPEED = .3, LOWER_FEEDER_SPEED_SLOW = .2, LOWER_FEEDER_SPEED = .3,
+        public static final double PICKUP_SPEED = .55, LOWER_FEEDER_SPEED_SLOW = .2, LOWER_FEEDER_SPEED = .3,
                         UPPER_FEEDER_SPEED = .2;
         public static final double UPPER_FEEDER_BACKFEED_SPEED = -.4;
 
