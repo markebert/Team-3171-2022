@@ -604,7 +604,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       }
     }
 
-    SmartDashboard.putString("teleopPeriodic:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
+    SmartDashboard.putString("teleopPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
