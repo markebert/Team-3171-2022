@@ -191,9 +191,9 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
     SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
-    SmartDashboard.putNumber("Gyro Lock:", gyroPIDController.getSensorLockValue());
+    SmartDashboard.putString("Gyro Lock:", String.format("%.2f", gyroPIDController.getSensorLockValue()));
     if (gyro.isConnected() && !gyro.isCalibrating()) {
-      SmartDashboard.putNumber("NavX Heading:", gyro.getYaw());
+      SmartDashboard.putString("NavX Heading:", String.format("%.2f", gyro.getYaw()));
     }
 
     // SmartDashboard.putNumber("Pickup Arm Position:",
@@ -604,7 +604,7 @@ public class Robot extends TimedRobot implements RobotProperties {
       }
     }
 
-    SmartDashboard.putString("teleopPeriodic:", String.format("%.5f", Timer.getFPGATimestamp() - startTime));
+    SmartDashboard.putString("teleopPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
