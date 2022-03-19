@@ -5,45 +5,30 @@ package frc.robot;
  */
 public interface RobotProperties {
 
-        /**
-         * Static Values Properties
-         * 
-         * @param JOYSTICK_DEADZONE            The percent of error allowed, from -1.0
-         *                                     to
-         *                                     1.0, of
-         *                                     the joysticks X and Y values.
-         * @param MAX_DRIVE_SPEED              The maximum drive speed of the robot,
-         *                                     from
-         *                                     0 to 1.0
-         * @param MAX_SECONDARY_CLIMBER_SPEED
-         * @param LOWER_SHOOTER_VELOCITY
-         * @param UPPER_SHOOTER_VELOCITY
-         * @param LOWER_SHOOTER_SHORT_VELOCITY
-         * @param UPPER_SHOOTER_SHORT_VELOCITY
-         * @param DESIRED_PERCENT_ACCURACY
-         * @param DESIRED_AT_SPEED_TIME
-         */
+        /** Drive Variables **/
         public static final double JOYSTICK_DEADZONE = .08;
         public static final double MAX_DRIVE_SPEED = .75;
-        public static final double MAX_SECONDARY_CLIMBER_SPEED = .4;
+
+        /** Shooter Variables **/
         public static final int LOWER_SHOOTER_VELOCITY = 1400, UPPER_SHOOTER_VELOCITY = 4000; // High shot
         public static final int LOWER_SHOOTER_SHORT_VELOCITY = 1250, UPPER_SHOOTER_SHORT_VELOCITY = 1900; // Low shot
         public static final double DESIRED_PERCENT_ACCURACY = .08, DESIRED_AT_SPEED_TIME = .06; // Accuracy Settings
 
-        public static final double SHOOTER_UPPER_FEED_SPEED = .25, SHOOTER_LOWER_FEED_SPEED = .1;
+        /** Pickup Variables **/
+        public static final int PICKUP_ARM_MAX_CURRENT = 90;
+        public static final double REVERSE_PICKUP_SPEED = -.5;
+        public static final double PICKUP_SPEED = .55;
 
-        public static final double PICKUP_SPEED = .55, LOWER_FEEDER_SPEED_SLOW = .2, LOWER_FEEDER_SPEED = .3,
-                        UPPER_FEEDER_SPEED = .2;
-        public static final double UPPER_FEEDER_BACKFEED_SPEED = -.4;
+        /** Feeder Variables **/
+        public static final double SHOOTER_LOWER_FEED_SPEED = .1, SHOOTER_UPPER_FEED_SPEED = .25;
+        public static final double REVERSE_LOWER_FEEDER_SPEED = -.75, REVERSE_UPPER_FEEDER_SPEED = -.75;
+        public static final double LOWER_FEEDER_SPEED = .3, LOWER_FEEDER_SPEED_SLOW = .2;
+        public static final double UPPER_FEEDER_SPEED = .2, UPPER_FEEDER_BACKFEED_SPEED = -.4;
+        public static final double LOWER_FEED_END_SPEED = .15, LOWER_FEED_END_TIME = .2;
+        public static final double UPPER_FEED_END_SPEED = -.3, UPPER_FEED_END_TIME = .2;
 
-        public static final double UPPER_FEED_END_SPEED = -.3, LOWER_FEED_END_SPEED = .15;
-        public static final double UPPER_FEED_END_TIME = .2, LOWER_FEED_END_TIME = .2;
-
-        public static final double REVERSE_PICKUP_SPEED = -.5, REVERSE_LOWER_FEEDER_SPEED = -.75,
-                        REVERSE_UPPER_FEEDER_SPEED = -.75;
-
-        public static int PICKUP_ARM_MAX_CURRENT = 90;
-
+        /** Climber Variables **/
+        public static final double MAX_SECONDARY_CLIMBER_SPEED = .4;
         public static final double PRIMARY_CLIMBER_RETRACT_SPEED = -1, PRIMARY_CLIMBER_EXTEND_SPEED = 1;
         public static final double SECONDARY_CLIMBER_RETRACT_SPEED = -.5, SECONDARY_CLIMBER_EXTEND_SPEED = .25;
         public static final int PRIMARY_CLIMBER_MIN_TICK = -460000, PRIMARY_CLIMBER_MAX_TICK = 935000;
