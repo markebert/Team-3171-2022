@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.Timer;
 // Team 3171 Imports
 import frc.team3171.auton.AutonRecorder;
 import frc.team3171.auton.AutonRecorderData;
+import frc.team3171.auton.HardcodedAutons;
 import frc.team3171.controllers.Climber;
 import frc.team3171.controllers.Shooter;
 //import frc.team3171.auton.HardcodedAutons;
@@ -243,7 +244,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else {
       switch (selectedAutonMode) {
         case kHardcodedAuton:
-          // HardcodedAutons.Auton_Init();
+          HardcodedAutons.Auton_Init();
           break;
         case kDefaultAuton:
           disabledInit();
@@ -271,8 +272,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     switch (selectedAutonMode) {
       case kHardcodedAuton:
-        // HardcodedAutons.Auton_Center(driveController, gyro, gyroPIDController,
-        // shooterController);
+        HardcodedAutons.Auton_Basic(driveController, gyro, gyroPIDController, shooterController, feedSensor);
         break;
       case kDefaultAuton:
         disabledPeriodic();
