@@ -95,7 +95,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Gyro init
     gyro = new NavXMXP();
-    gyroPIDController = new GyroPIDController(gyro, GYRO_KP, GYRO_KI, GYRO_KD, -1.0, 1.0);
+    gyroPIDController = new GyroPIDController(gyro, GYRO_KP, GYRO_KI, GYRO_KD, -.75, .75);
     gyroPIDController.start();
 
     // Auton Recorder init
