@@ -157,7 +157,6 @@ public class HardcodedAutons implements RobotProperties {
             } else {
                 shooterController.retractPickupArm();
             }
-            // shooterController.setPickupArmSpeed(rightStick.getY());
         } else {
             driveController.disable();
             gyroPIDController.disablePID();
