@@ -491,10 +491,20 @@ public class Robot extends TimedRobot implements RobotProperties {
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
         // Get time that shooter first designated at speed
         shooterAtSpeedStartTime = Timer.getFPGATimestamp();
-      } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + DESIRED_AT_SPEED_TIME)) {
+      } else if (isAtSpeed
+          && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime
+              + (button_Short_Shot ? DESIRED_AT_SPEED_TIME_SHORT : DESIRED_AT_SPEED_TIME))) {
         // Feed the ball through the shooter
-        shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);
-        shooterController.setUpperFeederSpeed(SHOOTER_UPPER_FEED_SPEED);
+        if (button_YEET_Shot) {
+          shooterController.setLowerFeederSpeed(.3);
+          shooterController.setUpperFeederSpeed(.25);
+        } else if (button_Short_Shot) {
+          shooterController.setLowerFeederSpeed(.15);
+          shooterController.setUpperFeederSpeed(.25);
+        } else {
+          shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);
+          shooterController.setUpperFeederSpeed(SHOOTER_UPPER_FEED_SPEED);
+        }
       } else if (!feedSensor.get()) {
         // Back off the ball from the feed sensor
         shooterController.setLowerFeederSpeed(0);
@@ -524,6 +534,7 @@ public class Robot extends TimedRobot implements RobotProperties {
           shooterController.setUpperFeederSpeed(UPPER_FEEDER_SPEED);
         }
       } else if (button_Reverse_Pickup) {
+        shooterController.setShooterSpeed(-.5);
         shooterController.setPickupSpeed(REVERSE_PICKUP_SPEED);
         shooterController.setLowerFeederSpeed(REVERSE_LOWER_FEEDER_SPEED);
         shooterController.setUpperFeederSpeed(REVERSE_UPPER_FEEDER_SPEED);

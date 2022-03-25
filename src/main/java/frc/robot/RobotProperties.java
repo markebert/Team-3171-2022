@@ -11,9 +11,9 @@ public interface RobotProperties {
 
         /** Shooter Variables **/
         public static final int LOWER_SHOOTER_VELOCITY = 1400, UPPER_SHOOTER_VELOCITY = 3800; // High shot
-        public static final int LOWER_SHOOTER_SHORT_VELOCITY = 1000, UPPER_SHOOTER_SHORT_VELOCITY = 1925; // Low shot
-        public static final int LOWER_SHOOTER_YEET_VELOCITY = 6000, UPPER_SHOOTER_YEET_VELOCITY = 6000; // Yeet shot
-        public static final double DESIRED_PERCENT_ACCURACY = .08, DESIRED_AT_SPEED_TIME = .06; // Accuracy Settings
+        public static final int LOWER_SHOOTER_SHORT_VELOCITY = 500, UPPER_SHOOTER_SHORT_VELOCITY = 1925; // Low shot
+        public static final int LOWER_SHOOTER_YEET_VELOCITY = 3200, UPPER_SHOOTER_YEET_VELOCITY = 5200; // Yeet shot
+        public static final double DESIRED_PERCENT_ACCURACY = .08, DESIRED_AT_SPEED_TIME = .06, DESIRED_AT_SPEED_TIME_SHORT = .2; // Accuracy Settings
 
         /** Pickup Variables **/
         public static final int PICKUP_ARM_MAX_CURRENT = 90;
