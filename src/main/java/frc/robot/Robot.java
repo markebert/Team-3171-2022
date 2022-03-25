@@ -427,7 +427,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     final boolean button_Shooter = rightStick.getTrigger();
     final boolean button_Short_Shot = rightStick.getRawButton(2);
-    final boolean button_Full_Yeet = rightStick.getRawButton(3);
+    final boolean button_YEET_Shot = rightStick.getRawButton(3);
     final boolean button_Extend_Pickup_Arm = rightStick.getRawButton(4);
 
     final boolean button_Override_Primary_Climber = operatorLeftStick.getRawButton(2);
@@ -480,7 +480,12 @@ public class Robot extends TimedRobot implements RobotProperties {
       shooterAtSpeedEdgeTrigger = false;
       shooterController.enableTargetingLight(true);
       shooterController.setShooterVelocity(LOWER_SHOOTER_SHORT_VELOCITY, UPPER_SHOOTER_SHORT_VELOCITY);
-    } else if (button_Shooter || button_Short_Shot) {
+    } else if (button_YEET_Shot && !shooterButtonEdgeTrigger) {
+      // Sets the shooter speed for a short shot and the targeting light
+      shooterAtSpeedEdgeTrigger = false;
+      shooterController.enableTargetingLight(false);
+      shooterController.setShooterVelocity(LOWER_SHOOTER_YEET_VELOCITY, UPPER_SHOOTER_YEET_VELOCITY);
+    } else if (button_Shooter || button_Short_Shot || button_YEET_Shot) {
       // Check if the shooter is at speed
       final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(DESIRED_PERCENT_ACCURACY);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
@@ -501,13 +506,6 @@ public class Robot extends TimedRobot implements RobotProperties {
       }
       shooterController.setPickupSpeed(0);
       shooterAtSpeedEdgeTrigger = isAtSpeed;
-    } else if (button_Full_Yeet) {
-      // Yeets the ball
-      shooterAtSpeedEdgeTrigger = false;
-      shooterController.setShooterSpeed(1);
-      shooterController.setPickupSpeed(0);
-      shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);
-      shooterController.setUpperFeederSpeed(SHOOTER_UPPER_FEED_SPEED);
     } else {
       // Stops the shooter
       shooterAtSpeedEdgeTrigger = false;
@@ -540,7 +538,7 @@ public class Robot extends TimedRobot implements RobotProperties {
         shooterController.setUpperFeederSpeed(0);
       }
     }
-    shooterButtonEdgeTrigger = button_Shooter || button_Short_Shot;
+    shooterButtonEdgeTrigger = button_Shooter || button_Short_Shot || button_YEET_Shot;
     ballpickupEdgeTrigger = button_Pickup;
 
     // Pickup Arm Control
