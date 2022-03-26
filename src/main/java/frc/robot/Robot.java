@@ -423,12 +423,12 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Get the latest joystick button values
     final boolean button_Pickup = leftStick.getTrigger();
     final boolean button_Boost = leftStick.getRawButton(2);
+    final boolean button_Extend_Pickup_Arm = leftStick.getRawButton(3);
     final boolean button_Reverse_Pickup = leftStick.getRawButton(4);
 
     final boolean button_Shooter = rightStick.getTrigger();
     final boolean button_Short_Shot = rightStick.getRawButton(2);
-    final boolean button_YEET_Shot = rightStick.getRawButton(3);
-    final boolean button_Extend_Pickup_Arm = rightStick.getRawButton(4);
+    final boolean button_YEET_Shot = rightStick.getRawButton(3) || rightStick.getRawButton(4);
 
     final boolean button_Override_Primary_Climber = operatorLeftStick.getRawButton(2);
     final boolean button_Retract_Primary_Climber = operatorLeftStick.getRawButton(3);
