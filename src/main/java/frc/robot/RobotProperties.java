@@ -11,10 +11,11 @@ public interface RobotProperties {
 
         /** Shooter Variables **/
         public static final int LOWER_SHOOTER_VELOCITY = 2700, UPPER_SHOOTER_VELOCITY = 2400; // High shot
-        public static final int LOWER_SHOOTER_SHORT_VELOCITY = 500, UPPER_SHOOTER_SHORT_VELOCITY = 1925; // Low shot
+        //public static final int LOWER_SHOOTER_SHORT_VELOCITY = 500, UPPER_SHOOTER_SHORT_VELOCITY = 1925; // Low shot
+        public static final int LOWER_SHOOTER_SHORT_VELOCITY = 5200, UPPER_SHOOTER_SHORT_VELOCITY = 200; // Low-High shot
         public static final int LOWER_SHOOTER_YEET_VELOCITY = 1300, UPPER_SHOOTER_YEET_VELOCITY = 5200; // Yeet shot
-        public static final double DESIRED_PERCENT_ACCURACY = .06, DESIRED_PERCENT_ACCURACY_YEET = .05,
-                        DESIRED_AT_SPEED_TIME = .16, DESIRED_AT_SPEED_TIME_SHORT = .3; // Accuracy Settings
+        public static final double DESIRED_PERCENT_ACCURACY = .03, DESIRED_PERCENT_ACCURACY_YEET = .05,
+                        DESIRED_AT_SPEED_TIME = .16, DESIRED_AT_SPEED_TIME_SHORT = .4; // Accuracy Settings
 
         /** Pickup Variables **/
         public static final int PICKUP_ARM_MAX_CURRENT = 90;
@@ -173,7 +174,7 @@ public interface RobotProperties {
          */
         public static final boolean PID_LOGGING = true;
         public static final double GYRO_KP = .0045, GYRO_KI = .0001, GYRO_KD = .0001;
-        public static final double LIMELIGHT_KP = .025, LIMELIGHT_KI = .003, LIMELIGHT_KD = .00175;
+        public static final double LIMELIGHT_KP = .02, LIMELIGHT_KI = .0002, LIMELIGHT_KD = .00015;
         public static final double SHOOTER_KP = .01, SHOOTER_KI = .0002, SHOOTER_KD = .0001, SHOOTER_KF = 0;
         public static final double WINCH_KP = .01, WINCH_KI = .0002, WINCH_KD = .0001, WINCH_KF = 0;
         public static final double DRIVE_KP = .01, DRIVE_KI = .0002, DRIVE_KD = .0001, DRIVE_KF = 0;

@@ -75,11 +75,10 @@ public class Robot extends TimedRobot implements RobotProperties {
   private GyroPIDController gyroPIDController;
 
   // Limelight Network Table
-  private Limelight limelight;
+  private Limelight limelightShooter, limelightPickup;
 
   // LimelightPID Controller
-  private PIDController limeLightPIDController;
-  private boolean targetLockEdgeTrigger;
+  private GyroPIDController limelightShooter_PIDController, limelightPickup_PIDController;
 
   // Shooter Controller
   private Shooter shooterController;
@@ -152,14 +151,19 @@ public class Robot extends TimedRobot implements RobotProperties {
     feedSensor = new DigitalInput(FEED_SENSOR_CHANNEL);
 
     // Limelight init
-    limelight = new Limelight("limelight-shooter");
+    limelightShooter = new Limelight("limelight-shooter");
+    limelightPickup = new Limelight("limelight-pickup");
+    limelightPickup.turnLightOff();
 
     // Limelight PID Controller init
-    limeLightPIDController = new PIDController(LIMELIGHT_KP, LIMELIGHT_KI, LIMELIGHT_KD);
-    limeLightPIDController.enableContinuousInput(-180, 180);
+    limelightShooter_PIDController = new GyroPIDController(limelightShooter, LIMELIGHT_KP, LIMELIGHT_KI, LIMELIGHT_KD,
+        -.5, .5);
+    limelightPickup_PIDController = new GyroPIDController(limelightPickup, LIMELIGHT_KP, LIMELIGHT_KI, LIMELIGHT_KD,
+        -.5, .5);
+    limelightShooter_PIDController.start(true);
+    limelightPickup_PIDController.start(true);
 
     // Edge Trigger init
-    targetLockEdgeTrigger = false;
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
@@ -167,12 +171,12 @@ public class Robot extends TimedRobot implements RobotProperties {
     maxCurrent = 0;
 
     // Camera Server for climber camera
-    final UsbCamera camera0 = CameraServer.startAutomaticCapture();
-    final UsbCamera camera1 = CameraServer.startAutomaticCapture();
-    camera0.setResolution(160, 90);
-    camera0.setFPS(20);
-    camera1.setResolution(160, 90);
-    camera1.setFPS(20);
+    //final UsbCamera camera0 = CameraServer.startAutomaticCapture();
+    //final UsbCamera camera1 = CameraServer.startAutomaticCapture();
+    //camera0.setResolution(160, 90);
+    //camera0.setFPS(20);
+    //camera1.setResolution(160, 90);
+    //camera1.setFPS(20);
 
     // PID Logging init
     if (PID_LOGGING && !DriverStation.isFMSAttached()) {
@@ -214,6 +218,12 @@ public class Robot extends TimedRobot implements RobotProperties {
       SmartDashboard.putString("NavX Heading:", String.format("%.2f", gyro.getYaw()));
     }
 
+    SmartDashboard.putString("Shooter Lock:",
+        String.format("%.2f", limelightShooter_PIDController.getSensorLockValue()));
+    SmartDashboard.putString("Shooter Current:",
+        String.format("%.2f", limelightShooter_PIDController.getSensorValue()));
+    SmartDashboard.putString("Shooter PID:", String.format("%.2f", limelightShooter_PIDController.getPIDValue()));
+
     // SmartDashboard.putNumber("Pickup Arm Position:",
     // shooterController.getPickupArmPoisition());
     SmartDashboard.putNumber("Primary Winch Position:", climberController.getPrimaryClimberPosition());
@@ -232,8 +242,10 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("Max Current", maxCurrent);
 
     // Limelight data
-    SmartDashboard.putBoolean("Has Targets:", limelight.hasTarget());
-    SmartDashboard.putNumber("Target Horizontal Offset:", limelight.getTargetHorizontalOffset());
+    SmartDashboard.putBoolean("Shooter Has Targets:", limelightShooter.hasTarget());
+    SmartDashboard.putNumber("Shooter Target Offset:", limelightShooter.getTargetHorizontalOffset());
+    SmartDashboard.putBoolean("Pickup Has Targets:", limelightPickup.hasTarget());
+    SmartDashboard.putNumber("Pickup Target Offset:", limelightPickup.getTargetHorizontalOffset());
 
     SmartDashboard.putString("robotPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
@@ -246,7 +258,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Reset all of the Edge Triggers
-    targetLockEdgeTrigger = false;
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
@@ -257,6 +268,8 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Enable the Gyro PID Controller
     gyroPIDController.enablePID();
+    limelightShooter_PIDController.disablePID();
+    limelightPickup_PIDController.disablePID();
 
     // Update Auton Selected Mode and load the auton
     selectedAutonType = autonTypeChooser.getSelected();
@@ -305,12 +318,25 @@ public class Robot extends TimedRobot implements RobotProperties {
           // Get the latest joystick button values
           final boolean button_Pickup = playbackData.getPickup();
           final boolean button_Shooter = playbackData.getShooter();
+          final boolean button_Target_Lock = playbackData.getTargetLock();
 
           // Get the latest joystick values and calculate their deadzones
           final double leftStickY = playbackData.getLeftY(), rightStickX = playbackData.getRightX();
 
           // Drive Control
-          if (gyroPIDController.isEnabled() && gyro.isConnected()) {
+          if (button_Target_Lock && limelightShooter.hasTarget()) {
+            gyroPIDController.updateSensorLockValue();
+            limelightShooter_PIDController.enablePID();
+            limelightShooter_PIDController.updateSensorLockValue();
+          } else if (button_Target_Lock && limelightShooter.hasTarget()) {
+            gyroPIDController.updateSensorLockValue();
+            // Check to see if the robot has any valid targets and set the gyro lock
+            // limelightShooter_PIDController.getPIDValue()
+            // driveController.mecanumTraction(-leftStickY,
+            // limelightShooter_PIDController.calculate(-limelightShooter.getTargetHorizontalOffset(),
+            // 0));
+          } else if (gyroPIDController.isEnabled() && gyro.isConnected()) {
+            limelightShooter_PIDController.disablePID();
             if (rightStickX != 0) {
               driveController.mecanumTraction(-leftStickY, rightStickX);
               gyroPIDController.updateSensorLockValue();
@@ -318,6 +344,7 @@ public class Robot extends TimedRobot implements RobotProperties {
               driveController.mecanumTraction(-leftStickY, gyroPIDController.getPIDValue());
             }
           } else {
+            limelightShooter_PIDController.disablePID();
             driveController.mecanumTraction(-leftStickY, rightStickX);
           }
 
@@ -412,7 +439,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Reset all of the Edge Triggers
-    targetLockEdgeTrigger = false;
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
@@ -423,9 +449,8 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Enable the Gyro PID Controller
     gyroPIDController.enablePID();
-
-    // Reset the Limelight PID Controller
-    limeLightPIDController.reset();
+    limelightShooter_PIDController.disablePID();
+    limelightPickup_PIDController.disablePID();
 
     // Update Auton Selected Mode and reset the data recorder
     selectedAutonType = autonTypeChooser.getSelected();
@@ -449,7 +474,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Get the latest joystick button values
     final boolean button_Pickup = leftStick.getTrigger();
     final boolean button_Boost = leftStick.getRawButton(2);
-    final boolean button_Extend_Pickup_Arm = leftStick.getRawButton(3);
+    final boolean button_Target_Lock_Pickup = leftStick.getRawButton(3);
     final boolean button_Reverse_Pickup = leftStick.getRawButton(4);
 
     final boolean button_Shooter = rightStick.getTrigger();
@@ -478,13 +503,19 @@ public class Robot extends TimedRobot implements RobotProperties {
     operatorRightStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, operatorRightStick.getY()) * MAX_SECONDARY_CLIMBER_SPEED;
 
     // Drive Control
-    if (button_Target_Lock && limelight.hasTarget() && !targetLockEdgeTrigger) {
-      limeLightPIDController.reset();
-    } else if (button_Target_Lock && limelight.hasTarget()) {
+    if (button_Target_Lock && limelightShooter.hasTarget()) {
+      limelightShooter_PIDController.enablePID();
+      gyroPIDController.updateSensorLockValue();
       // Check to see if the robot has any valid targets and set the gyro lock
-      driveController.mecanumTraction(-leftStickY,
-          limeLightPIDController.calculate(-limelight.getTargetHorizontalOffset(), 0));
+      driveController.mecanumTraction(-leftStickY, limelightShooter_PIDController.getPIDValue());
+    } else if (button_Target_Lock_Pickup && limelightPickup.hasTarget()) {
+      limelightPickup_PIDController.enablePID();
+      gyroPIDController.updateSensorLockValue();
+      // Check to see if the robot has any valid targets and set the gyro lock
+      driveController.mecanumTraction(-leftStickY, limelightPickup_PIDController.getPIDValue());
     } else if (gyroPIDController.isEnabled() && gyro.isConnected()) {
+      limelightShooter_PIDController.disablePID();
+      limelightPickup_PIDController.disablePID();
       if (rightStickX != 0) {
         driveController.mecanumTraction(-leftStickY, rightStickX);
         gyroPIDController.updateSensorLockValue();
@@ -492,9 +523,10 @@ public class Robot extends TimedRobot implements RobotProperties {
         driveController.mecanumTraction(-leftStickY, gyroPIDController.getPIDValue());
       }
     } else {
+      limelightShooter_PIDController.disablePID();
+      limelightPickup_PIDController.disablePID();
       driveController.mecanumTraction(-leftStickY, rightStickX);
     }
-    targetLockEdgeTrigger = button_Target_Lock;
 
     // Disables the gyro if the climber is enaged at all
     if (button_Extend_Primary_Climber || button_Extend_Secondary_Climber || operatorLeftStickY != 0
@@ -503,7 +535,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
 
     // Shooter Control
-    boolean extend_Pickup_Arm = button_Extend_Pickup_Arm;
+    boolean extend_Pickup_Arm = false;
     if (button_Shooter && !shooterButtonEdgeTrigger) {
       // Sets the shooter speed and the targeting light
       shooterAtSpeedEdgeTrigger = false;
@@ -641,6 +673,7 @@ public class Robot extends TimedRobot implements RobotProperties {
           newData.setRightX(rightStickX);
           newData.setPickup(button_Pickup);
           newData.setShooter(button_Shooter);
+          newData.setTargetLock(button_Target_Lock);
 
           // Adds the recorded data to the auton recorder, but only if the data is new
           autonRecorder.addNewData(newData);
@@ -664,6 +697,8 @@ public class Robot extends TimedRobot implements RobotProperties {
     climberController.disable();
 
     gyroPIDController.disablePID();
+    limelightShooter_PIDController.disablePID();
+    limelightPickup_PIDController.disablePID();
 
     if (saveNewAuton) {
       saveNewAuton = false;
