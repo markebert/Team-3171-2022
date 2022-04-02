@@ -23,6 +23,16 @@ public class Limelight {
     }
 
     /**
+     * Constructor
+     */
+    public Limelight(final String limelightKey) {
+        limelightNetworkTable = NetworkTableInstance.getDefault().getTable(limelightKey);
+        limelightNetworkTable.getEntry("ledMode").setNumber(3);
+        limelightNetworkTable.getEntry("camMode").setNumber(1);
+        limelightNetworkTable.getEntry("stream").setNumber(0);
+    }
+
+    /**
      * Turns off the build in LEDs on the Limelight.
      */
     public void turnLightOff() {

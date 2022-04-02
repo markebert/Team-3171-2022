@@ -182,9 +182,9 @@ public interface RobotProperties {
 
         /** Auton Properties **/
         public static final String[] AUTON_OPTIONS = {
-                        "Position 1", "Position 1-L", "Position 1-R",
-                        "Position 2", "Position 2-L", "Position 2-R",
-                        "Position 3", "Position 3-L", "Position 3-R"
+                        "Position 1 - 2 Ball", "Position 1 - 3 Ball",
+                        "Position 2 - 2 Ball", "Position 2 - 3 Ball",
+                        "Position 3 - 2 Ball", "Position 3 - 3 Ball",
         };
 
 }

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -33,6 +34,7 @@ import frc.team3171.drive.UniversalMotorGroup;
 import frc.team3171.drive.TractionDrive;
 import frc.team3171.drive.UniversalMotorGroup.ControllerType;
 import frc.team3171.sensors.GyroPIDController;
+import frc.team3171.sensors.Limelight;
 import frc.team3171.sensors.NavXMXP;
 
 /**
@@ -71,6 +73,13 @@ public class Robot extends TimedRobot implements RobotProperties {
   private TractionDrive driveController;
   private NavXMXP gyro;
   private GyroPIDController gyroPIDController;
+
+  // Limelight Network Table
+  private Limelight limelight;
+
+  // LimelightPID Controller
+  private PIDController limeLightPIDController;
+  private boolean targetLockEdgeTrigger;
 
   // Shooter Controller
   private Shooter shooterController;
@@ -142,7 +151,15 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Feed Sensor init
     feedSensor = new DigitalInput(FEED_SENSOR_CHANNEL);
 
+    // Limelight init
+    limelight = new Limelight("limelight-shooter");
+
+    // Limelight PID Controller init
+    limeLightPIDController = new PIDController(LIMELIGHT_KP, LIMELIGHT_KI, LIMELIGHT_KD);
+    limeLightPIDController.enableContinuousInput(-180, 180);
+
     // Edge Trigger init
+    targetLockEdgeTrigger = false;
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
@@ -214,6 +231,10 @@ public class Robot extends TimedRobot implements RobotProperties {
     maxCurrent = current > maxCurrent ? current : maxCurrent;
     SmartDashboard.putNumber("Max Current", maxCurrent);
 
+    // Limelight data
+    SmartDashboard.putBoolean("Has Targets:", limelight.hasTarget());
+    SmartDashboard.putNumber("Target Horizontal Offset:", limelight.getTargetHorizontalOffset());
+
     SmartDashboard.putString("robotPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
@@ -225,6 +246,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Reset all of the Edge Triggers
+    targetLockEdgeTrigger = false;
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
@@ -390,6 +412,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     final double startTime = Timer.getFPGATimestamp();
 
     // Reset all of the Edge Triggers
+    targetLockEdgeTrigger = false;
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
@@ -400,6 +423,9 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Enable the Gyro PID Controller
     gyroPIDController.enablePID();
+
+    // Reset the Limelight PID Controller
+    limeLightPIDController.reset();
 
     // Update Auton Selected Mode and reset the data recorder
     selectedAutonType = autonTypeChooser.getSelected();
@@ -428,7 +454,8 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     final boolean button_Shooter = rightStick.getTrigger();
     final boolean button_Short_Shot = rightStick.getRawButton(2);
-    final boolean button_YEET_Shot = rightStick.getRawButton(3) || rightStick.getRawButton(4);
+    final boolean button_YEET_Shot = rightStick.getRawButton(3);
+    final boolean button_Target_Lock = rightStick.getRawButton(4);
 
     final boolean button_Override_Primary_Climber = operatorLeftStick.getRawButton(2);
     final boolean button_Retract_Primary_Climber = operatorLeftStick.getRawButton(3);
@@ -451,7 +478,13 @@ public class Robot extends TimedRobot implements RobotProperties {
     operatorRightStickY = Deadzone_With_Map(JOYSTICK_DEADZONE, operatorRightStick.getY()) * MAX_SECONDARY_CLIMBER_SPEED;
 
     // Drive Control
-    if (gyroPIDController.isEnabled() && gyro.isConnected()) {
+    if (button_Target_Lock && limelight.hasTarget() && !targetLockEdgeTrigger) {
+      limeLightPIDController.reset();
+    } else if (button_Target_Lock && limelight.hasTarget()) {
+      // Check to see if the robot has any valid targets and set the gyro lock
+      driveController.mecanumTraction(-leftStickY,
+          limeLightPIDController.calculate(-limelight.getTargetHorizontalOffset(), 0));
+    } else if (gyroPIDController.isEnabled() && gyro.isConnected()) {
       if (rightStickX != 0) {
         driveController.mecanumTraction(-leftStickY, rightStickX);
         gyroPIDController.updateSensorLockValue();
@@ -461,6 +494,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else {
       driveController.mecanumTraction(-leftStickY, rightStickX);
     }
+    targetLockEdgeTrigger = button_Target_Lock;
 
     // Disables the gyro if the climber is enaged at all
     if (button_Extend_Primary_Climber || button_Extend_Secondary_Climber || operatorLeftStickY != 0
