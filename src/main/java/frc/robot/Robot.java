@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -171,12 +170,12 @@ public class Robot extends TimedRobot implements RobotProperties {
     maxCurrent = 0;
 
     // Camera Server for climber camera
-    //final UsbCamera camera0 = CameraServer.startAutomaticCapture();
-    //final UsbCamera camera1 = CameraServer.startAutomaticCapture();
-    //camera0.setResolution(160, 90);
-    //camera0.setFPS(20);
-    //camera1.setResolution(160, 90);
-    //camera1.setFPS(20);
+    // final UsbCamera camera0 = CameraServer.startAutomaticCapture();
+    // final UsbCamera camera1 = CameraServer.startAutomaticCapture();
+    // camera0.setResolution(160, 90);
+    // camera0.setFPS(20);
+    // camera1.setResolution(160, 90);
+    // camera1.setFPS(20);
 
     // PID Logging init
     if (PID_LOGGING && !DriverStation.isFMSAttached()) {
@@ -354,14 +353,15 @@ public class Robot extends TimedRobot implements RobotProperties {
             // Sets the shooter speed and the targeting light
             shooterAtSpeedEdgeTrigger = false;
             shooterController.enableTargetingLight(true);
-            shooterController.setShooterVelocity(LOWER_SHOOTER_VELOCITY, UPPER_SHOOTER_VELOCITY);
+            shooterController.setShooterVelocity(MidShot.LOWER_VELOCITY, MidShot.UPPER_VELOCITY);
           } else if (button_Shooter) {
             // Check if the shooter is at speed
-            final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(DESIRED_PERCENT_ACCURACY);
+            final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(MidShot.DESIRED_PERCENT_ACCURACY);
             if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
               // Get time that shooter first designated at speed
               shooterAtSpeedStartTime = Timer.getFPGATimestamp();
-            } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + DESIRED_AT_SPEED_TIME)) {
+            } else if (isAtSpeed
+                && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + MidShot.DESIRED_AT_SPEED_TIME)) {
               // Feed the ball through the shooter
               shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);
               shooterController.setUpperFeederSpeed(SHOOTER_UPPER_FEED_SPEED);
@@ -540,27 +540,29 @@ public class Robot extends TimedRobot implements RobotProperties {
       // Sets the shooter speed and the targeting light
       shooterAtSpeedEdgeTrigger = false;
       shooterController.enableTargetingLight(true);
-      shooterController.setShooterVelocity(LOWER_SHOOTER_VELOCITY, UPPER_SHOOTER_VELOCITY);
+      shooterController.setShooterVelocity(MidShot.LOWER_VELOCITY, MidShot.UPPER_VELOCITY);
     } else if (button_Short_Shot && !shooterButtonEdgeTrigger) {
       // Sets the shooter speed for a short shot and the targeting light
       shooterAtSpeedEdgeTrigger = false;
       shooterController.enableTargetingLight(true);
-      shooterController.setShooterVelocity(LOWER_SHOOTER_SHORT_VELOCITY, UPPER_SHOOTER_SHORT_VELOCITY);
+      shooterController.setShooterVelocity(LowShot.LOWER_VELOCITY, LowShot.UPPER_VELOCITY);
     } else if (button_YEET_Shot && !shooterButtonEdgeTrigger) {
       // Sets the shooter speed for a short shot and the targeting light
       shooterAtSpeedEdgeTrigger = false;
       shooterController.enableTargetingLight(false);
-      shooterController.setShooterVelocity(LOWER_SHOOTER_YEET_VELOCITY, UPPER_SHOOTER_YEET_VELOCITY);
+      shooterController.setShooterVelocity(YEETShot.LOWER_VELOCITY, YEETShot.UPPER_VELOCITY);
     } else if (button_Shooter || button_Short_Shot || button_YEET_Shot) {
       // Check if the shooter is at speed
       final boolean isAtSpeed = shooterController
-          .isBothShootersAtVelocity(button_YEET_Shot ? DESIRED_PERCENT_ACCURACY_YEET : DESIRED_PERCENT_ACCURACY);
+          .isBothShootersAtVelocity(
+              button_YEET_Shot ? YEETShot.DESIRED_PERCENT_ACCURACY : MidShot.DESIRED_PERCENT_ACCURACY);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
         // Get time that shooter first designated at speed
         shooterAtSpeedStartTime = Timer.getFPGATimestamp();
       } else if (isAtSpeed
           && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime
-              + (button_Short_Shot || button_YEET_Shot ? DESIRED_AT_SPEED_TIME_SHORT : DESIRED_AT_SPEED_TIME))) {
+              + (button_Short_Shot || button_YEET_Shot ? LowShot.DESIRED_AT_SPEED_TIME
+                  : MidShot.DESIRED_AT_SPEED_TIME))) {
         // Feed the ball through the shooter
         if (button_YEET_Shot) {
           shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);

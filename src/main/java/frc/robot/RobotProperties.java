@@ -1,5 +1,7 @@
 package frc.robot;
 
+import frc.team3171.controllers.Shooter;
+
 /**
  * @author Mark Ebert
  */
@@ -10,12 +12,25 @@ public interface RobotProperties {
         public static final double MAX_DRIVE_SPEED = .75;
 
         /** Shooter Variables **/
-        public static final int LOWER_SHOOTER_VELOCITY = 2700, UPPER_SHOOTER_VELOCITY = 2400; // High shot
-        //public static final int LOWER_SHOOTER_SHORT_VELOCITY = 500, UPPER_SHOOTER_SHORT_VELOCITY = 1925; // Low shot
-        public static final int LOWER_SHOOTER_SHORT_VELOCITY = 5200, UPPER_SHOOTER_SHORT_VELOCITY = 200; // Low-High shot
-        public static final int LOWER_SHOOTER_YEET_VELOCITY = 1300, UPPER_SHOOTER_YEET_VELOCITY = 5200; // Yeet shot
-        public static final double DESIRED_PERCENT_ACCURACY = .03, DESIRED_PERCENT_ACCURACY_YEET = .05,
-                        DESIRED_AT_SPEED_TIME = .16, DESIRED_AT_SPEED_TIME_SHORT = .4; // Accuracy Settings
+        public static class LowShot {
+                public static final int LOWER_VELOCITY = 500, UPPER_VELOCITY = 1925;
+                public static final double DESIRED_PERCENT_ACCURACY = .06, DESIRED_AT_SPEED_TIME = .3;
+        }
+
+        static class MidShot {
+                public static final int LOWER_VELOCITY = 2700, UPPER_VELOCITY = 2400;
+                public static final double DESIRED_PERCENT_ACCURACY = .06, DESIRED_AT_SPEED_TIME = .16;
+        }
+
+        static class HighShot {
+                public static final int LOWER_VELOCITY = 5200, UPPER_VELOCITY = 200;
+                public static final double DESIRED_PERCENT_ACCURACY = .03, DESIRED_AT_SPEED_TIME = .4;
+        }
+
+        static class YEETShot {
+                public static final int LOWER_VELOCITY = 1300, UPPER_VELOCITY = 5200;
+                public static final double DESIRED_PERCENT_ACCURACY = .05, DESIRED_AT_SPEED_TIME = .3;
+        }
 
         /** Pickup Variables **/
         public static final int PICKUP_ARM_MAX_CURRENT = 90;
