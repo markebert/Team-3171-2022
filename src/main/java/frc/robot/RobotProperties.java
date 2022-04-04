@@ -1,7 +1,5 @@
 package frc.robot;
 
-import frc.team3171.controllers.Shooter;
-
 /**
  * @author Mark Ebert
  */

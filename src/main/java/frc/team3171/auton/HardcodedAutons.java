@@ -96,14 +96,15 @@ public class HardcodedAutons implements RobotProperties {
                 // Sets the shooter speed and the targeting light
                 shooterAtSpeedEdgeTrigger = false;
                 shooterController.enableTargetingLight(true);
-                shooterController.setShooterVelocity(LOWER_SHOOTER_VELOCITY, UPPER_SHOOTER_VELOCITY);
+                shooterController.setShooterVelocity(MidShot.LOWER_VELOCITY, MidShot.UPPER_VELOCITY);
             } else if (button_Shooter) {
                 // Check if the shooter is at speed
-                final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(DESIRED_PERCENT_ACCURACY);
+                final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(MidShot.DESIRED_PERCENT_ACCURACY);
                 if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
                     // Get time that shooter first designated at speed
                     shooterAtSpeedStartTime = Timer.getFPGATimestamp();
-                } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + DESIRED_AT_SPEED_TIME)) {
+                } else if (isAtSpeed
+                        && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + MidShot.DESIRED_AT_SPEED_TIME)) {
                     // Feed the ball through the shooter
                     shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);
                     shooterController.setUpperFeederSpeed(SHOOTER_UPPER_FEED_SPEED);
