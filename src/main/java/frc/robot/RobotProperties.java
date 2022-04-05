@@ -187,7 +187,7 @@ public interface RobotProperties {
          */
         public static final boolean PID_LOGGING = true;
         public static final double GYRO_KP = .0045, GYRO_KI = .0001, GYRO_KD = .0001;
-        public static final double LIMELIGHT_KP = .02, LIMELIGHT_KI = .0002, LIMELIGHT_KD = .00015;
+        public static final double LIMELIGHT_KP = .02, LIMELIGHT_KI = .003, LIMELIGHT_KD = .00175;
         public static final double SHOOTER_KP = .01, SHOOTER_KI = .0002, SHOOTER_KD = .0001, SHOOTER_KF = 0;
         public static final double WINCH_KP = .01, WINCH_KI = .0002, WINCH_KD = .0001, WINCH_KF = 0;
         public static final double DRIVE_KP = .01, DRIVE_KI = .0002, DRIVE_KD = .0001, DRIVE_KF = 0;

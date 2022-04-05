@@ -324,18 +324,13 @@ public class Robot extends TimedRobot implements RobotProperties {
 
           // Drive Control
           if (button_Target_Lock && limelightShooter.hasTarget()) {
-            gyroPIDController.updateSensorLockValue();
             limelightShooter_PIDController.enablePID();
-            limelightShooter_PIDController.updateSensorLockValue();
-          } else if (button_Target_Lock && limelightShooter.hasTarget()) {
             gyroPIDController.updateSensorLockValue();
             // Check to see if the robot has any valid targets and set the gyro lock
-            // limelightShooter_PIDController.getPIDValue()
-            // driveController.mecanumTraction(-leftStickY,
-            // limelightShooter_PIDController.calculate(-limelightShooter.getTargetHorizontalOffset(),
-            // 0));
+            driveController.mecanumTraction(-leftStickY, limelightShooter_PIDController.getPIDValue());
           } else if (gyroPIDController.isEnabled() && gyro.isConnected()) {
             limelightShooter_PIDController.disablePID();
+            limelightPickup_PIDController.disablePID();
             if (rightStickX != 0) {
               driveController.mecanumTraction(-leftStickY, rightStickX);
               gyroPIDController.updateSensorLockValue();
@@ -344,6 +339,7 @@ public class Robot extends TimedRobot implements RobotProperties {
             }
           } else {
             limelightShooter_PIDController.disablePID();
+            limelightPickup_PIDController.disablePID();
             driveController.mecanumTraction(-leftStickY, rightStickX);
           }
 
