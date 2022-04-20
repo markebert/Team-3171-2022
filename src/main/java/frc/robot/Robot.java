@@ -74,7 +74,6 @@ public class Robot extends TimedRobot implements RobotProperties {
 
   // Limelight Network Table
   private Limelight limelightShooter, limelightPickup;
-  private boolean trackBall;
 
   // LimelightPID Controller
   private GyroPIDController limelightShooter_PIDController, limelightPickup_PIDController;
@@ -91,6 +90,8 @@ public class Robot extends TimedRobot implements RobotProperties {
   // Shooter PID Logging
   private ConcurrentLinkedQueue<String> outgoingMessages;
   private UDPClient udpClient = null;
+
+  private double debugLastUpdate;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -187,6 +188,8 @@ public class Robot extends TimedRobot implements RobotProperties {
       }
     }
 
+    debugLastUpdate = 0;
+
     SmartDashboard.putString("roboInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
@@ -202,34 +205,11 @@ public class Robot extends TimedRobot implements RobotProperties {
   public void robotPeriodic() {
     final double startTime = Timer.getFPGATimestamp();
 
-    SmartDashboard.putString("Lower Shooter Velocity:", String.format("%d / %d",
-        Math.round(shooterController.getLowerShooterVelocity()),
-        Math.round(shooterController.getLowerShooterTargetVelocity())));
-    SmartDashboard.putString("Upper Shooter Velocity:", String.format("%d / %d",
-        Math.round(shooterController.getUpperShooterVelocity()),
-        Math.round(shooterController.getUpperShooterTargetVelocity())));
-
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
     SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
     SmartDashboard.putString("Gyro Lock:", String.format("%.2f", gyroPIDController.getSensorLockValue()));
     if (gyro.isConnected() && !gyro.isCalibrating()) {
       SmartDashboard.putString("NavX Heading:", String.format("%.2f", gyro.getYaw()));
-    }
-
-    if (SHOW_SHOOTER_LOCK_DEBUG) {
-      SmartDashboard.putString("Shooter Lock:",
-          String.format("%.2f", limelightShooter_PIDController.getSensorLockValue()));
-      SmartDashboard.putString("Shooter Current:",
-          String.format("%.2f", limelightShooter_PIDController.getSensorValue()));
-      SmartDashboard.putString("Shooter PID:", String.format("%.2f", limelightShooter_PIDController.getPIDValue()));
-    }
-
-    // SmartDashboard.putNumber("Pickup Arm Position:",
-    // shooterController.getPickupArmPoisition());
-    if (SHOW_WINCH_TICKS) {
-      SmartDashboard.putNumber("Primary Winch Position:", climberController.getPrimaryClimberPosition());
-      SmartDashboard.putNumber("Secodary Winch One Position:", climberController.getSecondryClimberOnePosition());
-      SmartDashboard.putNumber("Secondary Winch Two Position:", climberController.getSecondryClimberTwoPosition());
     }
 
     if (PID_LOGGING && !DriverStation.isFMSAttached()) {
@@ -242,24 +222,46 @@ public class Robot extends TimedRobot implements RobotProperties {
     switch (DriverStation.getAlliance()) {
       case Red:
         limelightPickup.setPipeline(1);
-        trackBall = true;
         break;
       case Blue:
         limelightPickup.setPipeline(0);
-        trackBall = true;
         break;
       default:
-        trackBall = false;
         break;
     }
 
-    // Limelight data
-    if (SHOW_LIMELIGHT_DEBUG) {
-      SmartDashboard.putBoolean("Shooter Has Targets:", limelightShooter.hasTarget());
-      SmartDashboard.putNumber("Shooter Target Offset:", limelightShooter.getTargetHorizontalOffset());
-      SmartDashboard.putBoolean("Pickup Has Targets:", limelightPickup.hasTarget());
-      SmartDashboard.putNumber("Pickup Target Offset:", limelightPickup.getTargetHorizontalOffset());
-      SmartDashboard.putNumber("Pipeline", limelightPickup.getPipeline());
+    double currentTime = Timer.getFPGATimestamp();
+    if (currentTime > debugLastUpdate + .2) {
+      SmartDashboard.putString("Lower Shooter Velocity:", String.format("%d / %d",
+          Math.round(shooterController.getLowerShooterVelocity()),
+          Math.round(shooterController.getLowerShooterTargetVelocity())));
+      SmartDashboard.putString("Upper Shooter Velocity:", String.format("%d / %d",
+          Math.round(shooterController.getUpperShooterVelocity()),
+          Math.round(shooterController.getUpperShooterTargetVelocity())));
+
+      if (SHOW_SHOOTER_LOCK_DEBUG) {
+        SmartDashboard.putString("Shooter Lock:",
+            String.format("%.2f", limelightShooter_PIDController.getSensorLockValue()));
+        SmartDashboard.putString("Shooter Current:",
+            String.format("%.2f", limelightShooter_PIDController.getSensorValue()));
+        SmartDashboard.putString("Shooter PID:", String.format("%.2f", limelightShooter_PIDController.getPIDValue()));
+      }
+
+      if (SHOW_WINCH_TICKS) {
+        SmartDashboard.putNumber("Primary Winch Position:", climberController.getPrimaryClimberPosition());
+        SmartDashboard.putNumber("Secodary Winch One Position:", climberController.getSecondryClimberOnePosition());
+        SmartDashboard.putNumber("Secondary Winch Two Position:", climberController.getSecondryClimberTwoPosition());
+      }
+
+      // Limelight data
+      if (SHOW_LIMELIGHT_DEBUG) {
+        SmartDashboard.putBoolean("Shooter Has Targets:", limelightShooter.hasTarget());
+        SmartDashboard.putNumber("Shooter Target Offset:", limelightShooter.getTargetHorizontalOffset());
+        SmartDashboard.putBoolean("Pickup Has Targets:", limelightPickup.hasTarget());
+        SmartDashboard.putNumber("Pickup Target Offset:", limelightPickup.getTargetHorizontalOffset());
+        SmartDashboard.putNumber("Pipeline", limelightPickup.getPipeline());
+      }
+      debugLastUpdate = currentTime;
     }
 
     SmartDashboard.putString("robotPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
@@ -484,7 +486,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Get the latest joystick button values
     final boolean button_Pickup = leftStick.getTrigger();
     final boolean button_Boost = leftStick.getRawButton(2);
-    final boolean button_Target_Lock_Pickup = leftStick.getRawButton(3) || (trackBall && button_Pickup);
+    final boolean button_Target_Lock_Pickup = leftStick.getRawButton(3);
     final boolean button_Reverse_Pickup = leftStick.getRawButton(4);
 
     final boolean button_Shooter = rightStick.getTrigger();

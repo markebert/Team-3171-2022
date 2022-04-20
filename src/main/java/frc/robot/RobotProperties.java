@@ -9,7 +9,7 @@ public interface RobotProperties {
         public static final double JOYSTICK_DEADZONE = .08;
         public static final double MAX_DRIVE_SPEED = .75;
 
-        public static boolean SHOW_SHOOTER_LOCK_DEBUG = false, SHOW_WINCH_TICKS = false, SHOW_LIMELIGHT_DEBUG = true;
+        public static boolean SHOW_SHOOTER_LOCK_DEBUG = false, SHOW_WINCH_TICKS = false, SHOW_LIMELIGHT_DEBUG = false;
 
         /** Shooter Variables **/
         public static class LowShot {
