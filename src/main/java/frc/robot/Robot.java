@@ -9,6 +9,7 @@ package frc.robot;
 // Java Imports
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.io.IOException;
+import java.sql.Driver;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -81,7 +82,7 @@ public class Robot extends TimedRobot implements RobotProperties {
   // Shooter Controller
   private Shooter shooterController;
   private DigitalInput feedSensor;
-  private double shooterAtSpeedStartTime, maxCurrent;
+  private double shooterAtSpeedStartTime;
   private boolean shooterButtonEdgeTrigger, shooterAtSpeedEdgeTrigger, ballpickupEdgeTrigger;
 
   // Climber Controller
@@ -166,7 +167,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     shooterAtSpeedEdgeTrigger = false;
     ballpickupEdgeTrigger = false;
     shooterAtSpeedStartTime = 0;
-    maxCurrent = 0;
 
     // Camera Server for climber camera
     // final UsbCamera camera0 = CameraServer.startAutomaticCapture();
@@ -216,34 +216,27 @@ public class Robot extends TimedRobot implements RobotProperties {
       SmartDashboard.putString("NavX Heading:", String.format("%.2f", gyro.getYaw()));
     }
 
-    SmartDashboard.putString("Shooter Lock:",
-        String.format("%.2f", limelightShooter_PIDController.getSensorLockValue()));
-    SmartDashboard.putString("Shooter Current:",
-        String.format("%.2f", limelightShooter_PIDController.getSensorValue()));
-    SmartDashboard.putString("Shooter PID:", String.format("%.2f", limelightShooter_PIDController.getPIDValue()));
+    if (SHOW_SHOOTER_LOCK_DEBUG) {
+      SmartDashboard.putString("Shooter Lock:",
+          String.format("%.2f", limelightShooter_PIDController.getSensorLockValue()));
+      SmartDashboard.putString("Shooter Current:",
+          String.format("%.2f", limelightShooter_PIDController.getSensorValue()));
+      SmartDashboard.putString("Shooter PID:", String.format("%.2f", limelightShooter_PIDController.getPIDValue()));
+    }
 
     // SmartDashboard.putNumber("Pickup Arm Position:",
     // shooterController.getPickupArmPoisition());
-    SmartDashboard.putNumber("Primary Winch Position:", climberController.getPrimaryClimberPosition());
-    SmartDashboard.putNumber("Secodary Winch One Position:", climberController.getSecondryClimberOnePosition());
-    SmartDashboard.putNumber("Secondary Winch Two Position:", climberController.getSecondryClimberTwoPosition());
+    if (SHOW_WINCH_TICKS) {
+      SmartDashboard.putNumber("Primary Winch Position:", climberController.getPrimaryClimberPosition());
+      SmartDashboard.putNumber("Secodary Winch One Position:", climberController.getSecondryClimberOnePosition());
+      SmartDashboard.putNumber("Secondary Winch Two Position:", climberController.getSecondryClimberTwoPosition());
+    }
 
     if (PID_LOGGING && !DriverStation.isFMSAttached()) {
       outgoingMessages.add(String.format("%.4f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
           shooterController.getUpperShooterVelocity(), shooterController.getUpperShooterTargetVelocity(),
           shooterController.getUpperShooterSpeed()));
     }
-
-    SmartDashboard.putNumber("Neo: Temp", shooterController.getPickupArmTemp());
-    final double current = shooterController.getPickupArmCurrent();
-    maxCurrent = current > maxCurrent ? current : maxCurrent;
-    SmartDashboard.putNumber("Max Current", maxCurrent);
-
-    // Limelight data
-    SmartDashboard.putBoolean("Shooter Has Targets:", limelightShooter.hasTarget());
-    SmartDashboard.putNumber("Shooter Target Offset:", limelightShooter.getTargetHorizontalOffset());
-    SmartDashboard.putBoolean("Pickup Has Targets:", limelightPickup.hasTarget());
-    SmartDashboard.putNumber("Pickup Target Offset:", limelightPickup.getTargetHorizontalOffset());
 
     // Limelight Team Selection
     switch (DriverStation.getAlliance()) {
@@ -259,7 +252,15 @@ public class Robot extends TimedRobot implements RobotProperties {
         trackBall = false;
         break;
     }
-    SmartDashboard.putNumber("Pipeline", limelightPickup.getPipeline());
+
+    // Limelight data
+    if (SHOW_LIMELIGHT_DEBUG) {
+      SmartDashboard.putBoolean("Shooter Has Targets:", limelightShooter.hasTarget());
+      SmartDashboard.putNumber("Shooter Target Offset:", limelightShooter.getTargetHorizontalOffset());
+      SmartDashboard.putBoolean("Pickup Has Targets:", limelightPickup.hasTarget());
+      SmartDashboard.putNumber("Pickup Target Offset:", limelightPickup.getTargetHorizontalOffset());
+      SmartDashboard.putNumber("Pipeline", limelightPickup.getPipeline());
+    }
 
     SmartDashboard.putString("robotPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
@@ -363,7 +364,6 @@ public class Robot extends TimedRobot implements RobotProperties {
           if (button_Shooter && !shooterButtonEdgeTrigger) {
             // Sets the shooter speed and the targeting light
             shooterAtSpeedEdgeTrigger = false;
-            shooterController.enableTargetingLight(true);
             shooterController.setShooterVelocity(MidShot.LOWER_VELOCITY, MidShot.UPPER_VELOCITY);
           } else if (button_Shooter) {
             // Check if the shooter is at speed
@@ -390,7 +390,6 @@ public class Robot extends TimedRobot implements RobotProperties {
           } else {
             // Stops the shooter
             shooterAtSpeedEdgeTrigger = false;
-            shooterController.enableTargetingLight(false);
             shooterController.setShooterSpeed(0);
 
             // Ball Pickup Controls
@@ -550,17 +549,14 @@ public class Robot extends TimedRobot implements RobotProperties {
     if (button_Shooter && !shooterButtonEdgeTrigger) {
       // Sets the shooter speed and the targeting light
       shooterAtSpeedEdgeTrigger = false;
-      shooterController.enableTargetingLight(true);
       shooterController.setShooterVelocity(MidShot.LOWER_VELOCITY, MidShot.UPPER_VELOCITY);
     } else if (button_Short_Shot && !shooterButtonEdgeTrigger) {
       // Sets the shooter speed for a short shot and the targeting light
       shooterAtSpeedEdgeTrigger = false;
-      shooterController.enableTargetingLight(true);
       shooterController.setShooterVelocity(LowShot.LOWER_VELOCITY, LowShot.UPPER_VELOCITY);
     } else if (button_YEET_Shot && !shooterButtonEdgeTrigger) {
       // Sets the shooter speed for a short shot and the targeting light
       shooterAtSpeedEdgeTrigger = false;
-      shooterController.enableTargetingLight(false);
       shooterController.setShooterVelocity(YEETShot.LOWER_VELOCITY, YEETShot.UPPER_VELOCITY);
     } else if (button_Shooter || button_Short_Shot || button_YEET_Shot) {
       // Check if the shooter is at speed
@@ -599,7 +595,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else {
       // Stops the shooter
       shooterAtSpeedEdgeTrigger = false;
-      shooterController.enableTargetingLight(false);
       shooterController.setShooterSpeed(0);
 
       // Ball Pickup Controls

@@ -9,6 +9,8 @@ public interface RobotProperties {
         public static final double JOYSTICK_DEADZONE = .08;
         public static final double MAX_DRIVE_SPEED = .75;
 
+        public static boolean SHOW_SHOOTER_LOCK_DEBUG = false, SHOW_WINCH_TICKS = false, SHOW_LIMELIGHT_DEBUG = true;
+
         /** Shooter Variables **/
         public static class LowShot {
                 public static final int LOWER_VELOCITY = 500, UPPER_VELOCITY = 1925;
@@ -48,7 +50,7 @@ public interface RobotProperties {
         public static final double PRIMARY_CLIMBER_RETRACT_SPEED = -1, PRIMARY_CLIMBER_EXTEND_SPEED = 1;
         public static final double SECONDARY_CLIMBER_RETRACT_SPEED = -.5, SECONDARY_CLIMBER_EXTEND_SPEED = .25;
         public static final int PRIMARY_CLIMBER_MIN_TICK = -460000, PRIMARY_CLIMBER_MAX_TICK = 935000;
-        public static final int SECONDARY_CLIMBER_MIN_TICK = 5000, SECONDARY_CLIMBER_MAX_TICK = 1250000;
+        public static final int SECONDARY_CLIMBER_MIN_TICK = 5000, SECONDARY_CLIMBER_MAX_TICK = 165500;
 
         /**
          * CAN ID Properties
@@ -115,14 +117,6 @@ public interface RobotProperties {
         public static final boolean SECONDARY_WINCH_ONE_INVERTED = true, SECONDARY_WINCH_TWO_INVERTED = false;
 
         /**
-         * Relay Channels. 0-4 are on-board.
-         * 
-         * @param TARGET_LIGHT_CHANNEL The relay channel to use for the targeting light
-         *                             relay.
-         */
-        public static final int TARGET_LIGHT_CHANNEL = 0;
-
-        /**
          * Digital Inputs and Outputs. 0-9 are on-board, 10-25 are on the MXP.
          * 
          * @param FEED_SENSOR_CHANNEL The dio channel to use for the feed sensor.
@@ -185,7 +179,7 @@ public interface RobotProperties {
          *                      Controller. kF: 1.0 represents output value to
          *                      Neo Spark Max Brushless at 100%.
          */
-        public static final boolean PID_LOGGING = true;
+        public static boolean PID_LOGGING = false;
         public static final double GYRO_KP = .0045, GYRO_KI = .0001, GYRO_KD = .0001;
         public static final double LIMELIGHT_KP = .02, LIMELIGHT_KI = .003, LIMELIGHT_KD = .00175;
         public static final double SHOOTER_KP = .01, SHOOTER_KI = .0002, SHOOTER_KD = .0001, SHOOTER_KF = 0;

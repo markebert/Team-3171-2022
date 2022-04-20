@@ -95,7 +95,6 @@ public class HardcodedAutons implements RobotProperties {
             if (button_Shooter && !shooterButtonEdgeTrigger) {
                 // Sets the shooter speed and the targeting light
                 shooterAtSpeedEdgeTrigger = false;
-                shooterController.enableTargetingLight(true);
                 shooterController.setShooterVelocity(MidShot.LOWER_VELOCITY, MidShot.UPPER_VELOCITY);
             } else if (button_Shooter) {
                 // Check if the shooter is at speed
@@ -122,7 +121,6 @@ public class HardcodedAutons implements RobotProperties {
             } else {
                 // Stops the shooter
                 shooterAtSpeedEdgeTrigger = false;
-                shooterController.enableTargetingLight(false);
                 shooterController.setShooterSpeed(0);
 
                 // Ball Pickup Controls

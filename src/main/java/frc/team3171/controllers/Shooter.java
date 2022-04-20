@@ -8,9 +8,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Relay;
-import edu.wpi.first.wpilibj.Relay.Direction;
-import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -38,9 +35,6 @@ public class Shooter implements RobotProperties {
     private final RelativeEncoder pickupArmEncoder;
     private final SparkMaxPIDController pickupArmPIDController;
 
-    // Relay for the targeting light
-    private final Relay targetLightRelay;
-
     // Executor Service
     private final ExecutorService executorService;
 
@@ -65,8 +59,6 @@ public class Shooter implements RobotProperties {
         lowerFeederMotor = new FRCTalonFX(LOWER_FEEDER_CAN_ID);
         pickupArmMotor = new CANSparkMax(PICKUP_ARM_CAN_ID, MotorType.kBrushless);
         pickupArmMotor.setIdleMode(IdleMode.kCoast);
-
-        targetLightRelay = new Relay(TARGET_LIGHT_CHANNEL, Direction.kForward);
 
         // Set if any motors need to be inverted
         lowerShooterMotor.setInverted(LOWER_SHOOTER_INVERTED);
@@ -113,19 +105,6 @@ public class Shooter implements RobotProperties {
     }
 
     /**
-     * Controls the relay to turn on or off the targeting light on the shooter.
-     * 
-     * @param enable True to enable the targeting light, false to disable it.
-     */
-    public void enableTargetingLight(final boolean enable) {
-        if (enable) {
-            targetLightRelay.set(Value.kOn);
-        } else {
-            targetLightRelay.set(Value.kOff);
-        }
-    }
-
-    /**
      * Sets the speed of the shooter motors to the given value.
      * 
      * @param lowerShooterSpeed The speed, from -1.0 to 1.0, to set the lower
@@ -136,11 +115,6 @@ public class Shooter implements RobotProperties {
     public void setShooterSpeed(final double lowerShooterSpeed, final double upperShooterSpeed) {
         lowerShooterMotor.set(ControlMode.PercentOutput, lowerShooterSpeed);
         upperShooterMotor.set(ControlMode.PercentOutput, upperShooterSpeed);
-        if (lowerShooterSpeed != 0 || upperShooterSpeed != 0) {
-            enableTargetingLight(true);
-        } else {
-            enableTargetingLight(false);
-        }
     }
 
     /**
@@ -172,19 +146,15 @@ public class Shooter implements RobotProperties {
          */
         if (lowerShooterRPM == 0) {
             lowerShooterMotor.set(ControlMode.PercentOutput, 0);
-            enableTargetingLight(false);
         } else {
             final double lowerTargetVelocity_UnitsPer100ms = (lowerShooterRPM * 2048.0) / 600;
             lowerShooterMotor.set(ControlMode.Velocity, lowerTargetVelocity_UnitsPer100ms);
-            enableTargetingLight(true);
         }
         if (upperShooterRPM == 0) {
             upperShooterMotor.set(ControlMode.PercentOutput, 0);
-            enableTargetingLight(false);
         } else {
             final double upperTargetVelocity_UnitsPer100ms = (upperShooterRPM * 2048.0) / 600;
             upperShooterMotor.set(ControlMode.Velocity, upperTargetVelocity_UnitsPer100ms);
-            enableTargetingLight(true);
         }
     }
 
@@ -504,7 +474,6 @@ public class Shooter implements RobotProperties {
         lowerFeederMotor.set(ControlMode.Disabled, 0);
         upperFeederMotor.set(ControlMode.Disabled, 0);
         pickupArmMotor.disable();
-        targetLightRelay.set(Value.kOff);
     }
 
 }
