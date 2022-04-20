@@ -98,4 +98,12 @@ public class Limelight implements DoubleSupplier {
         return -getTargetHorizontalOffset();
     }
 
+    public void setPipeline(final int pipeline) {
+        limelightNetworkTable.getEntry("pipeline").setNumber(pipeline);
+    }
+
+    public int getPipeline() {
+        return limelightNetworkTable.getEntry("getpipe").getNumber(-1).intValue();
+    }
+
 }

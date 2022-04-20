@@ -14,8 +14,6 @@ import java.io.IOException;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -75,6 +73,7 @@ public class Robot extends TimedRobot implements RobotProperties {
 
   // Limelight Network Table
   private Limelight limelightShooter, limelightPickup;
+  private boolean trackBall;
 
   // LimelightPID Controller
   private GyroPIDController limelightShooter_PIDController, limelightPickup_PIDController;
@@ -245,6 +244,22 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putNumber("Shooter Target Offset:", limelightShooter.getTargetHorizontalOffset());
     SmartDashboard.putBoolean("Pickup Has Targets:", limelightPickup.hasTarget());
     SmartDashboard.putNumber("Pickup Target Offset:", limelightPickup.getTargetHorizontalOffset());
+
+    // Limelight Team Selection
+    switch (DriverStation.getAlliance()) {
+      case Red:
+        limelightPickup.setPipeline(1);
+        trackBall = true;
+        break;
+      case Blue:
+        limelightPickup.setPipeline(0);
+        trackBall = true;
+        break;
+      default:
+        trackBall = false;
+        break;
+    }
+    SmartDashboard.putNumber("Pipeline", limelightPickup.getPipeline());
 
     SmartDashboard.putString("robotPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
@@ -470,7 +485,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Get the latest joystick button values
     final boolean button_Pickup = leftStick.getTrigger();
     final boolean button_Boost = leftStick.getRawButton(2);
-    final boolean button_Target_Lock_Pickup = leftStick.getRawButton(3);
+    final boolean button_Target_Lock_Pickup = leftStick.getRawButton(3) || (trackBall && button_Pickup);
     final boolean button_Reverse_Pickup = leftStick.getRawButton(4);
 
     final boolean button_Shooter = rightStick.getTrigger();
