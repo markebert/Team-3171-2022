@@ -8,7 +8,6 @@ package frc.robot;
 
 // Java Imports
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.io.IOException;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -85,10 +84,6 @@ public class Robot extends TimedRobot implements RobotProperties {
 
   // Climber Controller
   private Climber climberController;
-
-  // Shooter PID Logging
-  private ConcurrentLinkedQueue<String> outgoingMessages;
-  private UDPClient udpClient = null;
 
   private double debugLastUpdate;
 
@@ -174,17 +169,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     // camera1.setResolution(160, 90);
     // camera1.setFPS(20);
 
-    // PID Logging init
-    if (PID_LOGGING && !DriverStation.isFMSAttached()) {
-      try {
-        outgoingMessages = new ConcurrentLinkedQueue<>();
-        udpClient = new UDPClient(outgoingMessages, "10.31.71.201", 5801);
-        udpClient.start();
-      } catch (IOException e) {
-        System.err.println("Invalid destination IP Address!");
-      }
-    }
-
     debugLastUpdate = 0;
   }
 
@@ -198,6 +182,9 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void robotPeriodic() {
+    shooterController.periodic();
+    climberController.periodic();
+
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
     SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
     if (gyro.isConnected() && !gyro.isCalibrating()) {
@@ -205,12 +192,6 @@ public class Robot extends TimedRobot implements RobotProperties {
           String.format("%.2f | %.2f", gyro.getYaw(), gyroPIDController.getSensorLockValue()));
     } else {
       SmartDashboard.putString("NavX:", "Disconnected!");
-    }
-
-    if (PID_LOGGING && !DriverStation.isFMSAttached()) {
-      outgoingMessages.add(String.format("%.4f,%.2f,%.2f,%.2f,0,0,0", Timer.getFPGATimestamp(),
-          shooterController.getUpperShooterVelocity(), shooterController.getUpperShooterTargetVelocity(),
-          shooterController.getUpperShooterSpeed()));
     }
 
     // Limelight Team Selection
@@ -261,6 +242,8 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void autonomousInit() {
+    shooterController.init();
+
     // Reset all of the Edge Triggers
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
@@ -429,6 +412,8 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void teleopInit() {
+    shooterController.init();
+
     // Reset all of the Edge Triggers
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
@@ -629,7 +614,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else {
       shooterController.retractPickupArm();
     }
-    // shooterController.setPickupArmSpeed(rightStick.getY());
 
     // Primary Climber Control
     if (button_Extend_Primary_Climber) {

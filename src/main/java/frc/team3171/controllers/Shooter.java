@@ -44,6 +44,9 @@ public class Shooter implements RobotProperties {
     // Atomic Booleans
     private final AtomicBoolean lowerFeederExecutorActive, upperFeederExecutorActive;
 
+    private int lowerVelocity, upperVelocity, desiredLowerVelocity, desiredUpperVelocity, pickupArmPosition;
+    private double pickupArmCurrent;
+
     /**
      * Constructor
      * 
@@ -102,6 +105,19 @@ public class Shooter implements RobotProperties {
         // Initialize the AtomicBooleans to control the thread executors
         lowerFeederExecutorActive = new AtomicBoolean(false);
         upperFeederExecutorActive = new AtomicBoolean(false);
+    }
+
+    public void init() {
+        pickupArmMotor.setIdleMode(IdleMode.kCoast);
+    }
+
+    public void periodic() {
+        lowerVelocity = (int) Math.round((lowerShooterMotor.getSelectedSensorVelocity() / 2048) * 600);
+        upperVelocity = (int) Math.round((upperShooterMotor.getSelectedSensorVelocity() / 2048) * 600);
+        desiredLowerVelocity = (int) Math.round((lowerShooterMotor.getClosedLoopTarget() / 2048) * 600);
+        desiredUpperVelocity = (int) Math.round((upperShooterMotor.getClosedLoopTarget() / 2048) * 600);
+        pickupArmPosition = (int) Math.round(pickupArmEncoder.getPosition());
+        pickupArmCurrent = pickupArmMotor.getOutputCurrent();
     }
 
     /**
@@ -174,7 +190,7 @@ public class Shooter implements RobotProperties {
      * @return The RPM of the lower shooter motor.
      */
     public double getLowerShooterVelocity() {
-        return (lowerShooterMotor.getSelectedSensorVelocity() / 2048.0) * 600;
+        return lowerVelocity;
     }
 
     /**
@@ -189,8 +205,8 @@ public class Shooter implements RobotProperties {
     public boolean isLowerShooterAtVelocity(double percentError) {
         percentError = Math.abs(percentError);
         percentError = percentError > 1 ? 1.0 : percentError;
-        final double acceptableError = Math.abs(lowerShooterMotor.getClosedLoopTarget()) * percentError;
-        return Math.abs(lowerShooterMotor.getClosedLoopError()) < acceptableError;
+        final double acceptableError = Math.abs(desiredLowerVelocity) * percentError;
+        return Math.abs(desiredLowerVelocity - lowerVelocity) < acceptableError;
     }
 
     /**
@@ -200,7 +216,7 @@ public class Shooter implements RobotProperties {
      * @return The RPM of the upper shooter motor.
      */
     public double getUpperShooterVelocity() {
-        return (upperShooterMotor.getSelectedSensorVelocity() / 2048.0) * 600;
+        return upperVelocity;
     }
 
     /**
@@ -215,8 +231,8 @@ public class Shooter implements RobotProperties {
     public boolean isUpperShooterAtVelocity(double percentError) {
         percentError = Math.abs(percentError);
         percentError = percentError > 1 ? 1.0 : percentError;
-        final double acceptableError = Math.abs(upperShooterMotor.getClosedLoopTarget()) * percentError;
-        return Math.abs(upperShooterMotor.getClosedLoopError()) < acceptableError;
+        final double acceptableError = Math.abs(desiredUpperVelocity) * percentError;
+        return Math.abs(desiredUpperVelocity - upperVelocity) < acceptableError;
     }
 
     /**
@@ -226,10 +242,7 @@ public class Shooter implements RobotProperties {
      * @return The target RPM of the lower shooter motor.
      */
     public double getLowerShooterTargetVelocity() {
-        if (lowerShooterMotor.getControlMode() == ControlMode.Velocity) {
-            return (lowerShooterMotor.getClosedLoopTarget() / 2048.0) * 600;
-        }
-        return 0;
+        return desiredLowerVelocity;
     }
 
     /**
@@ -239,28 +252,7 @@ public class Shooter implements RobotProperties {
      * @return The RPM of the upper shooter motor.
      */
     public double getUpperShooterTargetVelocity() {
-        if (upperShooterMotor.getControlMode() == ControlMode.Velocity) {
-            return (upperShooterMotor.getClosedLoopTarget() / 2048.0) * 600;
-        }
-        return 0;
-    }
-
-    /**
-     * Returns the speed of the lower shooter motor in percent.
-     * 
-     * @return The speed of the lower shooter motor, from -1.0 to 1.0.
-     */
-    public double getLowerShooterSpeed() {
-        return lowerShooterMotor.getMotorOutputPercent();
-    }
-
-    /**
-     * Returns the speed of the upper shooter motor.
-     * 
-     * @return The speed of the upper shooter motor in percent, from -1.0 to 1.0.
-     */
-    public double getUpperShooterSpeed() {
-        return upperShooterMotor.getMotorOutputPercent();
+        return desiredUpperVelocity;
     }
 
     /**
@@ -275,10 +267,10 @@ public class Shooter implements RobotProperties {
     public boolean isBothShootersAtVelocity(double percentError) {
         percentError = Math.abs(percentError);
         percentError = percentError > 1 ? 1.0 : percentError;
-        final double upperAcceptableError = Math.abs(upperShooterMotor.getClosedLoopTarget()) * percentError;
-        final double lowerAcceptableError = Math.abs(lowerShooterMotor.getClosedLoopTarget()) * percentError;
-        return Math.abs(upperShooterMotor.getClosedLoopError()) < upperAcceptableError
-                && Math.abs(lowerShooterMotor.getClosedLoopError()) < lowerAcceptableError;
+        final double lowerAcceptableError = Math.abs(desiredLowerVelocity) * percentError;
+        final double upperAcceptableError = Math.abs(desiredUpperVelocity) * percentError;
+        return Math.abs(desiredLowerVelocity - lowerVelocity) < lowerAcceptableError
+                && Math.abs(desiredUpperVelocity - upperVelocity) < upperAcceptableError;
     }
 
     /**
@@ -427,15 +419,11 @@ public class Shooter implements RobotProperties {
      *         located at relative to its startup position.
      */
     public double getPickupArmPoisition() {
-        return pickupArmEncoder.getPosition();
-    }
-
-    public double getPickupArmTemp() {
-        return pickupArmMotor.getMotorTemperature();
+        return pickupArmPosition;
     }
 
     public double getPickupArmCurrent() {
-        return pickupArmMotor.getOutputCurrent();
+        return pickupArmCurrent;
     }
 
     /**
@@ -444,13 +432,11 @@ public class Shooter implements RobotProperties {
      * @param speed The speed, from -1.0 to 1.0, to set the pickup motors to.
      */
     public void setPickupArmSpeed(final double speed) {
-        pickupArmMotor.setIdleMode(IdleMode.kCoast);
         pickupArmMotor.set(speed);
     }
 
     public void extendPickupArm() {
-        pickupArmMotor.setIdleMode(IdleMode.kCoast);
-        if (pickupArmEncoder.getPosition() > 81) {
+        if (pickupArmPosition > 81) {
             pickupArmMotor.disable();
         } else {
             pickupArmPIDController.setReference(81, ControlType.kPosition);
@@ -458,8 +444,7 @@ public class Shooter implements RobotProperties {
     }
 
     public void retractPickupArm() {
-        pickupArmMotor.setIdleMode(IdleMode.kCoast);
-        if (pickupArmEncoder.getPosition() < 10) {
+        if (pickupArmPosition < 10) {
             pickupArmMotor.disable();
         } else {
             pickupArmPIDController.setReference(10, ControlType.kPosition);

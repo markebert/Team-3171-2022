@@ -12,10 +12,6 @@ public interface RobotProperties {
         public static boolean SHOW_SHOOTER_LOCK_DEBUG = false, SHOW_WINCH_TICKS = false, SHOW_LIMELIGHT_DEBUG = false;
 
         /** Shooter Variables **/
-        public enum Shots {
-                LowShot, MidShot, HighShot, YEETShot
-        }
-
         public static class LowShot {
                 public static final int LOWER_VELOCITY = 500, UPPER_VELOCITY = 1925;
                 public static final double DESIRED_PERCENT_ACCURACY = .06, DESIRED_AT_SPEED_TIME = .3;
@@ -183,7 +179,6 @@ public interface RobotProperties {
          *                      Controller. kF: 1.0 represents output value to
          *                      Neo Spark Max Brushless at 100%.
          */
-        public static boolean PID_LOGGING = false;
         public static final double GYRO_KP = .0045, GYRO_KI = .0001, GYRO_KD = .0001;
         public static final double LIMELIGHT_KP = .02, LIMELIGHT_KI = .003, LIMELIGHT_KD = .00175;
         public static final double SHOOTER_KP = .01, SHOOTER_KI = .0002, SHOOTER_KD = .0001, SHOOTER_KF = 0;
