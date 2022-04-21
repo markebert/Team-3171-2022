@@ -46,6 +46,7 @@ public class Shooter implements RobotProperties {
 
     private int lowerVelocity, upperVelocity, desiredLowerVelocity, desiredUpperVelocity, pickupArmPosition;
     private double pickupArmCurrent;
+    private boolean extended;
 
     /**
      * Constructor
@@ -105,6 +106,8 @@ public class Shooter implements RobotProperties {
         // Initialize the AtomicBooleans to control the thread executors
         lowerFeederExecutorActive = new AtomicBoolean(false);
         upperFeederExecutorActive = new AtomicBoolean(false);
+
+        extended = false;
     }
 
     public void init() {
@@ -446,7 +449,8 @@ public class Shooter implements RobotProperties {
     public void extendPickupArm() {
         if (pickupArmPosition > 81) {
             pickupArmMotor.disable();
-        } else {
+        } else if (!extended) {
+            extended = true;
             pickupArmPIDController.setReference(81, ControlType.kPosition);
         }
     }
@@ -454,7 +458,8 @@ public class Shooter implements RobotProperties {
     public void retractPickupArm() {
         if (pickupArmPosition < 10) {
             pickupArmMotor.disable();
-        } else {
+        } else if (extended) {
+            extended = false;
             pickupArmPIDController.setReference(10, ControlType.kPosition);
         }
     }
