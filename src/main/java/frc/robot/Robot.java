@@ -9,7 +9,6 @@ package frc.robot;
 // Java Imports
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.io.IOException;
-import java.sql.Driver;
 
 // FRC Imports
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -99,8 +98,6 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void robotInit() {
-    final double startTime = Timer.getFPGATimestamp();
-
     // Gyro init
     gyro = new NavXMXP();
     gyroPIDController = new GyroPIDController(gyro, GYRO_KP, GYRO_KI, GYRO_KD, -.75, .75);
@@ -189,8 +186,6 @@ public class Robot extends TimedRobot implements RobotProperties {
     }
 
     debugLastUpdate = 0;
-
-    SmartDashboard.putString("roboInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -203,13 +198,13 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void robotPeriodic() {
-    final double startTime = Timer.getFPGATimestamp();
-
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
     SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
-    SmartDashboard.putString("Gyro Lock:", String.format("%.2f", gyroPIDController.getSensorLockValue()));
     if (gyro.isConnected() && !gyro.isCalibrating()) {
-      SmartDashboard.putString("NavX Heading:", String.format("%.2f", gyro.getYaw()));
+      SmartDashboard.putString("NavX:",
+          String.format("%.2f | %.2f", gyro.getYaw(), gyroPIDController.getSensorLockValue()));
+    } else {
+      SmartDashboard.putString("NavX:", "Disconnected!");
     }
 
     if (PID_LOGGING && !DriverStation.isFMSAttached()) {
@@ -230,14 +225,13 @@ public class Robot extends TimedRobot implements RobotProperties {
         break;
     }
 
+    SmartDashboard.putBoolean("Shooter Has Targets:", limelightShooter.hasTarget());
+    SmartDashboard.putBoolean("Pickup Has Targets:", limelightPickup.hasTarget());
+
     double currentTime = Timer.getFPGATimestamp();
-    if (currentTime > debugLastUpdate + .2) {
-      SmartDashboard.putString("Lower Shooter Velocity:", String.format("%d / %d",
-          Math.round(shooterController.getLowerShooterVelocity()),
-          Math.round(shooterController.getLowerShooterTargetVelocity())));
-      SmartDashboard.putString("Upper Shooter Velocity:", String.format("%d / %d",
-          Math.round(shooterController.getUpperShooterVelocity()),
-          Math.round(shooterController.getUpperShooterTargetVelocity())));
+    if (currentTime > debugLastUpdate + .1) {
+      SmartDashboard.putNumber("Lower Velocity:", Math.round(shooterController.getLowerShooterVelocity()));
+      SmartDashboard.putNumber("Upper Velocity:", Math.round(shooterController.getUpperShooterVelocity()));
 
       if (SHOW_SHOOTER_LOCK_DEBUG) {
         SmartDashboard.putString("Shooter Lock:",
@@ -255,16 +249,11 @@ public class Robot extends TimedRobot implements RobotProperties {
 
       // Limelight data
       if (SHOW_LIMELIGHT_DEBUG) {
-        SmartDashboard.putBoolean("Shooter Has Targets:", limelightShooter.hasTarget());
         SmartDashboard.putNumber("Shooter Target Offset:", limelightShooter.getTargetHorizontalOffset());
-        SmartDashboard.putBoolean("Pickup Has Targets:", limelightPickup.hasTarget());
         SmartDashboard.putNumber("Pickup Target Offset:", limelightPickup.getTargetHorizontalOffset());
-        SmartDashboard.putNumber("Pipeline", limelightPickup.getPipeline());
       }
       debugLastUpdate = currentTime;
     }
-
-    SmartDashboard.putString("robotPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -272,8 +261,6 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void autonomousInit() {
-    final double startTime = Timer.getFPGATimestamp();
-
     // Reset all of the Edge Triggers
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
@@ -311,8 +298,6 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Update the autonStartTime
     autonStartTime = Timer.getFPGATimestamp();
-
-    SmartDashboard.putString("autonInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -320,8 +305,6 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void autonomousPeriodic() {
-    final double startTime = Timer.getFPGATimestamp();
-
     switch (selectedAutonMode) {
       case kHardcodedAuton:
         HardcodedAutons.Auton_Basic(driveController, gyro, gyroPIDController, shooterController, feedSensor);
@@ -439,8 +422,6 @@ public class Robot extends TimedRobot implements RobotProperties {
         }
         break;
     }
-
-    SmartDashboard.putString("autonPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -448,8 +429,6 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void teleopInit() {
-    final double startTime = Timer.getFPGATimestamp();
-
     // Reset all of the Edge Triggers
     shooterButtonEdgeTrigger = false;
     shooterAtSpeedEdgeTrigger = false;
@@ -472,8 +451,6 @@ public class Robot extends TimedRobot implements RobotProperties {
 
     // Update the autonStartTime
     autonStartTime = Timer.getFPGATimestamp();
-
-    SmartDashboard.putString("teleopInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -481,8 +458,6 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void teleopPeriodic() {
-    final double startTime = Timer.getFPGATimestamp();
-
     // Get the latest joystick button values
     final boolean button_Pickup = leftStick.getTrigger();
     final boolean button_Boost = leftStick.getRawButton(2);
@@ -690,8 +665,6 @@ public class Robot extends TimedRobot implements RobotProperties {
           break;
       }
     }
-
-    SmartDashboard.putString("teleopPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -699,8 +672,6 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void disabledInit() {
-    final double startTime = Timer.getFPGATimestamp();
-
     // Disabled all of the robot controllers
     driveController.disable();
     shooterController.disable();
@@ -723,8 +694,6 @@ public class Robot extends TimedRobot implements RobotProperties {
           break;
       }
     }
-
-    SmartDashboard.putString("disabledInit:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
   /**
@@ -732,9 +701,6 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void disabledPeriodic() {
-    final double startTime = Timer.getFPGATimestamp();
-
-    SmartDashboard.putString("disabledPeriodic:", String.format("%.4f", Timer.getFPGATimestamp() - startTime));
   }
 
 }

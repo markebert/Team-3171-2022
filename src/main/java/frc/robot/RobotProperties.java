@@ -19,7 +19,7 @@ public interface RobotProperties {
 
         static class MidShot {
                 public static final int LOWER_VELOCITY = 2700, UPPER_VELOCITY = 2400;
-                public static final double DESIRED_PERCENT_ACCURACY = .06, DESIRED_AT_SPEED_TIME = .16;
+                public static final double DESIRED_PERCENT_ACCURACY = .05, DESIRED_AT_SPEED_TIME = .2;
         }
 
         static class HighShot {
@@ -28,7 +28,7 @@ public interface RobotProperties {
         }
 
         static class YEETShot {
-                public static final int LOWER_VELOCITY = 1300, UPPER_VELOCITY = 5200;
+                public static final int LOWER_VELOCITY = 1288, UPPER_VELOCITY = 5150;
                 public static final double DESIRED_PERCENT_ACCURACY = .05, DESIRED_AT_SPEED_TIME = .3;
         }
 
@@ -38,7 +38,7 @@ public interface RobotProperties {
         public static final double PICKUP_SPEED = .55;
 
         /** Feeder Variables **/
-        public static final double SHOOTER_LOWER_FEED_SPEED = .1, SHOOTER_UPPER_FEED_SPEED = .25;
+        public static final double SHOOTER_LOWER_FEED_SPEED = .15, SHOOTER_UPPER_FEED_SPEED = .25;
         public static final double REVERSE_LOWER_FEEDER_SPEED = -.75, REVERSE_UPPER_FEEDER_SPEED = -.75;
         public static final double LOWER_FEEDER_SPEED = .3, LOWER_FEEDER_SPEED_SLOW = .2;
         public static final double UPPER_FEEDER_SPEED = .2, UPPER_FEEDER_BACKFEED_SPEED = -.4;
