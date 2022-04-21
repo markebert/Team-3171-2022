@@ -114,8 +114,16 @@ public class Shooter implements RobotProperties {
     public void periodic() {
         lowerVelocity = (int) Math.round((lowerShooterMotor.getSelectedSensorVelocity() / 2048) * 600);
         upperVelocity = (int) Math.round((upperShooterMotor.getSelectedSensorVelocity() / 2048) * 600);
-        desiredLowerVelocity = (int) Math.round((lowerShooterMotor.getClosedLoopTarget() / 2048) * 600);
-        desiredUpperVelocity = (int) Math.round((upperShooterMotor.getClosedLoopTarget() / 2048) * 600);
+        if (lowerShooterMotor.getControlMode() == ControlMode.Velocity) {
+            desiredLowerVelocity = (int) Math.round((lowerShooterMotor.getClosedLoopTarget() / 2048) * 600);
+        } else {
+            desiredLowerVelocity = 0;
+        }
+        if (upperShooterMotor.getControlMode() == ControlMode.Velocity) {
+            desiredUpperVelocity = (int) Math.round((upperShooterMotor.getClosedLoopTarget() / 2048) * 600);
+        } else {
+            desiredLowerVelocity = 0;
+        }
         pickupArmPosition = (int) Math.round(pickupArmEncoder.getPosition());
         pickupArmCurrent = pickupArmMotor.getOutputCurrent();
     }
