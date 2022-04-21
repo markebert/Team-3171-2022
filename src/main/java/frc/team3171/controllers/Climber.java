@@ -75,21 +75,6 @@ public class Climber implements RobotProperties {
         }
     }
 
-    /**
-     * 
-     * @param position
-     */
-    public void setPrimaryClimberPosition(final int position, final int lowerBound, final int upperBound) {
-        final int winchPosition = primaryWinchPosition;
-        if (position < winchPosition && winchPosition <= lowerBound) {
-            primaryWinch.set(ControlMode.PercentOutput, 0);
-        } else if (position > winchPosition && winchPosition >= upperBound) {
-            primaryWinch.set(ControlMode.PercentOutput, 0);
-        } else {
-            primaryWinch.set(ControlMode.Position, position);
-        }
-    }
-
     public int getPrimaryClimberPosition() {
         return primaryWinchPosition;
     }
@@ -124,30 +109,6 @@ public class Climber implements RobotProperties {
             secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
         } else {
             secondaryWinchTwo.set(ControlMode.PercentOutput, speed);
-        }
-    }
-
-    /**
-     * 
-     * @param position
-     */
-    public void setSecondaryClimberPosition(final int position, final int lowerBound, final int upperBound) {
-        final int winchOnePosition = secondaryWinchOnePosition,
-                winchTwoPosition = secondaryWinchTwoPosition;
-        if (position < winchOnePosition && winchOnePosition <= lowerBound) {
-            secondaryWinchOne.set(ControlMode.PercentOutput, 0);
-        } else if (position > winchOnePosition && winchOnePosition >= upperBound) {
-            secondaryWinchOne.set(ControlMode.PercentOutput, 0);
-        } else {
-            secondaryWinchOne.set(ControlMode.Position, position);
-        }
-
-        if (position < winchTwoPosition && winchTwoPosition <= lowerBound) {
-            secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
-        } else if (position > winchTwoPosition && winchTwoPosition >= upperBound) {
-            secondaryWinchTwo.set(ControlMode.PercentOutput, 0);
-        } else {
-            secondaryWinchTwo.set(ControlMode.Position, position);
         }
     }
 
