@@ -12,6 +12,10 @@ public interface RobotProperties {
         public static boolean SHOW_SHOOTER_LOCK_DEBUG = false, SHOW_WINCH_TICKS = false, SHOW_LIMELIGHT_DEBUG = false;
 
         /** Shooter Variables **/
+        public enum Shots {
+                LowShot, MidShot, HighShot, YEETShot
+        }
+
         public static class LowShot {
                 public static final int LOWER_VELOCITY = 500, UPPER_VELOCITY = 1925;
                 public static final double DESIRED_PERCENT_ACCURACY = .06, DESIRED_AT_SPEED_TIME = .3;

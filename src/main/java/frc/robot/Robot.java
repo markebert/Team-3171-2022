@@ -515,38 +515,55 @@ public class Robot extends TimedRobot implements RobotProperties {
       driveController.mecanumTraction(-leftStickY, rightStickX);
     }
 
-    // Disables the gyro if the climber is enaged at all
-    if (button_Extend_Primary_Climber || button_Extend_Secondary_Climber || operatorLeftStickY != 0
-        || operatorRightStickY != 0) {
-      gyroPIDController.disablePID();
+    // Shooter Control
+    final boolean engageShooter;
+    final int LOWER_VELOCITY, UPPER_VELOCITY;
+    final double DESIRED_PERCENT_ACCURACY, DESIRED_AT_SPEED_TIME;
+    boolean extend_Pickup_Arm = false;
+
+    if (button_Short_Shot) {
+      engageShooter = true;
+      LOWER_VELOCITY = LowShot.LOWER_VELOCITY;
+      UPPER_VELOCITY = LowShot.UPPER_VELOCITY;
+      DESIRED_PERCENT_ACCURACY = LowShot.DESIRED_PERCENT_ACCURACY;
+      DESIRED_AT_SPEED_TIME = LowShot.DESIRED_AT_SPEED_TIME;
+    } else if (button_Shooter) {
+      engageShooter = true;
+      LOWER_VELOCITY = MidShot.LOWER_VELOCITY;
+      UPPER_VELOCITY = MidShot.UPPER_VELOCITY;
+      DESIRED_PERCENT_ACCURACY = MidShot.DESIRED_PERCENT_ACCURACY;
+      DESIRED_AT_SPEED_TIME = MidShot.DESIRED_AT_SPEED_TIME;
+    } else if (false) {
+      engageShooter = true;
+      LOWER_VELOCITY = HighShot.LOWER_VELOCITY;
+      UPPER_VELOCITY = HighShot.UPPER_VELOCITY;
+      DESIRED_PERCENT_ACCURACY = HighShot.DESIRED_PERCENT_ACCURACY;
+      DESIRED_AT_SPEED_TIME = HighShot.DESIRED_AT_SPEED_TIME;
+    } else if (button_YEET_Shot) {
+      engageShooter = true;
+      LOWER_VELOCITY = YEETShot.LOWER_VELOCITY;
+      UPPER_VELOCITY = YEETShot.UPPER_VELOCITY;
+      DESIRED_PERCENT_ACCURACY = YEETShot.DESIRED_PERCENT_ACCURACY;
+      DESIRED_AT_SPEED_TIME = YEETShot.DESIRED_AT_SPEED_TIME;
+    } else {
+      engageShooter = false;
+      LOWER_VELOCITY = 0;
+      UPPER_VELOCITY = 0;
+      DESIRED_PERCENT_ACCURACY = 0;
+      DESIRED_AT_SPEED_TIME = 0;
     }
 
-    // Shooter Control
-    boolean extend_Pickup_Arm = false;
-    if (button_Shooter && !shooterButtonEdgeTrigger) {
-      // Sets the shooter speed and the targeting light
+    if (engageShooter && !shooterButtonEdgeTrigger) {
+      // Sets the shooter speed
       shooterAtSpeedEdgeTrigger = false;
-      shooterController.setShooterVelocity(MidShot.LOWER_VELOCITY, MidShot.UPPER_VELOCITY);
-    } else if (button_Short_Shot && !shooterButtonEdgeTrigger) {
-      // Sets the shooter speed for a short shot and the targeting light
-      shooterAtSpeedEdgeTrigger = false;
-      shooterController.setShooterVelocity(LowShot.LOWER_VELOCITY, LowShot.UPPER_VELOCITY);
-    } else if (button_YEET_Shot && !shooterButtonEdgeTrigger) {
-      // Sets the shooter speed for a short shot and the targeting light
-      shooterAtSpeedEdgeTrigger = false;
-      shooterController.setShooterVelocity(YEETShot.LOWER_VELOCITY, YEETShot.UPPER_VELOCITY);
-    } else if (button_Shooter || button_Short_Shot || button_YEET_Shot) {
+      shooterController.setShooterVelocity(LOWER_VELOCITY, UPPER_VELOCITY);
+    } else if (engageShooter) {
       // Check if the shooter is at speed
-      final boolean isAtSpeed = shooterController
-          .isBothShootersAtVelocity(
-              button_YEET_Shot ? YEETShot.DESIRED_PERCENT_ACCURACY : MidShot.DESIRED_PERCENT_ACCURACY);
+      final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(DESIRED_PERCENT_ACCURACY);
       if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
         // Get time that shooter first designated at speed
         shooterAtSpeedStartTime = Timer.getFPGATimestamp();
-      } else if (isAtSpeed
-          && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime
-              + (button_Short_Shot || button_YEET_Shot ? LowShot.DESIRED_AT_SPEED_TIME
-                  : MidShot.DESIRED_AT_SPEED_TIME))) {
+      } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + DESIRED_AT_SPEED_TIME)) {
         // Feed the ball through the shooter
         if (button_YEET_Shot) {
           shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);
@@ -601,7 +618,7 @@ public class Robot extends TimedRobot implements RobotProperties {
         shooterController.setUpperFeederSpeed(0);
       }
     }
-    shooterButtonEdgeTrigger = button_Shooter || button_Short_Shot || button_YEET_Shot;
+    shooterButtonEdgeTrigger = engageShooter;
     ballpickupEdgeTrigger = button_Pickup;
 
     // Pickup Arm Control
@@ -639,6 +656,12 @@ public class Robot extends TimedRobot implements RobotProperties {
     } else {
       climberController.setSecondaryClimberSpeed(-operatorRightStickY, SECONDARY_CLIMBER_MIN_TICK,
           SECONDARY_CLIMBER_MAX_TICK);
+    }
+
+    // Disables the gyro if the climber is enaged at all
+    if (button_Extend_Primary_Climber || button_Extend_Secondary_Climber || operatorLeftStickY != 0
+        || operatorRightStickY != 0) {
+      gyroPIDController.disablePID();
     }
 
     // Auton Recording
