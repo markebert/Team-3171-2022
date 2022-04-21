@@ -58,7 +58,7 @@ public class Shooter implements RobotProperties {
         upperFeederMotor = new FRCTalonFX(UPPER_FEEDER_CAN_ID);
         lowerFeederMotor = new FRCTalonFX(LOWER_FEEDER_CAN_ID);
         pickupArmMotor = new CANSparkMax(PICKUP_ARM_CAN_ID, MotorType.kBrushless);
-        pickupArmMotor.setIdleMode(IdleMode.kCoast);
+        pickupArmMotor.setIdleMode(IdleMode.kBrake);
 
         // Set if any motors need to be inverted
         lowerShooterMotor.setInverted(LOWER_SHOOTER_INVERTED);
@@ -444,11 +444,12 @@ public class Shooter implements RobotProperties {
      * @param speed The speed, from -1.0 to 1.0, to set the pickup motors to.
      */
     public void setPickupArmSpeed(final double speed) {
+        pickupArmMotor.setIdleMode(IdleMode.kCoast);
         pickupArmMotor.set(speed);
     }
 
     public void extendPickupArm() {
-        // pickupArmMotor.setIdleMode(IdleMode.kCoast);
+        pickupArmMotor.setIdleMode(IdleMode.kCoast);
         if (pickupArmEncoder.getPosition() > 81) {
             pickupArmMotor.disable();
         } else {
@@ -457,6 +458,7 @@ public class Shooter implements RobotProperties {
     }
 
     public void retractPickupArm() {
+        pickupArmMotor.setIdleMode(IdleMode.kCoast);
         if (pickupArmEncoder.getPosition() < 10) {
             pickupArmMotor.disable();
         } else {
@@ -470,6 +472,7 @@ public class Shooter implements RobotProperties {
     public final void disable() {
         lowerShooterMotor.set(ControlMode.Disabled, 0);
         upperShooterMotor.set(ControlMode.Disabled, 0);
+        pickupArmMotor.setIdleMode(IdleMode.kBrake);
         pickupMotor.set(ControlMode.Disabled, 0);
         lowerFeederMotor.set(ControlMode.Disabled, 0);
         upperFeederMotor.set(ControlMode.Disabled, 0);
