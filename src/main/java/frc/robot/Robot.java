@@ -328,19 +328,41 @@ public class Robot extends TimedRobot implements RobotProperties {
           }
 
           // Shooter Control
+          final boolean engageShooter;
+          final int LOWER_VELOCITY, UPPER_VELOCITY;
+          final double DESIRED_PERCENT_ACCURACY, DESIRED_AT_SPEED_TIME;
+          final double SHOOTER_LOWER_FEED_SPEED, SHOOTER_UPPER_FEED_SPEED;
           boolean extend_Pickup_Arm = false;
-          if (button_Shooter && !shooterButtonEdgeTrigger) {
-            // Sets the shooter speed and the targeting light
+
+          if (button_Shooter) {
+            engageShooter = true;
+            LOWER_VELOCITY = MidShot.LOWER_VELOCITY;
+            UPPER_VELOCITY = MidShot.UPPER_VELOCITY;
+            DESIRED_PERCENT_ACCURACY = MidShot.DESIRED_PERCENT_ACCURACY;
+            DESIRED_AT_SPEED_TIME = MidShot.DESIRED_AT_SPEED_TIME;
+            SHOOTER_LOWER_FEED_SPEED = MidShot.LOWER_FEED_SPEED;
+            SHOOTER_UPPER_FEED_SPEED = MidShot.UPPER_FEED_SPEED;
+          } else {
+            engageShooter = false;
+            LOWER_VELOCITY = 0;
+            UPPER_VELOCITY = 0;
+            DESIRED_PERCENT_ACCURACY = 0;
+            DESIRED_AT_SPEED_TIME = 0;
+            SHOOTER_LOWER_FEED_SPEED = 0;
+            SHOOTER_UPPER_FEED_SPEED = 0;
+          }
+
+          if (engageShooter && !shooterButtonEdgeTrigger) {
+            // Sets the shooter speed
             shooterAtSpeedEdgeTrigger = false;
-            shooterController.setShooterVelocity(MidShot.LOWER_VELOCITY, MidShot.UPPER_VELOCITY);
-          } else if (button_Shooter) {
+            shooterController.setShooterVelocity(LOWER_VELOCITY, UPPER_VELOCITY);
+          } else if (engageShooter) {
             // Check if the shooter is at speed
-            final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(MidShot.DESIRED_PERCENT_ACCURACY);
+            final boolean isAtSpeed = shooterController.isBothShootersAtVelocity(DESIRED_PERCENT_ACCURACY);
             if (isAtSpeed && !shooterAtSpeedEdgeTrigger) {
               // Get time that shooter first designated at speed
               shooterAtSpeedStartTime = Timer.getFPGATimestamp();
-            } else if (isAtSpeed
-                && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + MidShot.DESIRED_AT_SPEED_TIME)) {
+            } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + DESIRED_AT_SPEED_TIME)) {
               // Feed the ball through the shooter
               shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);
               shooterController.setUpperFeederSpeed(SHOOTER_UPPER_FEED_SPEED);
@@ -349,7 +371,7 @@ public class Robot extends TimedRobot implements RobotProperties {
               shooterController.setLowerFeederSpeed(0);
               shooterController.setUpperFeederSpeed(UPPER_FEEDER_BACKFEED_SPEED);
             } else {
-              // Feeder stopped while shooter gets up tp speeed
+              // Feeder stopped while shooter gets up tp speed
               shooterController.setLowerFeederSpeed(0);
               shooterController.setUpperFeederSpeed(0);
             }
@@ -382,7 +404,7 @@ public class Robot extends TimedRobot implements RobotProperties {
               shooterController.setUpperFeederSpeed(0);
             }
           }
-          shooterButtonEdgeTrigger = button_Shooter;
+          shooterButtonEdgeTrigger = engageShooter;
           ballpickupEdgeTrigger = button_Pickup;
 
           // Pickup Arm Control
@@ -504,6 +526,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     final boolean engageShooter;
     final int LOWER_VELOCITY, UPPER_VELOCITY;
     final double DESIRED_PERCENT_ACCURACY, DESIRED_AT_SPEED_TIME;
+    final double SHOOTER_LOWER_FEED_SPEED, SHOOTER_UPPER_FEED_SPEED;
     boolean extend_Pickup_Arm = false;
 
     if (button_Short_Shot) {
@@ -512,30 +535,40 @@ public class Robot extends TimedRobot implements RobotProperties {
       UPPER_VELOCITY = LowShot.UPPER_VELOCITY;
       DESIRED_PERCENT_ACCURACY = LowShot.DESIRED_PERCENT_ACCURACY;
       DESIRED_AT_SPEED_TIME = LowShot.DESIRED_AT_SPEED_TIME;
+      SHOOTER_LOWER_FEED_SPEED = LowShot.LOWER_FEED_SPEED;
+      SHOOTER_UPPER_FEED_SPEED = LowShot.UPPER_FEED_SPEED;
     } else if (button_Shooter) {
       engageShooter = true;
       LOWER_VELOCITY = MidShot.LOWER_VELOCITY;
       UPPER_VELOCITY = MidShot.UPPER_VELOCITY;
       DESIRED_PERCENT_ACCURACY = MidShot.DESIRED_PERCENT_ACCURACY;
       DESIRED_AT_SPEED_TIME = MidShot.DESIRED_AT_SPEED_TIME;
+      SHOOTER_LOWER_FEED_SPEED = MidShot.LOWER_FEED_SPEED;
+      SHOOTER_UPPER_FEED_SPEED = MidShot.UPPER_FEED_SPEED;
     } else if (false) {
       engageShooter = true;
       LOWER_VELOCITY = HighShot.LOWER_VELOCITY;
       UPPER_VELOCITY = HighShot.UPPER_VELOCITY;
       DESIRED_PERCENT_ACCURACY = HighShot.DESIRED_PERCENT_ACCURACY;
       DESIRED_AT_SPEED_TIME = HighShot.DESIRED_AT_SPEED_TIME;
+      SHOOTER_LOWER_FEED_SPEED = HighShot.LOWER_FEED_SPEED;
+      SHOOTER_UPPER_FEED_SPEED = HighShot.UPPER_FEED_SPEED;
     } else if (button_YEET_Shot) {
       engageShooter = true;
       LOWER_VELOCITY = YEETShot.LOWER_VELOCITY;
       UPPER_VELOCITY = YEETShot.UPPER_VELOCITY;
       DESIRED_PERCENT_ACCURACY = YEETShot.DESIRED_PERCENT_ACCURACY;
       DESIRED_AT_SPEED_TIME = YEETShot.DESIRED_AT_SPEED_TIME;
+      SHOOTER_LOWER_FEED_SPEED = YEETShot.LOWER_FEED_SPEED;
+      SHOOTER_UPPER_FEED_SPEED = YEETShot.UPPER_FEED_SPEED;
     } else {
       engageShooter = false;
       LOWER_VELOCITY = 0;
       UPPER_VELOCITY = 0;
       DESIRED_PERCENT_ACCURACY = 0;
       DESIRED_AT_SPEED_TIME = 0;
+      SHOOTER_LOWER_FEED_SPEED = 0;
+      SHOOTER_UPPER_FEED_SPEED = 0;
     }
 
     if (engageShooter && !shooterButtonEdgeTrigger) {
@@ -550,22 +583,14 @@ public class Robot extends TimedRobot implements RobotProperties {
         shooterAtSpeedStartTime = Timer.getFPGATimestamp();
       } else if (isAtSpeed && (Timer.getFPGATimestamp() >= shooterAtSpeedStartTime + DESIRED_AT_SPEED_TIME)) {
         // Feed the ball through the shooter
-        if (button_YEET_Shot) {
-          shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);
-          shooterController.setUpperFeederSpeed(SHOOTER_UPPER_FEED_SPEED);
-        } else if (button_Short_Shot) {
-          shooterController.setLowerFeederSpeed(.15);
-          shooterController.setUpperFeederSpeed(.25);
-        } else {
-          shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);
-          shooterController.setUpperFeederSpeed(SHOOTER_UPPER_FEED_SPEED);
-        }
+        shooterController.setLowerFeederSpeed(SHOOTER_LOWER_FEED_SPEED);
+        shooterController.setUpperFeederSpeed(SHOOTER_UPPER_FEED_SPEED);
       } else if (!feedSensor.get()) {
         // Back off the ball from the feed sensor
         shooterController.setLowerFeederSpeed(0);
         shooterController.setUpperFeederSpeed(UPPER_FEEDER_BACKFEED_SPEED);
       } else {
-        // Feeder stopped while shooter gets up tp speeed
+        // Feeder stopped while shooter gets up tp speed
         shooterController.setLowerFeederSpeed(0);
         shooterController.setUpperFeederSpeed(0);
       }
