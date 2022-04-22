@@ -444,10 +444,10 @@ public class Shooter implements RobotProperties {
     }
 
     public void extendPickupArm() {
-        if (pickupArmPosition > 81) {
+        if (pickupArmPosition > 76) {
             pickupArmMotor.disable();
         }
-        pickupArmPIDController.setReference(81, ControlType.kPosition);
+        pickupArmPIDController.setReference(76, ControlType.kPosition);
     }
 
     public void retractPickupArm() {

@@ -106,4 +106,8 @@ public class Limelight implements DoubleSupplier {
         return limelightNetworkTable.getEntry("getpipe").getNumber(-1).intValue();
     }
 
+    public void setStream(final int stream) {
+        limelightNetworkTable.getEntry("stream").setNumber(stream);
+    }
+
 }

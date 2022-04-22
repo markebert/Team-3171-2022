@@ -85,7 +85,7 @@ public class Robot extends TimedRobot implements RobotProperties {
   // Climber Controller
   private Climber climberController;
 
-  private double debugLastUpdate;
+  private boolean periodicToggle;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -145,6 +145,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     // Limelight init
     limelightShooter = new Limelight("limelight-shooter");
     limelightPickup = new Limelight("limelight-pickup");
+    limelightShooter.setStream(0);
     limelightPickup.turnLightOff();
 
     // Limelight PID Controller init
@@ -169,7 +170,7 @@ public class Robot extends TimedRobot implements RobotProperties {
     // camera1.setResolution(160, 90);
     // camera1.setFPS(20);
 
-    debugLastUpdate = 0;
+    periodicToggle = false;
   }
 
   /**
@@ -182,15 +183,6 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
-    SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
-    if (gyro.isConnected() && !gyro.isCalibrating()) {
-      SmartDashboard.putString("NavX:",
-          String.format("%.2f | %.2f", gyro.getYaw(), gyroPIDController.getSensorLockValue()));
-    } else {
-      SmartDashboard.putString("NavX:", "Disconnected!");
-    }
-
     // Limelight Team Selection
     switch (DriverStation.getAlliance()) {
       case Red:
@@ -203,36 +195,46 @@ public class Robot extends TimedRobot implements RobotProperties {
         break;
     }
 
+    if (periodicToggle) {
+      climberController.periodic();
+    } else {
+      shooterController.periodic();
+    }
+    periodicToggle = !periodicToggle;
+
+    SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
+    SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
+    if (gyro.isConnected() && !gyro.isCalibrating()) {
+      SmartDashboard.putString("NavX:",
+          String.format("%.2f | %.2f", gyro.getYaw(), gyroPIDController.getSensorLockValue()));
+    } else {
+      SmartDashboard.putString("NavX:", "Disconnected!");
+    }
+
     SmartDashboard.putBoolean("Shooter Has Targets:", limelightShooter.hasTarget());
     SmartDashboard.putBoolean("Pickup Has Targets:", limelightPickup.hasTarget());
 
-    final double currentTime = Timer.getFPGATimestamp();
-    if (currentTime > debugLastUpdate + .04) {
-      shooterController.periodic();
-      climberController.periodic();
-      SmartDashboard.putNumber("Lower Velocity:", Math.round(shooterController.getLowerShooterVelocity()));
-      SmartDashboard.putNumber("Upper Velocity:", Math.round(shooterController.getUpperShooterVelocity()));
+    SmartDashboard.putNumber("Lower Velocity:", Math.round(shooterController.getLowerShooterVelocity()));
+    SmartDashboard.putNumber("Upper Velocity:", Math.round(shooterController.getUpperShooterVelocity()));
 
-      if (SHOW_SHOOTER_LOCK_DEBUG) {
-        SmartDashboard.putString("Shooter Lock:",
-            String.format("%.2f", limelightShooter_PIDController.getSensorLockValue()));
-        SmartDashboard.putString("Shooter Current:",
-            String.format("%.2f", limelightShooter_PIDController.getSensorValue()));
-        SmartDashboard.putString("Shooter PID:", String.format("%.2f", limelightShooter_PIDController.getPIDValue()));
-      }
+    if (SHOW_SHOOTER_LOCK_DEBUG) {
+      SmartDashboard.putString("Shooter Lock:",
+          String.format("%.2f", limelightShooter_PIDController.getSensorLockValue()));
+      SmartDashboard.putString("Shooter Current:",
+          String.format("%.2f", limelightShooter_PIDController.getSensorValue()));
+      SmartDashboard.putString("Shooter PID:", String.format("%.2f", limelightShooter_PIDController.getPIDValue()));
+    }
 
-      if (SHOW_WINCH_TICKS) {
-        SmartDashboard.putNumber("Primary Winch Position:", climberController.getPrimaryClimberPosition());
-        SmartDashboard.putNumber("Secodary Winch One Position:", climberController.getSecondryClimberOnePosition());
-        SmartDashboard.putNumber("Secondary Winch Two Position:", climberController.getSecondryClimberTwoPosition());
-      }
+    if (SHOW_WINCH_TICKS) {
+      SmartDashboard.putNumber("Primary Winch Position:", climberController.getPrimaryClimberPosition());
+      SmartDashboard.putNumber("Secodary Winch One Position:", climberController.getSecondryClimberOnePosition());
+      SmartDashboard.putNumber("Secondary Winch Two Position:", climberController.getSecondryClimberTwoPosition());
+    }
 
-      // Limelight data
-      if (SHOW_LIMELIGHT_DEBUG) {
-        SmartDashboard.putNumber("Shooter Target Offset:", limelightShooter.getTargetHorizontalOffset());
-        SmartDashboard.putNumber("Pickup Target Offset:", limelightPickup.getTargetHorizontalOffset());
-      }
-      debugLastUpdate = currentTime;
+    // Limelight data
+    if (SHOW_LIMELIGHT_DEBUG) {
+      SmartDashboard.putNumber("Shooter Target Offset:", limelightShooter.getTargetHorizontalOffset());
+      SmartDashboard.putNumber("Pickup Target Offset:", limelightPickup.getTargetHorizontalOffset());
     }
   }
 
