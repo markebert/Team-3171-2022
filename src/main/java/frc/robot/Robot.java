@@ -182,9 +182,6 @@ public class Robot extends TimedRobot implements RobotProperties {
    */
   @Override
   public void robotPeriodic() {
-    shooterController.periodic();
-    climberController.periodic();
-
     SmartDashboard.putBoolean("Feed Sensor:", feedSensor.get());
     SmartDashboard.putBoolean("NavX Present:", gyro.isConnected());
     if (gyro.isConnected() && !gyro.isCalibrating()) {
@@ -209,8 +206,10 @@ public class Robot extends TimedRobot implements RobotProperties {
     SmartDashboard.putBoolean("Shooter Has Targets:", limelightShooter.hasTarget());
     SmartDashboard.putBoolean("Pickup Has Targets:", limelightPickup.hasTarget());
 
-    double currentTime = Timer.getFPGATimestamp();
-    if (currentTime > debugLastUpdate + .1) {
+    final double currentTime = Timer.getFPGATimestamp();
+    if (currentTime > debugLastUpdate + .04) {
+      shooterController.periodic();
+      climberController.periodic();
       SmartDashboard.putNumber("Lower Velocity:", Math.round(shooterController.getLowerShooterVelocity()));
       SmartDashboard.putNumber("Upper Velocity:", Math.round(shooterController.getUpperShooterVelocity()));
 
